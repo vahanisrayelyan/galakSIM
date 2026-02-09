@@ -1,8 +1,6 @@
 module ca.qc.bdeb.sim.galak_sim {
     requires javafx.controls;
-    requires javafx.fxml;
+    requires javafx.graphics;
 
-
-    opens ca.qc.bdeb.sim.galak_sim to javafx.fxml;
     exports ca.qc.bdeb.sim.galak_sim;
 }
