@@ -15,7 +15,6 @@ public class Simulation {
 
     public void ajouterNouvellePlanete() {
         planetes.add(new Planete(0, 0, 20, 20));
-        System.out.println("Planete ajoutée");
     }
 
     public void update(double deltaTemps) {
