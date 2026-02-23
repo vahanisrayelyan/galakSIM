@@ -71,7 +71,7 @@ public class MainJavaFX extends Application {
         starField.start();
 
         StackPane centre = new StackPane(starLayer, canvas);
-        racine.getChildren().addAll(canvas, centre, menuLateral, btnAfficher, btnMasquer);
+        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
 
         javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
         StackPane.setMargin(btnAfficher, marges);
@@ -80,7 +80,7 @@ public class MainJavaFX extends Application {
         Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
 
         InterfaceGraphique gui = new InterfaceGraphique();
-        simulation = new Simulation(gui,LARGEUR,HAUTEUR);
+        simulation = new Simulation();
 
         AnimationTimer timer = new AnimationTimer() {
             private long dernierTemps = System.nanoTime();
@@ -90,7 +90,7 @@ public class MainJavaFX extends Application {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
 
                 simulation.update(deltaTemps);
-                simulation.draw(contexte, canvas.getWidth(), canvas.getHeight());
+                simulation.draw(contexte);
 
                 dernierTemps = temps;
             }
