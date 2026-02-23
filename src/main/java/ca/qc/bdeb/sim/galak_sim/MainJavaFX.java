@@ -40,7 +40,7 @@ public class MainJavaFX extends Application {
         };
         timer.start();
 
-        stage.getIcons().add(new Image("logo.png"));
+        stage.getIcons().add(new Image("logo.jpg"));
         stage.setTitle("GalakSIM");
         stage.setScene(scene);
         stage.show();
