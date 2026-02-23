@@ -61,7 +61,6 @@ public class MainJavaFX extends Application {
 
         StackPane racine = new StackPane();
         racine.setStyle("-fx-background-color: black;");
-        racine.getChildren().addAll(canvas, menuLateral, btnAfficher, btnMasquer);
 
         StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
@@ -72,8 +71,7 @@ public class MainJavaFX extends Application {
         starField.start();
 
         StackPane centre = new StackPane(starLayer, canvas);
-        racine.getChildren().add(centre);
-
+        racine.getChildren().addAll(canvas, centre, menuLateral, btnAfficher, btnMasquer);
 
         javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
         StackPane.setMargin(btnAfficher, marges);
