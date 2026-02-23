@@ -11,7 +11,11 @@ public class Simulation {
 
     public Simulation(InterfaceGraphique gui) {
         this.gui = gui;
+    }
+
+    public void ajouterNouvellePlanete() {
         planetes.add(new Planete(0, 0, 20, 20));
+        System.out.println("Planete ajoutée");
     }
 
     public void update(double deltaTemps) {
