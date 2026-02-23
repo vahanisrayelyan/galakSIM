@@ -9,7 +9,7 @@ public class Simulation {
     private final InterfaceGraphique gui;
     private ArrayList<Planete> planetes = new ArrayList<>();
 
-    public Simulation(InterfaceGraphique gui) {
+    public Simulation(InterfaceGraphique gui,double w,double h) {
         this.gui = gui;
     }
 
@@ -19,10 +19,10 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
-
+gui.update(deltaTemps);
     }
     
-    public void draw(GraphicsContext contexte) {
-        gui.draw(contexte);
+    public void draw(GraphicsContext contexte, double width, double height) {
+        gui.draw(contexte, width, height);
     }
 }

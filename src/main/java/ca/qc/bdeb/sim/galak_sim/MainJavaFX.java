@@ -2,6 +2,7 @@ package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.graphics.InterfaceGraphique;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
+import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -12,6 +13,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
@@ -22,6 +25,7 @@ public class MainJavaFX extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         var contexte = canvas.getGraphicsContext2D();
 
@@ -63,6 +67,14 @@ public class MainJavaFX extends Application {
         StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
 
+        Pane starLayer = new Pane();
+        StarField starField = new StarField(starLayer, 2500.0);
+        starField.start();
+
+        StackPane centre = new StackPane(starLayer, canvas);
+        racine.getChildren().add(centre);
+
+
         javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
         StackPane.setMargin(btnAfficher, marges);
         StackPane.setMargin(btnMasquer, marges);
@@ -70,7 +82,7 @@ public class MainJavaFX extends Application {
         Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
 
         InterfaceGraphique gui = new InterfaceGraphique();
-        simulation = new Simulation(gui);
+        simulation = new Simulation(gui,LARGEUR,HAUTEUR);
 
         AnimationTimer timer = new AnimationTimer() {
             private long dernierTemps = System.nanoTime();
@@ -80,7 +92,7 @@ public class MainJavaFX extends Application {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
 
                 simulation.update(deltaTemps);
-                simulation.draw(contexte);
+                simulation.draw(contexte, canvas.getWidth(), canvas.getHeight());
 
                 dernierTemps = temps;
             }
