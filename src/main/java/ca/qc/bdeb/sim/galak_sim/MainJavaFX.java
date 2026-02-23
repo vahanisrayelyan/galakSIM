@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim;
 
+import ca.qc.bdeb.sim.galak_sim.graphics.InterfaceGraphique;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -18,14 +19,20 @@ public class MainJavaFX extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        simulation = new Simulation();
-        var canvas = new Canvas(LARGEUR, HAUTEUR);
+
+        Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         var contexte = canvas.getGraphicsContext2D();
 
         BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: black;");
+        borderPane.setCenter(canvas);
+
         Scene scene = new Scene(borderPane, LARGEUR, HAUTEUR);
 
-        var timer = new AnimationTimer() {
+        InterfaceGraphique gui = new InterfaceGraphique();
+        simulation = new Simulation(gui);
+
+        AnimationTimer timer = new AnimationTimer() {
             private long dernierTemps = System.nanoTime();
 
             @Override
