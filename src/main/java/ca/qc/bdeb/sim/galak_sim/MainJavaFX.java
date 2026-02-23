@@ -29,6 +29,34 @@ public class MainJavaFX extends Application {
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         var contexte = canvas.getGraphicsContext2D();
 
+        StackPane racine = configurerInterface(canvas);
+        Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
+
+        InterfaceGraphique gui = new InterfaceGraphique();
+        simulation = new Simulation();
+
+        AnimationTimer timer = new AnimationTimer() {
+            private long dernierTemps = System.nanoTime();
+
+            @Override
+            public void handle(long temps) {
+                double deltaTemps = (temps - dernierTemps) * 1e-9;
+
+                simulation.update(deltaTemps);
+                simulation.draw(contexte);
+
+                dernierTemps = temps;
+            }
+        };
+        timer.start();
+
+        stage.getIcons().add(new Image("logo.jpg"));
+        stage.setTitle("GalakSIM");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private StackPane configurerInterface(Canvas canvas) {
         VBox menuLateral = new VBox(15);
         menuLateral.setPadding(new javafx.geometry.Insets(60, 15, 15, 15));
         menuLateral.setMaxWidth(250);
@@ -59,47 +87,24 @@ public class MainJavaFX extends Application {
             btnAfficher.setVisible(false);
         });
 
+        Pane starLayer = new Pane();
+        StarField starField = new StarField(starLayer, 2500.0);
+        starField.start();
+
         StackPane racine = new StackPane();
         racine.setStyle("-fx-background-color: black;");
+
+        StackPane centre = new StackPane(starLayer, canvas);
+        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
 
         StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
 
-        Pane starLayer = new Pane();
-        StarField starField = new StarField(starLayer, 2500.0);
-        starField.start();
-
-        StackPane centre = new StackPane(starLayer, canvas);
-        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
-
         javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
         StackPane.setMargin(btnAfficher, marges);
         StackPane.setMargin(btnMasquer, marges);
 
-        Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
-
-        InterfaceGraphique gui = new InterfaceGraphique();
-        simulation = new Simulation();
-
-        AnimationTimer timer = new AnimationTimer() {
-            private long dernierTemps = System.nanoTime();
-
-            @Override
-            public void handle(long temps) {
-                double deltaTemps = (temps - dernierTemps) * 1e-9;
-
-                simulation.update(deltaTemps);
-                simulation.draw(contexte);
-
-                dernierTemps = temps;
-            }
-        };
-        timer.start();
-
-        stage.getIcons().add(new Image("logo.jpg"));
-        stage.setTitle("GalakSIM");
-        stage.setScene(scene);
-        stage.show();
+        return racine;
     }
 }
