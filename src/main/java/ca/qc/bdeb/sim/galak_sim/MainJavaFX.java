@@ -1,6 +1,5 @@
 package ca.qc.bdeb.sim.galak_sim;
 
-import ca.qc.bdeb.sim.galak_sim.graphics.InterfaceGraphique;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
@@ -14,7 +13,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
@@ -30,9 +28,12 @@ public class MainJavaFX extends Application {
         var contexte = canvas.getGraphicsContext2D();
 
         StackPane racine = configurerInterface(canvas);
+
+        canvas.widthProperty().bind(racine.widthProperty());
+        canvas.heightProperty().bind(racine.heightProperty());
+
         Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
 
-        InterfaceGraphique gui = new InterfaceGraphique();
         simulation = new Simulation();
 
         AnimationTimer timer = new AnimationTimer() {
@@ -42,6 +43,8 @@ public class MainJavaFX extends Application {
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
 
+                contexte.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+
                 simulation.update(deltaTemps);
                 simulation.draw(contexte);
 
@@ -50,7 +53,7 @@ public class MainJavaFX extends Application {
         };
         timer.start();
 
-        stage.getIcons().add(new Image("logo.jpg"));
+        stage.getIcons().add(new Image("logoSansFond.png"));
         stage.setTitle("GalakSIM");
         stage.setScene(scene);
         stage.show();
@@ -88,7 +91,9 @@ public class MainJavaFX extends Application {
         });
 
         Pane starLayer = new Pane();
-        StarField starField = new StarField(starLayer, 2500.0);
+        starLayer.prefWidthProperty().bind(canvas.widthProperty());
+        starLayer.prefHeightProperty().bind(canvas.heightProperty());
+        StarField starField = new StarField(starLayer, 1000);
         starField.start();
 
         StackPane racine = new StackPane();

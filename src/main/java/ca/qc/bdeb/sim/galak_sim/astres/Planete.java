@@ -1,11 +1,15 @@
 package ca.qc.bdeb.sim.galak_sim.astres;
 
+import ca.qc.bdeb.sim.galak_sim.MainJavaFX;
+import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Planete extends Astre{
     private Color color;
+    private double rayon = taille.getX()/2;
+
     public Planete() {
         super(50,50,50,50);
         this.color = couleurAleatoire();
@@ -14,7 +18,6 @@ public class Planete extends Astre{
 
     public void update(double deltaTemps) {
         super.update(deltaTemps);
-
     }
 
     public void draw(GraphicsContext contexte) {

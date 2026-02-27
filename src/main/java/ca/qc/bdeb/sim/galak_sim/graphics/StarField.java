@@ -8,6 +8,9 @@ import javafx.scene.shape.Circle;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+Classe entièrement faite par l'intelligence artificielle pour ajouter du style au simulateur
+ */
 
 public class StarField {
 
@@ -36,7 +39,6 @@ public class StarField {
         this.layer = layer;
         this.pixelsParEtoile = Math.max(200.0, pixelsParEtoile);
 
-
         this.layer.setStyle("-fx-background-color: black;");
 
         this.layer.widthProperty().addListener((obs, o, n) -> adjustToSize());
@@ -64,7 +66,6 @@ public class StarField {
         };
         twinkleTimer.start();
 
-
         adjustToSize();
     }
 
@@ -85,13 +86,11 @@ public class StarField {
 
         int target = (int) ((w * h) / pixelsParEtoile);
 
-
         while (stars.size() < target) {
             Star s = createRandomStar(w, h);
             stars.add(s);
             layer.getChildren().add(s.node);
         }
-
 
         if (removeWhenShrinking) {
             while (stars.size() > target && !stars.isEmpty()) {
@@ -110,12 +109,10 @@ public class StarField {
         c.setCenterX(Math.random() * w);
         c.setCenterY(Math.random() * h);
 
-
         c.setFill(Color.WHITE);
         c.setOpacity(0.8);
 
         s.node = c;
-
 
         s.phase = Math.random() * Math.PI * 2.0;
         s.speed = 1.5 + Math.random() * 2.5;      // vitesse du sinus
@@ -124,7 +121,6 @@ public class StarField {
         return s;
     }
 
-
     private void updateTwinkle(double dt) {
 
         adjustToSize();
@@ -132,9 +128,7 @@ public class StarField {
         for (Star s : stars) {
             s.phase += dt * s.speed;
 
-
             double t = 0.5 + 0.5 * Math.sin(s.phase);
-
 
             double opacity = clamp(s.baseOpacity + t * 0.6, 0.05, 1.0);
             s.node.setOpacity(opacity);
