@@ -13,6 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -21,25 +23,22 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
-import java.io.IOException;
-
 public class MainJavaFX extends Application {
     private static Simulation simulation;
     public final static double LARGEUR = 1200;
     public final static double HAUTEUR = 700;
 
     @Override
-    public void start(Stage stage) throws IOException {
-
+    public void start(Stage stage) {
+        var panneau = new StackPane();
+        Scene scene = new Scene(panneau, LARGEUR, HAUTEUR);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
+        creerInterface(panneau, canvas);
+
         var contexte = canvas.getGraphicsContext2D();
 
-        StackPane racine = configurerInterface(canvas);
-
-        canvas.widthProperty().bind(racine.widthProperty());
-        canvas.heightProperty().bind(racine.heightProperty());
-
-        Scene scene = new Scene(racine, LARGEUR, HAUTEUR);
+        canvas.widthProperty().bind(panneau.widthProperty());
+        canvas.heightProperty().bind(panneau.heightProperty());
 
         simulation = new Simulation();
 
@@ -50,7 +49,7 @@ public class MainJavaFX extends Application {
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
 
-                contexte.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+                contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 simulation.update(deltaTemps);
                 simulation.draw(contexte);
@@ -68,7 +67,8 @@ public class MainJavaFX extends Application {
         stage.show();
     }
 
-    private StackPane configurerInterface(Canvas canvas) {
+    private void creerInterface(StackPane panneau, Canvas canvas) {
+        // Menu
         VBox menuLateral = new VBox(15);
         menuLateral.setPadding(new Insets(60, 15, 15, 15));
         menuLateral.setMaxWidth(250);
@@ -76,7 +76,6 @@ public class MainJavaFX extends Application {
         menuLateral.setVisible(true);
         VBox listePlanete = new VBox(5);
 
-        // Option de personnalisation de la planète
         // Vitesse
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
@@ -96,16 +95,88 @@ public class MainJavaFX extends Application {
         sliderTaille.setShowTickMarks(true);
         sliderTaille.setShowTickLabels(true);
 
-        // Position
+        // Position et ajout de la planète
         canvas.setOnMouseClicked(e -> {
-            double x = e.getX();
-            double y = e.getY();
+            ajouterPlanete(e, sliderVitesseX, sliderVitesseY, sliderTaille, listePlanete);
+        });
+        var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
+        texteAjoutPlanete.setFill(Color.WHITE);
 
-            var vX = sliderVitesseX.getValue();
-            var vY = sliderVitesseY.getValue();
-            var taille = sliderTaille.getValue();
+        // Liste des planètes
+        var defileurPlanetes = new ScrollPane(listePlanete);
+        defileurPlanetes.setFitToWidth(true);
+        defileurPlanetes.setPrefHeight(200);
+        defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-            // Ajout de la planète
+        menuLateral.getChildren().addAll(
+                texteVitesseX,
+                sliderVitesseX,
+                texteVitesseY,
+                sliderVitesseY,
+                texteTaille,
+                sliderTaille,
+                texteAjoutPlanete,
+                defileurPlanetes
+        );
+
+        // Affichage du menu
+        Button btnAfficher = new Button("☰");
+        btnAfficher.setVisible(false);
+        Button btnMasquer = new Button("☰");
+        btnMasquer.setOnAction(e -> {
+            menuLateral.setVisible(false);
+            btnMasquer.setVisible(false);
+            btnAfficher.setVisible(true);
+        });
+        btnAfficher.setOnAction(e -> {
+            menuLateral.setVisible(true);
+            btnMasquer.setVisible(true);
+            btnAfficher.setVisible(false);
+        });
+
+        // Étoiles
+        Pane starLayer = new Pane();
+        starLayer.prefWidthProperty().bind(canvas.widthProperty());
+        starLayer.prefHeightProperty().bind(canvas.heightProperty());
+        StarField starField = new StarField(starLayer, 1500);
+        starField.start();
+        StackPane centre = new StackPane(starLayer, canvas);
+
+        StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
+        StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
+        StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
+
+        Insets marges = new Insets(10);
+        StackPane.setMargin(btnAfficher, marges);
+        StackPane.setMargin(btnMasquer, marges);
+
+        panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
+    }
+
+    private static void ajouterPlanete(MouseEvent e, Slider sliderVitesseX, Slider sliderVitesseY, Slider sliderTaille, VBox listePlanete) {
+        if (e.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
+
+        // Paramètres récupérés
+        double x = e.getX();
+        double y = e.getY();
+        var vX = sliderVitesseX.getValue();
+        var vY = sliderVitesseY.getValue();
+        var taille = sliderTaille.getValue();
+
+        // Vérification pour éviter de mettre une planète sur une autre
+        var positionLibre = true;
+        for (Planete p : simulation.getPlanetes()) {
+            double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
+            if (distance < (p.getTaille().getX() / 2) + taille / 2) {
+                positionLibre = false;
+                break;
+            }
+        }
+
+        // Gestion des planètes
+        if (positionLibre) {
             Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille);
 
             HBox lignePlanete = new HBox(10);
@@ -125,62 +196,6 @@ public class MainJavaFX extends Application {
 
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
-        });
-        var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
-        texteAjoutPlanete.setFill(Color.WHITE);
-
-        var defileurPlanetes = new ScrollPane(listePlanete);
-        defileurPlanetes.setFitToWidth(true);
-        defileurPlanetes.setPrefHeight(200);
-        defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
-
-        menuLateral.getChildren().addAll(
-                texteVitesseX,
-                sliderVitesseX,
-                texteVitesseY,
-                sliderVitesseY,
-                texteTaille,
-                sliderTaille,
-                texteAjoutPlanete,
-                defileurPlanetes
-        );
-
-        //Affichage du menu
-        Button btnAfficher = new Button("☰");
-        btnAfficher.setVisible(false);
-        Button btnMasquer = new Button("☰");
-        btnMasquer.setOnAction(e -> {
-            menuLateral.setVisible(false);
-            btnMasquer.setVisible(false);
-            btnAfficher.setVisible(true);
-        });
-        btnAfficher.setOnAction(e -> {
-            menuLateral.setVisible(true);
-            btnMasquer.setVisible(true);
-            btnAfficher.setVisible(false);
-        });
-
-        //Étoiles
-        Pane starLayer = new Pane();
-        starLayer.prefWidthProperty().bind(canvas.widthProperty());
-        starLayer.prefHeightProperty().bind(canvas.heightProperty());
-        StarField starField = new StarField(starLayer, 1500);
-        starField.start();
-        StackPane centre = new StackPane(starLayer, canvas);
-
-        StackPane racine = new StackPane();
-        racine.setStyle("-fx-background-color: black;");
-
-        StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
-        StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
-        StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
-
-        Insets marges = new Insets(10);
-        StackPane.setMargin(btnAfficher, marges);
-        StackPane.setMargin(btnMasquer, marges);
-
-        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
-
-        return racine;
+        }
     }
 }

@@ -33,6 +33,9 @@ public class Simulation {
         for (Planete p:planetes){
             p.draw(contexte);
         }
+    }
 
+    public ArrayList<Planete> getPlanetes() {
+        return planetes;
     }
 }
