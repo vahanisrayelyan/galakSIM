@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim;
 
+import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
@@ -9,8 +10,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -71,7 +74,7 @@ public class MainJavaFX extends Application {
         menuLateral.setMaxWidth(250);
         menuLateral.setStyle("-fx-background-color: rgba(60, 60, 60, 0.85); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
         menuLateral.setVisible(true);
-
+        VBox listePlanete = new VBox(5);
 
         // Option de personnalisation de la planète
         // Vitesse
@@ -94,7 +97,6 @@ public class MainJavaFX extends Application {
         sliderTaille.setShowTickLabels(true);
 
         // Position
-        // Ajout de la planète
         canvas.setOnMouseClicked(e -> {
             double x = e.getX();
             double y = e.getY();
@@ -103,10 +105,34 @@ public class MainJavaFX extends Application {
             var vY = sliderVitesseY.getValue();
             var taille = sliderTaille.getValue();
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille);
+            // Ajout de la planète
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille);
+
+            HBox lignePlanete = new HBox(10);
+            lignePlanete.setAlignment(Pos.CENTER_LEFT);
+
+            Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
+            info.setFill(Color.LIGHTGRAY);
+
+            // Suppression de la planète
+            Button btnSupprimer = new Button("X");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
+
+            btnSupprimer.setOnAction(ev -> {
+                simulation.supprimerPlanete(nouvelle);
+                listePlanete.getChildren().remove(lignePlanete);
+            });
+
+            lignePlanete.getChildren().addAll(btnSupprimer, info);
+            listePlanete.getChildren().add(lignePlanete);
         });
         var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
         texteAjoutPlanete.setFill(Color.WHITE);
+
+        var defileurPlanetes = new ScrollPane(listePlanete);
+        defileurPlanetes.setFitToWidth(true);
+        defileurPlanetes.setPrefHeight(200);
+        defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         menuLateral.getChildren().addAll(
                 texteVitesseX,
@@ -115,7 +141,8 @@ public class MainJavaFX extends Application {
                 sliderVitesseY,
                 texteTaille,
                 sliderTaille,
-                texteAjoutPlanete
+                texteAjoutPlanete,
+                defileurPlanetes
         );
 
         //Affichage du menu

@@ -13,8 +13,13 @@ public class Simulation {
 
     }
 
-    public void ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille) {
+    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille) {
         planetes.add(new Planete(x, y, vX, vY, taille));
+        return planetes.getLast();
+    }
+
+    public void supprimerPlanete(Planete planete) {
+        planetes.remove(planete);
     }
 
     public void update(double deltaTemps) {
