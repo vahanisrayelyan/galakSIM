@@ -8,12 +8,10 @@ import javafx.scene.paint.Color;
 
 public class Planete extends Astre{
     private Color color;
-    private double rayon = taille.getX()/2;
 
-    public Planete() {
-        super(50,50,50,50);
+    public Planete(double x, double y, double vX, double vY, double taille) {
+        super(x,y,vX, vY, taille);
         this.color = couleurAleatoire();
-        this.velocite = new Point2D(50,50);
     }
 
     public void update(double deltaTemps) {
@@ -21,18 +19,12 @@ public class Planete extends Astre{
     }
 
     public void draw(GraphicsContext contexte) {
-
         contexte.setFill(color);
 
         double w = taille.getX();
         double h = taille.getY();
 
-        contexte.fillOval(
-                position.getX() - w/2,
-                position.getY() - h/2,
-                w,
-                h
-        );
+        contexte.fillOval(position.getX() - w/2, position.getY() - h/2, w, h);
     }
     public static Color couleurAleatoire() {
         return Color.color(Math.random(), Math.random(), Math.random());

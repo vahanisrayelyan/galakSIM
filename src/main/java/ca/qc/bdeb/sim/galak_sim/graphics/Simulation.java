@@ -13,9 +13,8 @@ public class Simulation {
 
     }
 
-    public void ajouterNouvellePlanete() {
-        planetes.add(new Planete());
-        System.out.println("Planete ajoutée");
+    public void ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille) {
+        planetes.add(new Planete(x, y, vX, vY, taille));
     }
 
     public void update(double deltaTemps) {

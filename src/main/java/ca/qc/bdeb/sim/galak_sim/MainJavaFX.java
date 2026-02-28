@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -66,41 +67,59 @@ public class MainJavaFX extends Application {
         menuLateral.setStyle("-fx-background-color: rgba(60, 60, 60, 0.85); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
         menuLateral.setVisible(true);
 
+
+        // Option de personnalisation de la planète
+
+        // Position
+
+        // Vitesse
+        var sliderVitesseX = new Slider(-100, 100, 0);
+        sliderVitesseX.setShowTickMarks(true);
+        sliderVitesseX.setShowTickLabels(true);
+        var sliderVitesseY = new Slider(-100, 100, 0);
+        sliderVitesseY.setShowTickMarks(true);
+        sliderVitesseY.setShowTickLabels(true);
+
+        // Taille
+
+        // Ajout
         var btnPlanete = new Button("Ajoutez une planète");
         btnPlanete.setMaxWidth(Double.MAX_VALUE);
-        menuLateral.getChildren().add(btnPlanete);
-
         btnPlanete.setOnAction(e -> {
-            simulation.ajouterNouvellePlanete();
+            var vX = sliderVitesseX.getValue();
+            var vY = sliderVitesseY.getValue();
+
+            System.out.println(vX + " " + vY);
+            simulation.ajouterNouvellePlanete(50, 50, vX, vY, 50);
         });
 
+        menuLateral.getChildren().addAll(sliderVitesseX, sliderVitesseY, btnPlanete);
+
+        //Affichage du menu
         Button btnAfficher = new Button("☰");
         btnAfficher.setVisible(false);
         Button btnMasquer = new Button("☰");
-
         btnMasquer.setOnAction(e -> {
             menuLateral.setVisible(false);
             btnMasquer.setVisible(false);
             btnAfficher.setVisible(true);
         });
-
         btnAfficher.setOnAction(e -> {
             menuLateral.setVisible(true);
             btnMasquer.setVisible(true);
             btnAfficher.setVisible(false);
         });
 
+        //Étoiles
         Pane starLayer = new Pane();
         starLayer.prefWidthProperty().bind(canvas.widthProperty());
         starLayer.prefHeightProperty().bind(canvas.heightProperty());
-        StarField starField = new StarField(starLayer, 1000);
+        StarField starField = new StarField(starLayer, 1500);
         starField.start();
+        StackPane centre = new StackPane(starLayer, canvas);
 
         StackPane racine = new StackPane();
         racine.setStyle("-fx-background-color: black;");
-
-        StackPane centre = new StackPane(starLayer, canvas);
-        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
 
         StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
@@ -109,6 +128,8 @@ public class MainJavaFX extends Application {
         javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
         StackPane.setMargin(btnAfficher, marges);
         StackPane.setMargin(btnMasquer, marges);
+
+        racine.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
 
         return racine;
     }
