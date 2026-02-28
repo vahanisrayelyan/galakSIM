@@ -4,6 +4,7 @@ import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -12,6 +13,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
@@ -54,6 +57,8 @@ public class MainJavaFX extends Application {
         };
         timer.start();
 
+        stage.setMinWidth(1200);
+        stage.setMinHeight(700);
         stage.getIcons().add(new Image("logoSansFond.png"));
         stage.setTitle("GalakSIM");
         stage.setScene(scene);
@@ -62,38 +67,56 @@ public class MainJavaFX extends Application {
 
     private StackPane configurerInterface(Canvas canvas) {
         VBox menuLateral = new VBox(15);
-        menuLateral.setPadding(new javafx.geometry.Insets(60, 15, 15, 15));
+        menuLateral.setPadding(new Insets(60, 15, 15, 15));
         menuLateral.setMaxWidth(250);
         menuLateral.setStyle("-fx-background-color: rgba(60, 60, 60, 0.85); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
         menuLateral.setVisible(true);
 
 
         // Option de personnalisation de la planète
-
-        // Position
-
         // Vitesse
+        var texteVitesseX = new Text("Vitesse en x");
+        texteVitesseX.setFill(Color.WHITE);
         var sliderVitesseX = new Slider(-100, 100, 0);
         sliderVitesseX.setShowTickMarks(true);
         sliderVitesseX.setShowTickLabels(true);
+        var texteVitesseY = new Text("Vitesse en y");
+        texteVitesseY.setFill(Color.WHITE);
         var sliderVitesseY = new Slider(-100, 100, 0);
         sliderVitesseY.setShowTickMarks(true);
         sliderVitesseY.setShowTickLabels(true);
 
         // Taille
+        var texteTaille = new Text("Taille");
+        texteTaille.setFill(Color.WHITE);
+        var sliderTaille = new Slider(10, 100, 50);
+        sliderTaille.setShowTickMarks(true);
+        sliderTaille.setShowTickLabels(true);
 
-        // Ajout
-        var btnPlanete = new Button("Ajoutez une planète");
-        btnPlanete.setMaxWidth(Double.MAX_VALUE);
-        btnPlanete.setOnAction(e -> {
+        // Position
+        // Ajout de la planète
+        canvas.setOnMouseClicked(e -> {
+            double x = e.getX();
+            double y = e.getY();
+
             var vX = sliderVitesseX.getValue();
             var vY = sliderVitesseY.getValue();
+            var taille = sliderTaille.getValue();
 
-            System.out.println(vX + " " + vY);
-            simulation.ajouterNouvellePlanete(50, 50, vX, vY, 50);
+            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille);
         });
+        var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
+        texteAjoutPlanete.setFill(Color.WHITE);
 
-        menuLateral.getChildren().addAll(sliderVitesseX, sliderVitesseY, btnPlanete);
+        menuLateral.getChildren().addAll(
+                texteVitesseX,
+                sliderVitesseX,
+                texteVitesseY,
+                sliderVitesseY,
+                texteTaille,
+                sliderTaille,
+                texteAjoutPlanete
+        );
 
         //Affichage du menu
         Button btnAfficher = new Button("☰");
@@ -125,7 +148,7 @@ public class MainJavaFX extends Application {
         StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
 
-        javafx.geometry.Insets marges = new javafx.geometry.Insets(10);
+        Insets marges = new Insets(10);
         StackPane.setMargin(btnAfficher, marges);
         StackPane.setMargin(btnMasquer, marges);
 
