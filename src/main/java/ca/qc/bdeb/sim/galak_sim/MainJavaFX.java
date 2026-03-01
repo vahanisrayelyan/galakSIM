@@ -95,9 +95,16 @@ public class MainJavaFX extends Application {
         sliderTaille.setShowTickMarks(true);
         sliderTaille.setShowTickLabels(true);
 
+        // Masse
+        var texteMasse = new Text("Masse");
+        texteMasse.setFill(Color.WHITE);
+        var sliderMasse = new Slider(10, 100, 50);
+        sliderMasse.setShowTickMarks(true);
+        sliderMasse.setShowTickLabels(true);
+
         // Position et ajout de la planète
         canvas.setOnMouseClicked(e -> {
-            ajouterPlanete(e, sliderVitesseX, sliderVitesseY, sliderTaille, listePlanete);
+            ajouterPlanete(e, sliderVitesseX, sliderVitesseY, sliderTaille, sliderMasse, listePlanete);
         });
         var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
         texteAjoutPlanete.setFill(Color.WHITE);
@@ -115,6 +122,8 @@ public class MainJavaFX extends Application {
                 sliderVitesseY,
                 texteTaille,
                 sliderTaille,
+                texteMasse,
+                sliderMasse,
                 texteAjoutPlanete,
                 defileurPlanetes
         );
@@ -153,7 +162,7 @@ public class MainJavaFX extends Application {
         panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
     }
 
-    private static void ajouterPlanete(MouseEvent e, Slider sliderVitesseX, Slider sliderVitesseY, Slider sliderTaille, VBox listePlanete) {
+    private static void ajouterPlanete(MouseEvent e, Slider sliderVitesseX, Slider sliderVitesseY, Slider sliderTaille, Slider sliderMasse, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -164,6 +173,7 @@ public class MainJavaFX extends Application {
         var vX = sliderVitesseX.getValue();
         var vY = sliderVitesseY.getValue();
         var taille = sliderTaille.getValue();
+        var masse = sliderMasse.getValue();
 
         // Vérification pour éviter de mettre une planète sur une autre
         var positionLibre = true;
@@ -177,7 +187,7 @@ public class MainJavaFX extends Application {
 
         // Gestion des planètes
         if (positionLibre) {
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille);
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse);
 
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);

@@ -22,6 +22,10 @@ public abstract class Astre {
      */
     protected Point2D taille;
     /**
+     * Masse de l'objet
+     */
+    protected double masse;
+    /**
      * Image utilisée pour l'affichage.
      */
     protected Image image;
@@ -30,10 +34,11 @@ public abstract class Astre {
      * Constructeur d'un objet du jeu.
      */
 
-    public Astre(double x, double y, double vX, double vY, double taille) {
+    public Astre(double x, double y, double vX, double vY, double taille, double masse) {
         this.position = new Point2D(x, y);
         this.velocite = new Point2D(vX, vY);
         this.taille = new Point2D(taille, taille);
+        this.masse = masse;
         this.acceleration = Point2D.ZERO;
     }
 
