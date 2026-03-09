@@ -6,7 +6,7 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 
 public class Physique {
-        private final double G = 6.67430e-11;
+        private final double G = 4 * Math.pow(Math.PI,2);
 
         public void effetForceGravitationelle(double dt,ArrayList<Planete> listePlanetes) {
             for (Planete planeteChoisie : listePlanetes) {
@@ -24,12 +24,6 @@ public class Physique {
                         double y1 =  planeteChoisie.getPosition().getY();
                         double y2 =  autrePlanete.getPosition().getY();
 
-                        double ax1 = planeteChoisie.getAcceleration().getX();
-                        double ax2 = autrePlanete.getAcceleration().getX();
-
-                        double ay1 = planeteChoisie.getAcceleration().getY();
-                        double ay2 = autrePlanete.getAcceleration().getY();
-
                         ///////////////////////////////////////////////////////////
                         double dx = x2 - x1;
                         double dy = y2 - y1;
@@ -44,11 +38,13 @@ public class Physique {
                         double Fgx = Fg * ux;
                         double Fgy = Fg * uy;
 
-                        ax1 = Fgx / m1;
-                        ay1 = Fgy / m1;
+                        double ax1 = Fgx / m1;
+                        double ay1 = Fgy / m1;
                         // Fab = -Fba
-                        ax2 = - Fgx / m2;
-                        ay2 = - Fgx / m2;
+                        double ax2 = - Fgx / m2;
+                        double ay2 = - Fgx / m2;
+
+                        System.out.println(ax2);
 
                         planeteChoisie.setAcceleration(new Point2D(ax1,ay1));
                         autrePlanete.setAcceleration(new Point2D(ax2,ay2));
