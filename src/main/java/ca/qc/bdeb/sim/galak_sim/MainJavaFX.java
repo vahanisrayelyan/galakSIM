@@ -1,8 +1,8 @@
 package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
-import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -87,6 +87,8 @@ public class MainJavaFX extends Application {
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
 
+                contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
                 simulation.update(deltaTemps);
                 simulation.draw(contexte);
 
@@ -104,6 +106,7 @@ public class MainJavaFX extends Application {
     }
 
     private void creerInterface(StackPane panneau, Canvas canvas) {
+        // Menu
         VBox menuLateral = new VBox(15);
         menuLateral.setPadding(new Insets(60, 15, 15, 15));
         menuLateral.setMaxWidth(250);
@@ -111,6 +114,7 @@ public class MainJavaFX extends Application {
         menuLateral.setVisible(true);
         VBox listePlanete = new VBox(5);
 
+        // Vitesse
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
         var sliderVitesseX = new Slider(-100, 100, 0);
@@ -123,6 +127,7 @@ public class MainJavaFX extends Application {
         sliderVitesseY.setShowTickMarks(true);
         sliderVitesseY.setShowTickLabels(true);
 
+        // Taille
         var texteTaille = new Text("Taille");
         texteTaille.setFill(Color.WHITE);
         var sliderTaille = new Slider(10, 100, 50);
@@ -183,7 +188,9 @@ public class MainJavaFX extends Application {
         Pane starLayer = new Pane();
         starLayer.prefWidthProperty().bind(canvas.widthProperty());
         starLayer.prefHeightProperty().bind(canvas.heightProperty());
-        StarField starField = new StarField(starLayer, 1500);
+
+
+        ChampEtoiles starField = new ChampEtoiles(starLayer);
         starField.start();
 
         StackPane centre = new StackPane(starLayer, canvas);
