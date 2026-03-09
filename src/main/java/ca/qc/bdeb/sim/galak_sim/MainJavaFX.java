@@ -190,8 +190,8 @@ public class MainJavaFX extends Application {
         starLayer.prefHeightProperty().bind(canvas.heightProperty());
 
 
-        ChampEtoiles starField = new ChampEtoiles(starLayer);
-        starField.start();
+        ChampEtoiles champEtoiles = new ChampEtoiles(starLayer);
+        champEtoiles.demarrer();
 
         StackPane centre = new StackPane(starLayer, canvas);
 
