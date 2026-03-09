@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim.graphics;
 
+import ca.qc.bdeb.sim.galak_sim.addons.Physique;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 public class Simulation {
 
     private ArrayList<Planete> planetes = new ArrayList<>();
+    private Physique physique = new Physique();
 
     public Simulation() {
 
@@ -23,6 +25,7 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
+        physique.effetForceGravitationelle(deltaTemps,planetes);
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
