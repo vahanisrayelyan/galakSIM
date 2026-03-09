@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class Physique {
         private final double G = 4 * Math.pow(Math.PI,2);
 
+
         public void effetForceGravitationelle(double dt,ArrayList<Planete> listePlanetes) {
             for (Planete planeteChoisie : listePlanetes) {
 
