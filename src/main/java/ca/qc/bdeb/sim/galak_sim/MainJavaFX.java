@@ -124,7 +124,7 @@ public class MainJavaFX extends Application {
 
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
-        var saisiMasse = new TextField("50");
+        var saisiMasse = new TextField("5");
         saisiMasse.setTextFormatter(formatteurNumeriqueMasse());
 
         canvas.setOnMouseClicked(e -> {
@@ -226,8 +226,8 @@ public class MainJavaFX extends Application {
 
         double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
         double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
-        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", "."));
-        double taille = masse * 0.1;
+        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e14;
+        double taille = 50;
 
         var positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
