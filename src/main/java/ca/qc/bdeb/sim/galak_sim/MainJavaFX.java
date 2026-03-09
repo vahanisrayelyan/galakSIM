@@ -1,11 +1,12 @@
 package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
-import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -26,6 +27,10 @@ public class MainJavaFX extends Application {
     public final static double LARGEUR = 1200;
     public final static double HAUTEUR = 700;
 
+    private double dernierX;
+    private double dernierY;
+    private boolean cameraEnDeplacement = false;
+
     @Override
     public void start(Stage stage) {
         var panneau = new StackPane();
@@ -39,6 +44,39 @@ public class MainJavaFX extends Application {
         canvas.heightProperty().bind(panneau.heightProperty());
 
         simulation = new Simulation();
+
+        // Zoom avec molette
+        canvas.setOnScroll(e -> {
+            double facteur = e.getDeltaY() > 0 ? 1.1 : 0.9;
+            simulation.zoomer(facteur, e.getX(), e.getY(), canvas.getWidth(), canvas.getHeight());
+        });
+
+        // Déplacement caméra avec bouton secondaire
+        canvas.setOnMousePressed(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                cameraEnDeplacement = true;
+                dernierX = e.getX();
+                dernierY = e.getY();
+            }
+        });
+
+        canvas.setOnMouseDragged(e -> {
+            if (cameraEnDeplacement) {
+                double dx = e.getX() - dernierX;
+                double dy = e.getY() - dernierY;
+
+                simulation.deplacerCamera(dx, dy);
+
+                dernierX = e.getX();
+                dernierY = e.getY();
+            }
+        });
+
+        canvas.setOnMouseReleased(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                cameraEnDeplacement = false;
+            }
+        });
 
         AnimationTimer timer = new AnimationTimer() {
             private long dernierTemps = System.nanoTime();
@@ -84,20 +122,21 @@ public class MainJavaFX extends Application {
         var saisiVitesseY = new TextField("0");
         saisiVitesseY.setTextFormatter(formatteurNumerique());
 
-        // Masse
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
         var saisiMasse = new TextField("50");
         saisiMasse.setTextFormatter(formatteurNumeriqueMasse());
 
-        // Position et ajout de la planète
         canvas.setOnMouseClicked(e -> {
-            ajouterPlanete(e, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
+            ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
         });
-        var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
+
+        var texteAjoutPlanete = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
         texteAjoutPlanete.setFill(Color.WHITE);
 
-        // Liste des planètes
+        Button btnResetVue = new Button("Réinitialiser la vue");
+        btnResetVue.setOnAction(e -> simulation.reinitialiserVue());
+
         var defileurPlanetes = new ScrollPane(listePlanete);
         defileurPlanetes.setFitToWidth(true);
         defileurPlanetes.setPrefHeight(200);
@@ -111,30 +150,34 @@ public class MainJavaFX extends Application {
                 texteMasse,
                 saisiMasse,
                 texteAjoutPlanete,
+                btnResetVue,
                 defileurPlanetes
         );
 
-        // Affichage du menu
         Button btnAfficher = new Button("☰");
         btnAfficher.setVisible(false);
+
         Button btnMasquer = new Button("☰");
         btnMasquer.setOnAction(e -> {
             menuLateral.setVisible(false);
             btnMasquer.setVisible(false);
             btnAfficher.setVisible(true);
         });
+
         btnAfficher.setOnAction(e -> {
             menuLateral.setVisible(true);
             btnMasquer.setVisible(true);
             btnAfficher.setVisible(false);
         });
 
-        // Étoiles
         Pane starLayer = new Pane();
         starLayer.prefWidthProperty().bind(canvas.widthProperty());
         starLayer.prefHeightProperty().bind(canvas.heightProperty());
-        StarField starField = new StarField(starLayer, 1500);
-        starField.start();
+
+
+        ChampEtoiles champEtoiles = new ChampEtoiles(starLayer);
+        champEtoiles.demarrer();
+
         StackPane centre = new StackPane(starLayer, canvas);
 
         StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
@@ -166,30 +209,39 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private static void ajouterPlanete(MouseEvent e, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
+    private static void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
 
         // Paramètres récupérés
-        double x = e.getX();
-        double y = e.getY();
+        Point2D monde = simulation.ecranVersMonde(
+                e.getX(),
+                e.getY(),
+                canvas.getWidth(),
+                canvas.getHeight()
+        );
+        double x = monde.getX();
+        double y = monde.getY();
+
         double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
         double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
         double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", "."));
         double taille = masse * 0.1;
 
-        // Vérification pour éviter de mettre une planète sur une autre
         var positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
-            double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
+            double distance = Math.sqrt(
+                    Math.pow(x - p.getPosition().getX(), 2) +
+                            Math.pow(y - p.getPosition().getY(), 2)
+            );
+
             if (distance < (p.getTaille().getX() / 2) + taille / 2) {
                 positionLibre = false;
                 break;
             }
         }
 
-        // Gestion des planètes
         if (positionLibre) {
             Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse);
 
@@ -199,7 +251,6 @@ public class MainJavaFX extends Application {
             Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
             info.setFill(Color.LIGHTGRAY);
 
-            // Suppression de la planète
             Button btnSupprimer = new Button("X");
             btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
 
