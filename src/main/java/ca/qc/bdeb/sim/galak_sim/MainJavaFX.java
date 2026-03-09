@@ -1,8 +1,9 @@
 package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
-import ca.qc.bdeb.sim.galak_sim.graphics.StarField;
+import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -147,8 +148,7 @@ public class MainJavaFX extends Application {
         Pane starLayer = new Pane();
         starLayer.prefWidthProperty().bind(canvas.widthProperty());
         starLayer.prefHeightProperty().bind(canvas.heightProperty());
-        StarField starField = new StarField(starLayer, 1500);
-        starField.start();
+        ChampEtoiles starField = new ChampEtoiles(starLayer);
         StackPane centre = new StackPane(starLayer, canvas);
 
         StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
