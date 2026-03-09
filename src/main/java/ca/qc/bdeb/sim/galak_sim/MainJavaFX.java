@@ -9,9 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -76,35 +74,25 @@ public class MainJavaFX extends Application {
         menuLateral.setVisible(true);
         VBox listePlanete = new VBox(5);
 
-        // Vitesse
+        // Vitesses
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
-        var sliderVitesseX = new Slider(-100, 100, 0);
-        sliderVitesseX.setShowTickMarks(true);
-        sliderVitesseX.setShowTickLabels(true);
+        var saisiVitesseX = new TextField("0");
+        saisiVitesseX.setTextFormatter(formatteurNumerique());
         var texteVitesseY = new Text("Vitesse en y");
         texteVitesseY.setFill(Color.WHITE);
-        var sliderVitesseY = new Slider(-100, 100, 0);
-        sliderVitesseY.setShowTickMarks(true);
-        sliderVitesseY.setShowTickLabels(true);
-
-        // Taille
-        var texteTaille = new Text("Taille");
-        texteTaille.setFill(Color.WHITE);
-        var sliderTaille = new Slider(10, 100, 50);
-        sliderTaille.setShowTickMarks(true);
-        sliderTaille.setShowTickLabels(true);
+        var saisiVitesseY = new TextField("0");
+        saisiVitesseY.setTextFormatter(formatteurNumerique());
 
         // Masse
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
-        var sliderMasse = new Slider(10, 100, 50);
-        sliderMasse.setShowTickMarks(true);
-        sliderMasse.setShowTickLabels(true);
+        var saisiMasse = new TextField("50");
+        saisiMasse.setTextFormatter(formatteurNumeriqueMasse());
 
         // Position et ajout de la planète
         canvas.setOnMouseClicked(e -> {
-            ajouterPlanete(e, sliderVitesseX, sliderVitesseY, sliderTaille, sliderMasse, listePlanete);
+            ajouterPlanete(e, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
         });
         var texteAjoutPlanete = new Text("Cliquez sur l'écran pour ajouter une planète");
         texteAjoutPlanete.setFill(Color.WHITE);
@@ -117,13 +105,11 @@ public class MainJavaFX extends Application {
 
         menuLateral.getChildren().addAll(
                 texteVitesseX,
-                sliderVitesseX,
+                saisiVitesseX,
                 texteVitesseY,
-                sliderVitesseY,
-                texteTaille,
-                sliderTaille,
+                saisiVitesseY,
                 texteMasse,
-                sliderMasse,
+                saisiMasse,
                 texteAjoutPlanete,
                 defileurPlanetes
         );
@@ -162,7 +148,25 @@ public class MainJavaFX extends Application {
         panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
     }
 
-    private static void ajouterPlanete(MouseEvent e, Slider sliderVitesseX, Slider sliderVitesseY, Slider sliderTaille, Slider sliderMasse, VBox listePlanete) {
+    public static TextFormatter<String> formatteurNumerique() {
+        return new TextFormatter<>(change -> {
+           if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
+               return change;
+           }
+           return null;
+        });
+    }
+
+    public static TextFormatter<String> formatteurNumeriqueMasse() {
+        return new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("^$|^(0|[1-9]\\d*)([.,]\\d*)?$")) {
+                return change;
+            }
+            return null;
+        });
+    }
+
+    private static void ajouterPlanete(MouseEvent e, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -170,10 +174,10 @@ public class MainJavaFX extends Application {
         // Paramètres récupérés
         double x = e.getX();
         double y = e.getY();
-        var vX = sliderVitesseX.getValue();
-        var vY = sliderVitesseY.getValue();
-        var taille = sliderTaille.getValue();
-        var masse = sliderMasse.getValue();
+        double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
+        double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
+        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", "."));
+        double taille = masse * 0.1;
 
         // Vérification pour éviter de mettre une planète sur une autre
         var positionLibre = true;
