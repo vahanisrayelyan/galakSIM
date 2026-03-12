@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -36,6 +37,7 @@ public class MainJavaFX extends Application {
         var panneau = new StackPane();
         Scene scene = new Scene(panneau, LARGEUR, HAUTEUR);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
+        canvas.setCursor(Cursor.HAND);
         creerInterface(panneau, canvas);
 
         var contexte = canvas.getGraphicsContext2D();
@@ -54,6 +56,7 @@ public class MainJavaFX extends Application {
         // Déplacement caméra avec bouton secondaire
         canvas.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
+                canvas.setCursor(Cursor.CLOSED_HAND);
                 cameraEnDeplacement = true;
                 dernierX = e.getX();
                 dernierY = e.getY();
@@ -74,6 +77,7 @@ public class MainJavaFX extends Application {
 
         canvas.setOnMouseReleased(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
+                canvas.setCursor(Cursor.HAND);
                 cameraEnDeplacement = false;
             }
         });
@@ -209,7 +213,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private static void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -238,6 +242,8 @@ public class MainJavaFX extends Application {
 
             if (distance < (p.getTaille().getX() / 2) + taille / 2) {
                 positionLibre = false;
+                System.out.println(p.getPosition());
+                ouvrirFenetreDetails(p);
                 break;
             }
         }
@@ -262,5 +268,52 @@ public class MainJavaFX extends Application {
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
         }
+    }
+
+    private void ouvrirFenetreDetails(Planete p) {
+        Stage fenetreDetails = new Stage();
+        fenetreDetails.setTitle("Suivi : ");
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+        layout.setStyle("-fx-background-color: #1a1a1a;");
+
+        Text titre = new Text("DONNÉES TÉLÉMÉTRIQUES");
+        titre.setFill(Color.WHITE);
+        titre.setStyle("-fx-font-weight: bold;");
+
+        Text txtPos = new Text();
+        Text txtVit = new Text();
+        txtPos.setFill(Color.WHITE);
+        txtVit.setFill(Color.WHITE);
+
+        // L'AnimationTimer spécifique à cette fenêtre
+        AnimationTimer rafraichisseur = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                // Si la planète a été supprimée ou la fenêtre fermée, on arrête
+                if (!simulation.getPlanetes().contains(p) || !fenetreDetails.isShowing()) {
+                    this.stop();
+                    fenetreDetails.close();
+                }
+
+                // Mise à jour des textes en temps réel
+                txtPos.setText(String.format("Position : X=%.1f Y=%.1f", p.getPosition().getX(), p.getPosition().getY()));
+
+                double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
+                txtVit.setText(String.format("Vitesse : %.2f m/s", vitesseAbsolue));
+            }
+        };
+
+        layout.getChildren().addAll(titre, txtPos, txtVit);
+        Scene scene = new Scene(layout, 250, 150);
+
+        fenetreDetails.setScene(scene);
+        fenetreDetails.setAlwaysOnTop(true);
+
+        // On lance le rafraîchissement dès l'ouverture
+        rafraichisseur.start();
+
+        fenetreDetails.show();
     }
 }
