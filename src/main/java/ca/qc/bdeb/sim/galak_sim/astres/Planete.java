@@ -51,4 +51,8 @@ public class Planete extends Astre {
         int index = (int)(Math.random() * IMAGES.length);
         return new Image(Planete.class.getResourceAsStream(IMAGES[index]));
     }
+
+    public String getNom() {
+        return nom;
+    }
 }

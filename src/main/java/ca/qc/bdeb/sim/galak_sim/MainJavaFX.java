@@ -120,16 +120,16 @@ public class MainJavaFX extends Application {
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
         var saisiVitesseX = new TextField("0");
-        saisiVitesseX.setTextFormatter(formatteurNumerique());
+        saisiVitesseX.setTextFormatter(formateurNumerique());
         var texteVitesseY = new Text("Vitesse en y");
         texteVitesseY.setFill(Color.WHITE);
         var saisiVitesseY = new TextField("0");
-        saisiVitesseY.setTextFormatter(formatteurNumerique());
+        saisiVitesseY.setTextFormatter(formateurNumerique());
 
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
         var saisiMasse = new TextField("5");
-        saisiMasse.setTextFormatter(formatteurNumeriqueMasse());
+        saisiMasse.setTextFormatter(formateurNumeriqueMasse());
 
         canvas.setOnMouseClicked(e -> {
             ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
@@ -195,7 +195,7 @@ public class MainJavaFX extends Application {
         panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
     }
 
-    public static TextFormatter<String> formatteurNumerique() {
+    public static TextFormatter<String> formateurNumerique() {
         return new TextFormatter<>(change -> {
            if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
                return change;
@@ -204,7 +204,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    public static TextFormatter<String> formatteurNumeriqueMasse() {
+    public static TextFormatter<String> formateurNumeriqueMasse() {
         return new TextFormatter<>(change -> {
             if (change.getControlNewText().matches("^$|^(0|[1-9]\\d*)([.,]\\d*)?$")) {
                 return change;
@@ -242,7 +242,6 @@ public class MainJavaFX extends Application {
 
             if (distance < (p.getTaille().getX() / 2) + taille / 2) {
                 positionLibre = false;
-                System.out.println(p.getPosition());
                 ouvrirFenetreDetails(p);
                 break;
             }
@@ -257,6 +256,9 @@ public class MainJavaFX extends Application {
 
             Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
             info.setFill(Color.LIGHTGRAY);
+            info.setOnMouseClicked(ev -> {
+                ouvrirFenetreDetails(nouvelle);
+            });
 
             Button btnSupprimer = new Button("X");
             btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
@@ -273,7 +275,7 @@ public class MainJavaFX extends Application {
 
     private void ouvrirFenetreDetails(Planete p) {
         Stage fenetreDetails = new Stage();
-        fenetreDetails.setTitle("Suivi : ");
+        fenetreDetails.setTitle(p.getNom());
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
