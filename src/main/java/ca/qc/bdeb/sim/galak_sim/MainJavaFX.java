@@ -249,7 +249,8 @@ public class MainJavaFX extends Application {
         }
 
         if (positionLibre) {
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse);
+            String nomDeBase = "Planète " + (listePlanete.getChildren().size() + 1);
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse,nomDeBase);
 
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);
