@@ -19,8 +19,8 @@ public class Simulation {
     public Simulation() {
     }
 
-    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse) {
-        planetes.add(new Planete(x, y, vX, vY, taille, masse));
+    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom) {
+        planetes.add(new Planete(x, y, vX, vY, taille, masse, nom));
         return planetes.getLast();
     }
 
