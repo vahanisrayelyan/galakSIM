@@ -23,6 +23,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainJavaFX extends Application {
     private static Simulation simulation;
     public final static double LARGEUR = 1200;
@@ -31,6 +34,8 @@ public class MainJavaFX extends Application {
     private double dernierX;
     private double dernierY;
     private boolean cameraEnDeplacement = false;
+
+    private Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
     @Override
     public void start(Stage stage) {
@@ -80,6 +85,10 @@ public class MainJavaFX extends Application {
                 canvas.setCursor(Cursor.HAND);
                 cameraEnDeplacement = false;
             }
+        });
+
+        stage.setOnCloseRequest(e -> {
+           fenetresOuvertes.values().forEach(Stage::close);
         });
 
         AnimationTimer timer = new AnimationTimer() {
@@ -197,10 +206,10 @@ public class MainJavaFX extends Application {
 
     public static TextFormatter<String> formateurNumerique() {
         return new TextFormatter<>(change -> {
-           if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
-               return change;
-           }
-           return null;
+            if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
+                return change;
+            }
+            return null;
         });
     }
 
@@ -249,7 +258,7 @@ public class MainJavaFX extends Application {
 
         if (positionLibre) {
             String nomDeBase = "Planète " + (listePlanete.getChildren().size() + 1);
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse,nomDeBase);
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomDeBase);
 
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);
@@ -274,8 +283,18 @@ public class MainJavaFX extends Application {
     }
 
     private void ouvrirFenetreDetails(Planete p) {
+        if (fenetresOuvertes.containsKey(p)) {
+            fenetresOuvertes.get(p).toFront();
+            return;
+        }
+
         Stage fenetreDetails = new Stage();
         fenetreDetails.setTitle(p.getNom());
+
+        fenetresOuvertes.put(p, fenetreDetails);
+        fenetreDetails.setOnCloseRequest(e -> {
+            fenetresOuvertes.remove(p);
+        });
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
@@ -294,29 +313,25 @@ public class MainJavaFX extends Application {
         AnimationTimer rafraichisseur = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // Si la planète a été supprimée ou la fenêtre fermée, on arrête
-                if (!simulation.getPlanetes().contains(p) || !fenetreDetails.isShowing()) {
+                // Si la planète a été supprimée
+                if (!simulation.getPlanetes().contains(p)) {
                     this.stop();
                     fenetreDetails.close();
+                    fenetresOuvertes.remove(p);
+                    return;
                 }
 
-                // Mise à jour des textes en temps réel
                 txtPos.setText(String.format("Position : X=%.1f Y=%.1f", p.getPosition().getX(), p.getPosition().getY()));
-
                 double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
                 txtVit.setText(String.format("Vitesse : %.2f m/s", vitesseAbsolue));
             }
         };
+        rafraichisseur.start();
 
         layout.getChildren().addAll(titre, txtPos, txtVit);
         Scene scene = new Scene(layout, 250, 150);
-
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
-
-        // On lance le rafraîchissement dès l'ouverture
-        rafraichisseur.start();
-
         fenetreDetails.show();
     }
 }
