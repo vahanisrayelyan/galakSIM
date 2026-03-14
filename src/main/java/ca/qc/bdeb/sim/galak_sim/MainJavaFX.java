@@ -35,7 +35,7 @@ public class MainJavaFX extends Application {
     private double dernierY;
     private boolean cameraEnDeplacement = false;
 
-    private Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
+    private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
     @Override
     public void start(Stage stage) {
@@ -88,7 +88,7 @@ public class MainJavaFX extends Application {
         });
 
         stage.setOnCloseRequest(e -> {
-           fenetresOuvertes.values().forEach(Stage::close);
+            fenetresOuvertes.values().forEach(Stage::close);
         });
 
         AnimationTimer timer = new AnimationTimer() {
@@ -228,12 +228,7 @@ public class MainJavaFX extends Application {
         }
 
         // Paramètres récupérés
-        Point2D monde = simulation.ecranVersMonde(
-                e.getX(),
-                e.getY(),
-                canvas.getWidth(),
-                canvas.getHeight()
-        );
+        Point2D monde = simulation.ecranVersMonde(e.getX(), e.getY(), canvas.getWidth(), canvas.getHeight());
         double x = monde.getX();
         double y = monde.getY();
 
@@ -244,14 +239,11 @@ public class MainJavaFX extends Application {
 
         var positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
-            double distance = Math.sqrt(
-                    Math.pow(x - p.getPosition().getX(), 2) +
-                            Math.pow(y - p.getPosition().getY(), 2)
-            );
+            double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
 
             if (distance < (p.getTaille().getX() / 2) + taille / 2) {
                 positionLibre = false;
-                ouvrirFenetreDetails(p);
+                ouvrirFenetreDetails(p, canvas);
                 break;
             }
         }
@@ -266,7 +258,7 @@ public class MainJavaFX extends Application {
             Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
             info.setFill(Color.LIGHTGRAY);
             info.setOnMouseClicked(ev -> {
-                ouvrirFenetreDetails(nouvelle);
+                ouvrirFenetreDetails(nouvelle, canvas);
             });
 
             Button btnSupprimer = new Button("X");
@@ -282,7 +274,7 @@ public class MainJavaFX extends Application {
         }
     }
 
-    private void ouvrirFenetreDetails(Planete p) {
+    private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
         if (fenetresOuvertes.containsKey(p)) {
             fenetresOuvertes.get(p).toFront();
             return;
@@ -295,6 +287,8 @@ public class MainJavaFX extends Application {
         fenetreDetails.setOnCloseRequest(e -> {
             fenetresOuvertes.remove(p);
         });
+
+        simulation.centrerSur(p, 1.0);
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
@@ -330,6 +324,7 @@ public class MainJavaFX extends Application {
 
         layout.getChildren().addAll(titre, txtPos, txtVit);
         Scene scene = new Scene(layout, 250, 150);
+        fenetreDetails.setResizable(false);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
         fenetreDetails.show();

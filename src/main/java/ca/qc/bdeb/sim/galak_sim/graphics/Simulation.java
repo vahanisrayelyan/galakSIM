@@ -16,6 +16,8 @@ public class Simulation {
     private double offsetX = 0;
     private double offsetY = 0;
 
+    private Planete planeteSuivie = null;
+
     public Simulation() {
     }
 
@@ -25,6 +27,9 @@ public class Simulation {
     }
 
     public void supprimerPlanete(Planete planete) {
+        if (planete == planeteSuivie) {
+            planeteSuivie = null;
+        }
         planetes.remove(planete);
     }
 
@@ -32,6 +37,12 @@ public class Simulation {
         physique.effetForceGravitationelle(deltaTemps, planetes);
         for (Planete p : planetes) {
             p.update(deltaTemps);
+        }
+
+        if (planeteSuivie != null) {
+            // On force l'offset à correspondre à la position de la planète
+            this.offsetX = -planeteSuivie.getPosition().getX();
+            this.offsetY = -planeteSuivie.getPosition().getY();
         }
     }
 
@@ -56,6 +67,7 @@ public class Simulation {
     }
 
     public void deplacerCamera(double dxEcran, double dyEcran) {
+        planeteSuivie = null;
         offsetX += dxEcran / zoom;
         offsetY += dyEcran / zoom;
     }
@@ -85,17 +97,22 @@ public class Simulation {
         return new Point2D(xMonde, yMonde);
     }
 
+    public void reinitialiserVue() {
+        zoom = 1.0;
+        offsetX = 0;
+        offsetY = 0;
+    }
+
+    public void centrerSur(Planete p, double valeurZoom) {
+        this.planeteSuivie = p;
+        this.zoom = valeurZoom;
+    }
+
     public ArrayList<Planete> getPlanetes() {
         return planetes;
     }
 
     public double getZoom() {
         return zoom;
-    }
-
-    public void reinitialiserVue() {
-        zoom = 1.0;
-        offsetX = 0;
-        offsetY = 0;
     }
 }
