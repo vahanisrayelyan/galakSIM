@@ -34,6 +34,7 @@ public class MainJavaFX extends Application {
     private double dernierX;
     private double dernierY;
     private boolean cameraEnDeplacement = false;
+    private boolean pause = false;
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
@@ -90,21 +91,26 @@ public class MainJavaFX extends Application {
         stage.setOnCloseRequest(e -> {
             fenetresOuvertes.values().forEach(Stage::close);
         });
-
         AnimationTimer timer = new AnimationTimer() {
+
             private long dernierTemps = System.nanoTime();
 
             @Override
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
-
                 contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                simulation.update(deltaTemps);
+                if(!pause) {
+                    simulation.update(deltaTemps);
+                }
+
                 simulation.draw(contexte);
 
+
                 dernierTemps = temps;
+
             }
+
         };
         timer.start();
 
@@ -155,6 +161,19 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setPrefHeight(200);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
+        Button btnPause = new Button("⏸");
+        btnPause.setAlignment(Pos.CENTER);
+        btnPause.setOnAction(e -> {
+            if (pause) {
+                pause = false;
+                btnPause.setText("⏸");
+            } else {
+                pause = true;
+                btnPause.setText("▶");
+
+            }
+        });
+
         menuLateral.getChildren().addAll(
                 texteVitesseX,
                 saisiVitesseX,
@@ -164,7 +183,8 @@ public class MainJavaFX extends Application {
                 saisiMasse,
                 texteAjoutPlanete,
                 btnResetVue,
-                defileurPlanetes
+                defileurPlanetes,
+                btnPause
         );
 
         Button btnAfficher = new Button("☰");
