@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim;
 
+import ca.qc.bdeb.sim.galak_sim.addons.Input;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
@@ -13,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -42,6 +44,8 @@ public class MainJavaFX extends Application {
     public void start(Stage stage) {
         var panneau = new StackPane();
         Scene scene = new Scene(panneau, LARGEUR, HAUTEUR);
+        Input input = new Input();
+        input.etatTouches(scene);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
         creerInterface(panneau, canvas);
