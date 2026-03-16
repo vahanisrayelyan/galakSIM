@@ -18,13 +18,10 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.layout.Pane;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -181,6 +178,9 @@ public class MainJavaFX extends Application {
             }
         });
 
+        Region espaceur = new Region();
+        VBox.setVgrow(espaceur, Priority.ALWAYS);
+
         menuLateral.getChildren().addAll(
                 texteVitesseX,
                 saisiVitesseX,
@@ -191,6 +191,7 @@ public class MainJavaFX extends Application {
                 texteAjoutPlanete,
                 btnResetVue,
                 defileurPlanetes,
+                espaceur,
                 btnPause
         );
 
@@ -316,6 +317,13 @@ public class MainJavaFX extends Application {
         });
 
         simulation.centrerSur(p, 1.0);
+
+        double centreCanvasX = canvas.localToScreen(canvas.getBoundsInLocal()).getMinX() + (canvas.getWidth() / 2);
+        double centreCanvasY = canvas.localToScreen(canvas.getBoundsInLocal()).getMinY() + (canvas.getHeight() / 2);
+
+        double decalageAleatoire = fenetresOuvertes.size() * 10;
+        fenetreDetails.setX(centreCanvasX - 350 - decalageAleatoire);
+        fenetreDetails.setY(centreCanvasY - 125 + decalageAleatoire);
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
