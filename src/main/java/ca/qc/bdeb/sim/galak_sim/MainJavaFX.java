@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -22,6 +23,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainJavaFX extends Application {
     private static Simulation simulation;
     public final static double LARGEUR = 1200;
@@ -31,11 +35,14 @@ public class MainJavaFX extends Application {
     private double dernierY;
     private boolean cameraEnDeplacement = false;
 
+    private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
+
     @Override
     public void start(Stage stage) {
         var panneau = new StackPane();
         Scene scene = new Scene(panneau, LARGEUR, HAUTEUR);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
+        canvas.setCursor(Cursor.HAND);
         creerInterface(panneau, canvas);
 
         var contexte = canvas.getGraphicsContext2D();
@@ -54,6 +61,7 @@ public class MainJavaFX extends Application {
         // Déplacement caméra avec bouton secondaire
         canvas.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
+                canvas.setCursor(Cursor.CLOSED_HAND);
                 cameraEnDeplacement = true;
                 dernierX = e.getX();
                 dernierY = e.getY();
@@ -74,8 +82,13 @@ public class MainJavaFX extends Application {
 
         canvas.setOnMouseReleased(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
+                canvas.setCursor(Cursor.HAND);
                 cameraEnDeplacement = false;
             }
+        });
+
+        stage.setOnCloseRequest(e -> {
+            fenetresOuvertes.values().forEach(Stage::close);
         });
 
         AnimationTimer timer = new AnimationTimer() {
@@ -116,16 +129,16 @@ public class MainJavaFX extends Application {
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
         var saisiVitesseX = new TextField("0");
-        saisiVitesseX.setTextFormatter(formatteurNumerique());
+        saisiVitesseX.setTextFormatter(formateurNumerique());
         var texteVitesseY = new Text("Vitesse en y");
         texteVitesseY.setFill(Color.WHITE);
         var saisiVitesseY = new TextField("0");
-        saisiVitesseY.setTextFormatter(formatteurNumerique());
+        saisiVitesseY.setTextFormatter(formateurNumerique());
 
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
         var saisiMasse = new TextField("5");
-        saisiMasse.setTextFormatter(formatteurNumeriqueMasse());
+        saisiMasse.setTextFormatter(formateurNumeriqueMasse());
 
         canvas.setOnMouseClicked(e -> {
             ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
@@ -191,16 +204,16 @@ public class MainJavaFX extends Application {
         panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer);
     }
 
-    public static TextFormatter<String> formatteurNumerique() {
+    public static TextFormatter<String> formateurNumerique() {
         return new TextFormatter<>(change -> {
-           if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
-               return change;
-           }
-           return null;
+            if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
+                return change;
+            }
+            return null;
         });
     }
 
-    public static TextFormatter<String> formatteurNumeriqueMasse() {
+    public static TextFormatter<String> formateurNumeriqueMasse() {
         return new TextFormatter<>(change -> {
             if (change.getControlNewText().matches("^$|^(0|[1-9]\\d*)([.,]\\d*)?$")) {
                 return change;
@@ -209,18 +222,13 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private static void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
 
         // Paramètres récupérés
-        Point2D monde = simulation.ecranVersMonde(
-                e.getX(),
-                e.getY(),
-                canvas.getWidth(),
-                canvas.getHeight()
-        );
+        Point2D monde = simulation.ecranVersMonde(e.getX(), e.getY(), canvas.getWidth(), canvas.getHeight());
         double x = monde.getX();
         double y = monde.getY();
 
@@ -231,25 +239,27 @@ public class MainJavaFX extends Application {
 
         var positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
-            double distance = Math.sqrt(
-                    Math.pow(x - p.getPosition().getX(), 2) +
-                            Math.pow(y - p.getPosition().getY(), 2)
-            );
+            double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
 
             if (distance < (p.getTaille().getX() / 2) + taille / 2) {
                 positionLibre = false;
+                ouvrirFenetreDetails(p, canvas);
                 break;
             }
         }
 
         if (positionLibre) {
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse);
+            String nomDeBase = "Planète " + (listePlanete.getChildren().size() + 1);
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomDeBase);
 
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);
 
             Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
             info.setFill(Color.LIGHTGRAY);
+            info.setOnMouseClicked(ev -> {
+                ouvrirFenetreDetails(nouvelle, canvas);
+            });
 
             Button btnSupprimer = new Button("X");
             btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
@@ -262,5 +272,61 @@ public class MainJavaFX extends Application {
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
         }
+    }
+
+    private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
+        if (fenetresOuvertes.containsKey(p)) {
+            fenetresOuvertes.get(p).toFront();
+            return;
+        }
+
+        Stage fenetreDetails = new Stage();
+        fenetreDetails.setTitle(p.getNom());
+
+        fenetresOuvertes.put(p, fenetreDetails);
+        fenetreDetails.setOnCloseRequest(e -> {
+            fenetresOuvertes.remove(p);
+        });
+
+        simulation.centrerSur(p, 1.0);
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+        layout.setStyle("-fx-background-color: #1a1a1a;");
+
+        Text titre = new Text("DONNÉES TÉLÉMÉTRIQUES");
+        titre.setFill(Color.WHITE);
+        titre.setStyle("-fx-font-weight: bold;");
+
+        Text txtPos = new Text();
+        Text txtVit = new Text();
+        txtPos.setFill(Color.WHITE);
+        txtVit.setFill(Color.WHITE);
+
+        // L'AnimationTimer spécifique à cette fenêtre
+        AnimationTimer rafraichisseur = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                // Si la planète a été supprimée
+                if (!simulation.getPlanetes().contains(p)) {
+                    this.stop();
+                    fenetreDetails.close();
+                    fenetresOuvertes.remove(p);
+                    return;
+                }
+
+                txtPos.setText(String.format("Position : X=%.1f Y=%.1f", p.getPosition().getX(), p.getPosition().getY()));
+                double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
+                txtVit.setText(String.format("Vitesse : %.2f m/s", vitesseAbsolue));
+            }
+        };
+        rafraichisseur.start();
+
+        layout.getChildren().addAll(titre, txtPos, txtVit);
+        Scene scene = new Scene(layout, 250, 150);
+        fenetreDetails.setResizable(false);
+        fenetreDetails.setScene(scene);
+        fenetreDetails.setAlwaysOnTop(true);
+        fenetreDetails.show();
     }
 }
