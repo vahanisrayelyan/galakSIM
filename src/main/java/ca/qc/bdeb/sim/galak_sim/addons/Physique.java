@@ -6,25 +6,30 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 
 public class Physique {
-        private final double G = 4 * Math.pow(Math.PI,2);
+        private final double G = 6.67430e-11;
+
 
         public void effetForceGravitationelle(double dt,ArrayList<Planete> listePlanetes) {
-            for (Planete planeteChoisie : listePlanetes) {
+            for (Planete planete : listePlanetes) {
+                planete.setAcceleration(new Point2D(0,0));
+            }
 
-                for (Planete autrePlanete : listePlanetes) {
+            for (int i = 0; i < listePlanetes.size(); i ++) {
 
-                    if (autrePlanete != planeteChoisie) {
+                for (int j = i + 1; j < listePlanetes.size(); j++) {
 
-                        double m1 = planeteChoisie.getMasse();
-                        double m2 = autrePlanete.getMasse();
+                        Planete pi = listePlanetes.get(i);
+                        Planete pj = listePlanetes.get(j);
 
-                        double x1 = planeteChoisie.getPosition().getX();
-                        double x2 = autrePlanete.getPosition().getX();
+                        double m1 = pi.getMasse();
+                        double m2 = pj.getMasse();
 
-                        double y1 =  planeteChoisie.getPosition().getY();
-                        double y2 =  autrePlanete.getPosition().getY();
+                        double x1 = pi.getPosition().getX();
+                        double x2 = pj.getPosition().getX();
 
-                        ///////////////////////////////////////////////////////////
+                        double y1 =  pi.getPosition().getY();
+                        double y2 =  pj.getPosition().getY();
+
                         double dx = x2 - x1;
                         double dy = y2 - y1;
 
@@ -42,13 +47,13 @@ public class Physique {
                         double ay1 = Fgy / m1;
                         // Fab = -Fba
                         double ax2 = - Fgx / m2;
-                        double ay2 = - Fgx / m2;
+                        double ay2 = - Fgy / m2;
 
                         System.out.println(ax2);
 
-                        planeteChoisie.setAcceleration(new Point2D(ax1,ay1));
-                        autrePlanete.setAcceleration(new Point2D(ax2,ay2));
-                    }
+                        pi.setAcceleration(new Point2D(ax1,ay1));
+                        pj.setAcceleration(new Point2D(ax2,ay2));
+
                 }
             }
         }

@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim;
 
+import ca.qc.bdeb.sim.galak_sim.addons.Input;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -36,6 +38,7 @@ public class MainJavaFX extends Application {
     private double dernierX;
     private double dernierY;
     private boolean cameraEnDeplacement = false;
+    private boolean pause = false;
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
@@ -43,6 +46,8 @@ public class MainJavaFX extends Application {
     public void start(Stage stage) {
         var panneau = new StackPane();
         Scene scene = new Scene(panneau, LARGEUR, HAUTEUR);
+        Input input = new Input();
+        input.etatTouches(scene);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
         creerInterface(panneau, canvas);
@@ -94,19 +99,25 @@ public class MainJavaFX extends Application {
         });
 
         AnimationTimer timer = new AnimationTimer() {
+
             private long dernierTemps = System.nanoTime();
 
             @Override
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
-
                 contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                simulation.update(deltaTemps);
+                if(!pause) {
+                    simulation.update(deltaTemps);
+                }
+
                 simulation.draw(contexte);
 
+
                 dernierTemps = temps;
+
             }
+
         };
         timer.start();
 
@@ -157,6 +168,19 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setPrefHeight(200);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
+        Button btnPause = new Button("⏸");
+        btnPause.setAlignment(Pos.CENTER);
+        btnPause.setOnAction(e -> {
+            if (pause) {
+                pause = false;
+                btnPause.setText("⏸");
+            } else {
+                pause = true;
+                btnPause.setText("▶");
+
+            }
+        });
+
         menuLateral.getChildren().addAll(
                 texteVitesseX,
                 saisiVitesseX,
@@ -166,7 +190,8 @@ public class MainJavaFX extends Application {
                 saisiMasse,
                 texteAjoutPlanete,
                 btnResetVue,
-                defileurPlanetes
+                defileurPlanetes,
+                btnPause
         );
 
         Button btnAfficher = new Button("☰");
@@ -236,7 +261,7 @@ public class MainJavaFX extends Application {
 
         double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
         double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
-        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", "."));
+        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e10;
         double taille = 50;
 
         var positionLibre = true;

@@ -30,6 +30,8 @@ public abstract class Astre {
      */
     protected Image image;
 
+    protected double scale = 1e9;
+
     /**
      * Constructeur d'un objet du jeu.
      */
@@ -49,7 +51,12 @@ public abstract class Astre {
         // v = v + a·dt
         velocite = velocite.add(acceleration.multiply(dt));
         // p = p + v·dt
-        position = position.add(velocite.multiply(dt));
+        double ajoutPositionx = (velocite.getX() * dt) / scale;
+        double ajoutPositiony = (velocite.getY() * dt) / scale;
+
+        Point2D ajoutPosition = new Point2D(ajoutPositionx,ajoutPositiony);
+
+        position = position.add(ajoutPosition);
     }
 
     /**
