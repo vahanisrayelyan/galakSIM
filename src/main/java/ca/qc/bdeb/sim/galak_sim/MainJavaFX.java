@@ -8,7 +8,6 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -22,6 +21,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -344,10 +346,37 @@ public class MainJavaFX extends Application {
 
         DecimalFormat df = new DecimalFormat("#.####");
 
+        // Creation Graphique
+
+        //Axes
+        NumberAxis axeX = new NumberAxis();
+        axeX.setLabel("Temps");
+        axeX.setForceZeroInRange(false);
+
+        NumberAxis axeY = new NumberAxis();
+        axeY.setLabel("Vitesse");
+
+        //Graphique
+        LineChart<Number,Number> graphVitesse = new LineChart<>(axeX,axeY);
+        graphVitesse.setTitle("Évolution de vitesse");
+        graphVitesse.setAnimated(false);
+        graphVitesse.setCreateSymbols(false);
+
+        //Lignes sur graphique pour vitesse X et Y
+        XYChart.Series<Number,Number> serieVitesseX = new XYChart.Series<>();
+        serieVitesseX.setName("Vitesse X");
+        XYChart.Series<Number, Number> serieVitesseY = new XYChart.Series<>();
+        serieVitesseY.setName("Vitesse Y");
+        graphVitesse.getData().addAll(serieVitesseX,serieVitesseY);
+
+        //Temps inital pour graphique
+        long tempsDebut = System.nanoTime();
+
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                //Logique pour les donnees affiches
                 // Si la planète a été supprimée
                 if (!simulation.getPlanetes().contains(p)) {
                     this.stop();
@@ -355,7 +384,6 @@ public class MainJavaFX extends Application {
                     fenetresOuvertes.remove(p);
                     return;
                 }
-
                 txtPos.setText("Position X : " + df.format(p.getPosition().getX()) + " unité" +
                         "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité");
                 double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
@@ -367,12 +395,28 @@ public class MainJavaFX extends Application {
                         "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
                         "\nAccélération : " + df.format(accelerationAbsolue) + " unité");
                 txtmasse.setText("Masse " + df.format(p.getMasse()) + " unité");
+
+                //Logique pour graphique
+                //Temps
+                double tempsEcoule = ((now - tempsDebut) * 1e-9);
+                //Chercher donnees
+                double vitesseX = p.getVelocite().getX();
+                double vitesseY = p.getVelocite().getY();
+                //Ajouter sur graphique
+                serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule,vitesseX));
+                serieVitesseY.getData().add(new XYChart.Data<>(tempsEcoule,vitesseY));
+                //Si on a trop de points
+                if(serieVitesseX.getData().size() > 250) {
+                    serieVitesseX.getData().remove(0);
+                    serieVitesseY.getData().remove(0);
+
+                }
             }
         };
         rafraichisseur.start();
 
-        layout.getChildren().addAll(titre, txtPos, txtVit, txtAcc, txtmasse);
-        Scene scene = new Scene(layout, 250, 250);
+        layout.getChildren().addAll(titre, txtPos, txtVit, txtAcc, txtmasse,graphVitesse);
+        Scene scene = new Scene(layout, 400, 500);
         fenetreDetails.setResizable(false);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
