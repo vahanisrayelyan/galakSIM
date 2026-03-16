@@ -7,6 +7,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -23,6 +24,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -234,7 +236,7 @@ public class MainJavaFX extends Application {
 
         double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
         double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-") ? 0 : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
-        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e14;
+        double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", "."));
         double taille = 50;
 
         var positionLibre = true;
@@ -299,9 +301,15 @@ public class MainJavaFX extends Application {
         titre.setStyle("-fx-font-weight: bold;");
 
         Text txtPos = new Text();
-        Text txtVit = new Text();
         txtPos.setFill(Color.WHITE);
+        Text txtVit = new Text();
         txtVit.setFill(Color.WHITE);
+        Text txtAcc = new Text();
+        txtAcc.setFill(Color.WHITE);
+        Text txtmasse = new Text();
+        txtmasse.setFill(Color.WHITE);
+
+        DecimalFormat df = new DecimalFormat("#.####");
 
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
@@ -315,15 +323,23 @@ public class MainJavaFX extends Application {
                     return;
                 }
 
-                txtPos.setText(String.format("Position : X=%.1f Y=%.1f", p.getPosition().getX(), p.getPosition().getY()));
+                txtPos.setText("Position X : " + df.format(p.getPosition().getX()) + " unité" +
+                        "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité");
                 double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
-                txtVit.setText(String.format("Vitesse : %.2f m/s", vitesseAbsolue));
+                txtVit.setText("Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" +
+                        "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" +
+                        "\nVitesse : " + df.format(vitesseAbsolue) + " unité");
+                double accelerationAbsolue = Math.sqrt(Math.pow(p.getAcceleration().getX(), 2) + Math.pow(p.getAcceleration().getY(), 2));
+                txtAcc.setText("Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" +
+                        "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
+                        "\nAccélération : " + df.format(accelerationAbsolue) + " unité");
+                txtmasse.setText("Masse " + df.format(p.getMasse()) + " unité");
             }
         };
         rafraichisseur.start();
 
-        layout.getChildren().addAll(titre, txtPos, txtVit);
-        Scene scene = new Scene(layout, 250, 150);
+        layout.getChildren().addAll(titre, txtPos, txtVit, txtAcc, txtmasse);
+        Scene scene = new Scene(layout, 250, 250);
         fenetreDetails.setResizable(false);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
