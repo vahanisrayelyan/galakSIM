@@ -100,7 +100,6 @@ public class MainJavaFX extends Application {
         AnimationTimer timer = new AnimationTimer() {
 
             private long dernierTemps = System.nanoTime();
-
             @Override
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9;
@@ -350,11 +349,13 @@ public class MainJavaFX extends Application {
 
         //Axes
         NumberAxis axeX = new NumberAxis();
-        axeX.setLabel("Temps");
+        axeX.setLabel(" Temps (s) ");
         axeX.setForceZeroInRange(false);
+        axeX.setAutoRanging(false);
+        axeX.setTickUnit(10);
 
         NumberAxis axeY = new NumberAxis();
-        axeY.setLabel("Vitesse");
+        axeY.setLabel("Vitesse (m/s) ");
 
         //Graphique
         LineChart<Number,Number> graphVitesse = new LineChart<>(axeX,axeY);
@@ -364,9 +365,9 @@ public class MainJavaFX extends Application {
 
         //Lignes sur graphique pour vitesse X et Y
         XYChart.Series<Number,Number> serieVitesseX = new XYChart.Series<>();
-        serieVitesseX.setName("Vitesse X");
+        serieVitesseX.setName(" Vitesse X ");
         XYChart.Series<Number, Number> serieVitesseY = new XYChart.Series<>();
-        serieVitesseY.setName("Vitesse Y");
+        serieVitesseY.setName(" Vitesse Y ");
         graphVitesse.getData().addAll(serieVitesseX,serieVitesseY);
 
         //Temps inital pour graphique
@@ -374,6 +375,9 @@ public class MainJavaFX extends Application {
 
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
+
+            private long dernierTempsGraph =  System.nanoTime(); //tracker pour graphique
+
             @Override
             public void handle(long now) {
                 //Logique pour les donnees affiches
@@ -397,6 +401,7 @@ public class MainJavaFX extends Application {
                 txtmasse.setText("Masse " + df.format(p.getMasse()) + " unité");
 
                 //Logique pour graphique
+                if ((now-dernierTempsGraph) > 500000000) {
                 //Temps
                 double tempsEcoule = ((now - tempsDebut) * 1e-9);
                 //Chercher donnees
@@ -405,12 +410,20 @@ public class MainJavaFX extends Application {
                 //Ajouter sur graphique
                 serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule,vitesseX));
                 serieVitesseY.getData().add(new XYChart.Data<>(tempsEcoule,vitesseY));
+
+                //Taille de graphique
+                double tailleFenetreGraph = 60;
+                axeX.setLowerBound(Math.max(0,tempsEcoule - tailleFenetreGraph));
+                axeX.setUpperBound(Math.max(tailleFenetreGraph,tempsEcoule));
+
                 //Si on a trop de points
                 if(serieVitesseX.getData().size() > 250) {
                     serieVitesseX.getData().remove(0);
                     serieVitesseY.getData().remove(0);
 
                 }
+                dernierTempsGraph = now;
+            }
             }
         };
         rafraichisseur.start();
