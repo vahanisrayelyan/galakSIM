@@ -373,6 +373,55 @@ public class MainJavaFX extends Application {
         //Temps inital pour graphique
         long tempsDebut = System.nanoTime();
 
+      // Oragnisation de la fenetre
+
+        VBox boiteDonnees = new VBox(15);
+        boiteDonnees.setPadding(new Insets(15,0,15,0));
+        boiteDonnees.getChildren().addAll(txtPos, txtVit, txtAcc, txtmasse);
+
+        VBox boiteGraphs = new VBox(15);
+        boiteGraphs.setPadding(new Insets(15,0,15,0));
+        boiteGraphs.getChildren().addAll(graphVitesse);
+        boiteGraphs.setVisible(false);
+        boiteGraphs.setManaged(false);
+
+        //Creation du conteneur
+        StackPane stackPane = new StackPane(boiteDonnees, boiteGraphs);
+
+        //Boutons pour choisir vue
+        Button bDonnees = new Button(" Données ");
+        Button bGraphs = new Button(" Graphiques ");
+        //Style des boutons
+        String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 5;";
+        String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-cursor: hand;";
+        bDonnees.setStyle(actif);
+        bGraphs.setStyle(nonactif);
+        HBox contBoutons = new HBox(10, bDonnees, bGraphs);
+        contBoutons.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
+
+        // Changement de vue
+        bDonnees.setOnAction(e -> {
+            boiteDonnees.setVisible(true);
+            boiteDonnees.setManaged(true);
+            boiteGraphs.setVisible(false);
+            boiteGraphs.setManaged(false);
+            bDonnees.setStyle(actif);
+            bGraphs.setStyle(nonactif);
+        });
+
+        bGraphs.setOnAction(e -> {
+            boiteGraphs.setVisible(true);
+            boiteGraphs.setManaged(true);
+            boiteDonnees.setVisible(false);
+            boiteDonnees.setManaged(false);
+            bGraphs.setStyle(actif);
+            bDonnees.setStyle(nonactif);
+        });
+
+        titre.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: white;");
+        VBox header = new VBox(titre);
+        header.setPadding(new Insets(0,0,15,0));
+
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
 
@@ -428,8 +477,9 @@ public class MainJavaFX extends Application {
         };
         rafraichisseur.start();
 
-        layout.getChildren().addAll(titre, txtPos, txtVit, txtAcc, txtmasse,graphVitesse);
-        Scene scene = new Scene(layout, 400, 500);
+        layout.getChildren().clear();
+        layout.getChildren().addAll(header,contBoutons,stackPane);
+        Scene scene = new Scene(layout, 450, 550);
         fenetreDetails.setResizable(false);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
