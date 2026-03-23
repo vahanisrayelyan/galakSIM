@@ -17,6 +17,7 @@ public class Simulation {
     private double zoom = 1.0;
     private double offsetX = 0;
     private double offsetY = 0;
+    private final double ECHELLE_AFFICHAGE = 1e-2;
 
     private Planete planeteSuivie = null;
 
@@ -37,7 +38,7 @@ public class Simulation {
 
     public void update(double deltaTemps) {
 
-        physique.effetForceGravitationelle(planetes);
+        physique.effetForceGravitationelle(deltaTemps, planetes);
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
@@ -121,5 +122,12 @@ public class Simulation {
 
     public double getZoom() {
         return zoom;
+    }
+
+    public int getSizeListPlanetes(){
+        return planetes.size();
+    }
+    public String dernierNomPlanete() {
+        return planetes.getLast().getNom();
     }
 }

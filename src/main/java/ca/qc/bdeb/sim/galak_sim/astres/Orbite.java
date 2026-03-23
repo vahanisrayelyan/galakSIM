@@ -8,14 +8,21 @@ import java.util.ArrayList;
 
 public class Orbite {
 
-    private ArrayList<PointOrbite> orbites;
+    private ArrayList<PointOrbite> point;
 
     public Orbite() {
-        orbites = new ArrayList<>();
+        point = new ArrayList<>();
     }
 
     public void ajouterPointOrbite(double x, double y) {
-        orbites.add(new PointOrbite(x, y));
+        point.add(new PointOrbite(x, y));
+        if (point.size() > 1000) {
+            point.remove(0);
+        }
+    }
+
+    public void ajouterPointOrbitePrediction() {
+
     }
 
     public void update(double x, double y) {
@@ -25,15 +32,9 @@ public class Orbite {
     public void draw(GraphicsContext contexte, Color color) {
         contexte.setStroke(color);
 
-        for (int j = 1; j < orbites.size(); j++) {
-            PointOrbite p = orbites.get(j);
-            contexte.strokeLine(p.getX(), p.getY(), orbites.get(orbites.indexOf(p) - 1).getX(), orbites.get(orbites.indexOf(p) - 1).getY());
-
-
-        }
-        if (orbites.size() > 1000) {
-            orbites.remove(0);
-
+        for (int j = 1; j < point.size(); j++) {
+            PointOrbite p = point.get(j);
+            contexte.strokeLine(p.getX(), p.getY(), point.get(point.indexOf(p) - 1).getX(), point.get(point.indexOf(p) - 1).getY());
         }
     }
 }
