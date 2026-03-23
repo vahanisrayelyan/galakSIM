@@ -8,8 +8,7 @@ import java.util.ArrayList;
 public class Physique {
         private final double G = 6.67430e-11;
 
-
-        public void effetForceGravitationelle(double dt,ArrayList<Planete> listePlanetes) {
+        public void effetForceGravitationelle(ArrayList<Planete> listePlanetes) {
             for (Planete planete : listePlanetes) {
                 planete.setAcceleration(new Point2D(0,0));
             }
@@ -35,6 +34,7 @@ public class Physique {
 
                         double r = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
+
                         double ux = dx/r;
                         double uy = dy/r;
 
@@ -49,15 +49,10 @@ public class Physique {
                         double ax2 = - Fgx / m2;
                         double ay2 = - Fgy / m2;
 
-                        System.out.println(ax2);
-
                         pi.setAcceleration(new Point2D(ax1,ay1));
                         pj.setAcceleration(new Point2D(ax2,ay2));
 
                 }
             }
         }
-
-
-
 }

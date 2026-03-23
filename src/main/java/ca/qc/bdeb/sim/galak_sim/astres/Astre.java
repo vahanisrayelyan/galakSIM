@@ -30,7 +30,7 @@ public abstract class Astre {
      */
     protected Image image;
 
-    protected double scale = 1e9;
+    protected double scale = 1e7;
 
     /**
      * Constructeur d'un objet du jeu.
