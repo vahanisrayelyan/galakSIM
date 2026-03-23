@@ -1,6 +1,5 @@
 package ca.qc.bdeb.sim.galak_sim.graphics;
 
-import ca.qc.bdeb.sim.galak_sim.addons.Collision;
 import ca.qc.bdeb.sim.galak_sim.addons.Physique;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
@@ -12,11 +11,11 @@ public class Simulation {
 
     private ArrayList<Planete> planetes = new ArrayList<>();
     private Physique physique = new Physique();
-    private Collision collision = new Collision();
 
     private double zoom = 1.0;
     private double offsetX = 0;
     private double offsetY = 0;
+    private final double ECHELLE_AFFICHAGE = 1e-2;
 
     private Planete planeteSuivie = null;
 
@@ -36,8 +35,7 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
-
-        physique.effetForceGravitationelle(planetes);
+        physique.effetForceGravitationelle(deltaTemps, planetes);
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
@@ -47,9 +45,6 @@ public class Simulation {
             this.offsetX = -planeteSuivie.getPosition().getX();
             this.offsetY = -planeteSuivie.getPosition().getY();
         }
-
-
-        planetes = collision.verificationCollision(planetes);
     }
 
     public void draw(GraphicsContext contexte) {
@@ -58,49 +53,49 @@ public class Simulation {
 
         contexte.clearRect(0, 0, largeur, hauteur);
 
-        contexte.save();
-
-        // Centre de l'écran + déplacement caméra + zoom
-        contexte.translate(largeur / 2.0, hauteur / 2.0);
-        contexte.scale(zoom, zoom);
-        contexte.translate(offsetX, offsetY);
-
         for (Planete p : planetes) {
-            p.draw(contexte);
+            double xEcran = largeur / 2.0 + (p.getPosition().getX() + offsetX) * zoom * ECHELLE_AFFICHAGE;
+            double yEcran = hauteur / 2.0 + (p.getPosition().getY() + offsetY) * zoom * ECHELLE_AFFICHAGE;
+
+            p.draw(contexte, xEcran, yEcran, zoom,
+                    largeur, hauteur, offsetX, offsetY, ECHELLE_AFFICHAGE);
         }
-
-
-        contexte.restore();
     }
 
     public void deplacerCamera(double dxEcran, double dyEcran) {
         planeteSuivie = null;
-        offsetX += dxEcran / zoom;
-        offsetY += dyEcran / zoom;
+
+        double facteur = zoom * ECHELLE_AFFICHAGE;
+
+        offsetX += dxEcran / facteur;
+        offsetY += dyEcran / facteur;
     }
 
-    public void zoomer(double facteur, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         double ancienZoom = zoom;
-        zoom *= facteur;
+        zoom *= facteurZoom;
 
         zoom = Math.max(0.1, Math.min(zoom, 20.0));
 
-        double facteurReel = zoom / ancienZoom;
+        double ancienFacteur = ancienZoom * ECHELLE_AFFICHAGE;
+        double nouveauFacteur = zoom * ECHELLE_AFFICHAGE;
 
-        // Ajuste l'offset pour que le point sous la souris reste fixe
-        double xMondeAvant = (sourisX - largeurCanvas / 2.0) / ancienZoom - offsetX;
-        double yMondeAvant = (sourisY - hauteurCanvas / 2.0) / ancienZoom - offsetY;
+        double xMondeAvant = (sourisX - largeurCanvas / 2.0) / ancienFacteur - offsetX;
+        double yMondeAvant = (sourisY - hauteurCanvas / 2.0) / ancienFacteur - offsetY;
 
-        double xMondeApres = (sourisX - largeurCanvas / 2.0) / zoom - offsetX;
-        double yMondeApres = (sourisY - hauteurCanvas / 2.0) / zoom - offsetY;
+        double xMondeApres = (sourisX - largeurCanvas / 2.0) / nouveauFacteur - offsetX;
+        double yMondeApres = (sourisY - hauteurCanvas / 2.0) / nouveauFacteur - offsetY;
 
         offsetX += (xMondeApres - xMondeAvant);
         offsetY += (yMondeApres - yMondeAvant);
     }
 
     public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
-        double xMonde = (xEcran - largeurCanvas / 2.0) / zoom - offsetX;
-        double yMonde = (yEcran - hauteurCanvas / 2.0) / zoom - offsetY;
+        double facteur = zoom * ECHELLE_AFFICHAGE;
+
+        double xMonde = (xEcran - largeurCanvas / 2.0) / facteur - offsetX;
+        double yMonde = (yEcran - hauteurCanvas / 2.0) / facteur - offsetY;
+
         return new Point2D(xMonde, yMonde);
     }
 
@@ -121,5 +116,11 @@ public class Simulation {
 
     public double getZoom() {
         return zoom;
+    }
+    public int getSizeListPlanetes(){
+        return planetes.size();
+    }
+    public String dernierNomPlanete() {
+        return planetes.getLast().getNom();
     }
 }
