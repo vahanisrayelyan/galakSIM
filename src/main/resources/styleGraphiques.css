@@ -1,0 +1,12 @@
+/*titres*/
+
+.axis-label {-fx-text-fill: white;}
+
+/*nombres*/
+.axis {-fx-tick-label-fill: white;}
+
+/* légende */
+.chart-legend-item {-fx-text-fill: white;}
+.chart-legend {-fx-background-color: transparent;}
+
+.chart {-fx-padding: 5px;}
