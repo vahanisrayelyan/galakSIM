@@ -22,28 +22,18 @@ public class Orbite {
         ajouterPointOrbite(x, y);
     }
 
-    public void draw(GraphicsContext contexte, Color color,
-                     double largeur, double hauteur,
-                     double offsetX, double offsetY,
-                     double zoom, double echelleAffichage) {
-
+    public void draw(GraphicsContext contexte, Color color) {
         contexte.setStroke(color);
 
-        for (int i = 1; i < orbites.size(); i++) {
-            PointOrbite precedent = orbites.get(i - 1);
-            PointOrbite courant = orbites.get(i);
+        for (int j = 1; j < orbites.size(); j++) {
+            PointOrbite p = orbites.get(j);
+            contexte.strokeLine(p.getX(), p.getY(), orbites.get(orbites.indexOf(p) - 1).getX(), orbites.get(orbites.indexOf(p) - 1).getY());
 
-            double x1 = largeur / 2.0 + (precedent.getX() + offsetX) * zoom * echelleAffichage;
-            double y1 = hauteur / 2.0 + (precedent.getY() + offsetY) * zoom * echelleAffichage;
 
-            double x2 = largeur / 2.0 + (courant.getX() + offsetX) * zoom * echelleAffichage;
-            double y2 = hauteur / 2.0 + (courant.getY() + offsetY) * zoom * echelleAffichage;
-
-            contexte.strokeLine(x1, y1, x2, y2);
         }
-
         if (orbites.size() > 1000) {
             orbites.remove(0);
+
         }
     }
 }

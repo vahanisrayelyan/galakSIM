@@ -6,39 +6,34 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 
 public class Physique {
+        private final double G = 6.67430e-11;
 
-    // Constante adaptée à une simulation visuelle
-    private final double G = 6.67430e-11;
 
-        public void effetForceGravitationelle(ArrayList<Planete> listePlanetes) {
+        public void effetForceGravitationelle(double dt,ArrayList<Planete> listePlanetes) {
             for (Planete planete : listePlanetes) {
                 planete.setAcceleration(new Point2D(0,0));
             }
 
-        for (int i = 0; i < listePlanetes.size(); i++) {
-            for (int j = i + 1; j < listePlanetes.size(); j++) {
+            for (int i = 0; i < listePlanetes.size(); i ++) {
 
-                Planete pi = listePlanetes.get(i);
-                Planete pj = listePlanetes.get(j);
+                for (int j = i + 1; j < listePlanetes.size(); j++) {
 
-                double m1 = pi.getMasse();
-                double m2 = pj.getMasse();
+                        Planete pi = listePlanetes.get(i);
+                        Planete pj = listePlanetes.get(j);
 
-                double x1 = pi.getPosition().getX();
-                double y1 = pi.getPosition().getY();
+                        double m1 = pi.getMasse();
+                        double m2 = pj.getMasse();
 
-                double x2 = pj.getPosition().getX();
-                double y2 = pj.getPosition().getY();
+                        double x1 = pi.getPosition().getX();
+                        double x2 = pj.getPosition().getX();
 
-                double dx = x2 - x1;
-                double dy = y2 - y1;
+                        double y1 =  pi.getPosition().getY();
+                        double y2 =  pj.getPosition().getY();
 
-                double r = Math.sqrt(dx * dx + dy * dy);
+                        double dx = x2 - x1;
+                        double dy = y2 - y1;
 
-                // évite division par 0
-                if (r < 1) {
-                    r = 1;
-                }
+                        double r = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
                         double ux = dx/r;
                         double uy = dy/r;

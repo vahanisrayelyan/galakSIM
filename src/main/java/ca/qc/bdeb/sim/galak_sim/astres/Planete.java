@@ -37,31 +37,21 @@ public class Planete extends Astre {
         orbitePlanete.update(position.getX(), position.getY());
     }
 
-    public void draw(GraphicsContext contexte,
-                     double xEcran, double yEcran,
-                     double zoom,
-                     double largeur, double hauteur,
-                     double offsetX, double offsetY,
-                     double echelleAffichage) {
+    public void draw(GraphicsContext contexte) {
 
-        orbitePlanete.draw(contexte, couleurOrbite, largeur, hauteur, offsetX, offsetY, zoom, echelleAffichage);
-
-        double w = taille.getX() * zoom;
-        double h = taille.getY() * zoom;
-
-        w = Math.max(5, Math.min(w, 300));
-        h = Math.max(5, Math.min(h, 300));
+        double w = taille.getX();
+        double h = taille.getY();
 
         contexte.drawImage(
                 image,
-                xEcran - w / 2,
-                yEcran - h / 2,
+                position.getX() - w/2,
+                position.getY() - h/2,
                 w,
                 h
         );
-
         contexte.setFill(Color.WHITE);
-        contexte.fillText(nom, xEcran - w / 2, yEcran - 3 * h / 4);
+        contexte.fillText(nom, position.getX()-w/2, position.getY()-3*h/4);
+        orbitePlanete.draw(contexte,couleurOrbite);
     }
 
     private static Image imageAleatoire() {
