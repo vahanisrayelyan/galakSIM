@@ -367,7 +367,7 @@ public class MainJavaFX extends Application {
 
         DecimalFormat df = new DecimalFormat("#.####");
 
-        // Creation Graphique
+        // Creation Graphique Vitesse
 
         //Axes
         NumberAxis axeX = new NumberAxis();
@@ -390,7 +390,36 @@ public class MainJavaFX extends Application {
         serieVitesseX.setName(" Vitesse X ");
         XYChart.Series<Number, Number> serieVitesseY = new XYChart.Series<>();
         serieVitesseY.setName(" Vitesse Y ");
+
+        //Creation graphique acceleration
+
+        //Axes acceleration
+        NumberAxis axeAccelX = new NumberAxis();
+        axeAccelX.setLabel(" Temps (s) ");
+        axeAccelX.setForceZeroInRange(false);
+        axeAccelX.setAutoRanging(false);
+        axeAccelX.setTickUnit(10);
+
+        NumberAxis axeAccelY = new NumberAxis();
+        axeAccelY.setLabel(" Accéleration (m/s²) ");
+
+        //Graphique acceleration
+        LineChart<Number,Number> graphAcceleration = new LineChart<>(axeAccelX,axeAccelY);
+        graphAcceleration.setTitle(" Évolution de l'accéleration ");
+        graphAcceleration.setAnimated(false);
+        graphAcceleration.setCreateSymbols(false);
+
+        //Lignes sur graphique pour vitesse X et Y
+        XYChart.Series<Number, Number> serieAccelX = new XYChart.Series<>();
+        serieAccelX.setName(" Accéleration X ");
+        XYChart.Series<Number, Number> serieAccelY = new XYChart.Series<>();
+        serieAccelY.setName(" Accéleration Y ");
+
         graphVitesse.getData().addAll(serieVitesseX, serieVitesseY);
+        graphAcceleration.getData().addAll(serieAccelX, serieAccelY);
+
+
+
 
         //Temps inital pour graphique
         long[] tempsDebut = {System.nanoTime()};
@@ -403,7 +432,7 @@ public class MainJavaFX extends Application {
 
         VBox boiteGraphs = new VBox(15);
         boiteGraphs.setPadding(new Insets(15, 0, 15, 0));
-        boiteGraphs.getChildren().addAll(graphVitesse);
+        boiteGraphs.getChildren().addAll(graphVitesse,graphAcceleration);
         boiteGraphs.setVisible(false);
         boiteGraphs.setManaged(false);
 
@@ -474,19 +503,31 @@ public class MainJavaFX extends Application {
                         //Chercher donnees
                         double vitesseX = p.getVelocite().getX();
                         double vitesseY = p.getVelocite().getY();
+                        double accelX = p.getAcceleration().getX();
+                        double accelY = p.getAcceleration().getY();
+
                         //Ajouter sur graphique
                         serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule, vitesseX));
                         serieVitesseY.getData().add(new XYChart.Data<>(tempsEcoule, vitesseY));
+                        serieAccelX.getData().add(new XYChart.Data<>(tempsEcoule,accelX));
+                        serieAccelY.getData().add((new XYChart.Data<>(tempsEcoule,accelY)));
 
                         //Taille de graphique
                         double tailleFenetreGraph = 60;
                         axeX.setLowerBound(Math.max(0, tempsEcoule - tailleFenetreGraph));
                         axeX.setUpperBound(Math.max(tailleFenetreGraph, tempsEcoule));
+                        axeAccelX.setLowerBound(Math.max(0, tempsEcoule - tailleFenetreGraph));
+                        axeAccelX.setUpperBound(Math.max(tailleFenetreGraph, tempsEcoule));
 
                         //Si on a trop de points
                         if (serieVitesseX.getData().size() > 250) {
                             serieVitesseX.getData().removeFirst();
                             serieVitesseY.getData().removeFirst();
+
+                        }
+                        if (serieAccelX.getData().size() > 250) {
+                            serieAccelX.getData().removeFirst();
+                            serieAccelY.getData().removeFirst();
 
                         }
                         dernierTempsGraph = now;
