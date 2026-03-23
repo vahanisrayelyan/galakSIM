@@ -26,7 +26,6 @@ public class Collision {
                 double distanceEntre = Math.sqrt(Math.pow(xj - xi, 2) + Math.pow(yj - yi, 2));
 
                 if (distanceEntre - rayoni - rayonj <= 0) {
-                    System.out.println("Touche");
                     listePlanetes.remove(pi);
                     listePlanetes.remove(pj);
                 }
