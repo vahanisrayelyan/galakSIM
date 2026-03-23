@@ -7,6 +7,7 @@ import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -20,6 +21,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -38,6 +40,7 @@ public class MainJavaFX extends Application {
     private double dernierY;
     private boolean cameraEnDeplacement = false;
     private boolean pause = false;
+    private double vitesseSimulation = 1.0;
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
@@ -103,7 +106,7 @@ public class MainJavaFX extends Application {
             private long dernierTemps = System.nanoTime();
             @Override
             public void handle(long temps) {
-                double deltaTemps = (temps - dernierTemps) * 1e-9;
+                double deltaTemps = (temps - dernierTemps) * 1e-9 * vitesseSimulation;
                 contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 if(!pause) {
@@ -172,6 +175,12 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setPrefHeight(200);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
+        Text vitesseTexte = new Text("Vitesse de la simulation: ×"+ vitesseSimulation);
+        vitesseTexte.setFill(Color.WHITE);
+        vitesseTexte.setTextAlignment(TextAlignment.CENTER);
+
+        HBox modificationTemps = new HBox();
+
         Button btnPause = new Button("⏸");
         btnPause.setAlignment(Pos.CENTER);
         btnPause.setOnAction(e -> {
@@ -184,6 +193,27 @@ public class MainJavaFX extends Application {
 
             }
         });
+
+        Button btnPlusVite = new Button("⏩");
+        Button btnMoinsVite = new Button("⏪");
+
+        btnPlusVite.setOnAction(e -> {
+            vitesseSimulation *= 2;
+            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+        });
+
+        btnMoinsVite.setOnAction(e -> {
+            vitesseSimulation /= 2;
+            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+        });
+
+        modificationTemps.getChildren().addAll(
+                btnMoinsVite,
+                btnPause,
+                btnPlusVite
+        );
+        modificationTemps.setAlignment(Pos.CENTER);
+        modificationTemps.setSpacing(10);
 
         Region espaceur = new Region();
         VBox.setVgrow(espaceur, Priority.ALWAYS);
@@ -201,7 +231,8 @@ public class MainJavaFX extends Application {
                 btnResetVue,
                 defileurPlanetes,
                 espaceur,
-                btnPause
+                vitesseTexte,
+                modificationTemps
         );
 
         Button btnAfficher = new Button("☰");
