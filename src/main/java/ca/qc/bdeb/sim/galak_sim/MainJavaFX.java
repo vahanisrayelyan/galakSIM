@@ -7,6 +7,7 @@ import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -20,6 +21,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -38,6 +40,7 @@ public class MainJavaFX extends Application {
     private double dernierY;
     private boolean cameraEnDeplacement = false;
     private boolean pause = false;
+    private double vitesseSimulation = 1.0;
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
@@ -103,7 +106,7 @@ public class MainJavaFX extends Application {
             private long dernierTemps = System.nanoTime();
             @Override
             public void handle(long temps) {
-                double deltaTemps = (temps - dernierTemps) * 1e-9;
+                double deltaTemps = (temps - dernierTemps) * 1e-9 * vitesseSimulation;
                 contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 if(!pause) {
@@ -172,6 +175,12 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setPrefHeight(200);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
+        Text vitesseTexte = new Text("Vitesse de la simulation: ×"+ vitesseSimulation);
+        vitesseTexte.setFill(Color.WHITE);
+        vitesseTexte.setTextAlignment(TextAlignment.CENTER);
+
+        HBox modificationTemps = new HBox();
+
         Button btnPause = new Button("⏸");
         btnPause.setAlignment(Pos.CENTER);
         btnPause.setOnAction(e -> {
@@ -184,6 +193,27 @@ public class MainJavaFX extends Application {
 
             }
         });
+
+        Button btnPlusVite = new Button("⏩");
+        Button btnMoinsVite = new Button("⏪");
+
+        btnPlusVite.setOnAction(e -> {
+            vitesseSimulation *= 2;
+            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+        });
+
+        btnMoinsVite.setOnAction(e -> {
+            vitesseSimulation /= 2;
+            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+        });
+
+        modificationTemps.getChildren().addAll(
+                btnMoinsVite,
+                btnPause,
+                btnPlusVite
+        );
+        modificationTemps.setAlignment(Pos.CENTER);
+        modificationTemps.setSpacing(10);
 
         Region espaceur = new Region();
         VBox.setVgrow(espaceur, Priority.ALWAYS);
@@ -201,7 +231,8 @@ public class MainJavaFX extends Application {
                 btnResetVue,
                 defileurPlanetes,
                 espaceur,
-                btnPause
+                vitesseTexte,
+                modificationTemps
         );
 
         Button btnAfficher = new Button("☰");
@@ -385,7 +416,7 @@ public class MainJavaFX extends Application {
         graphVitesse.getData().addAll(serieVitesseX,serieVitesseY);
 
         //Temps inital pour graphique
-        long tempsDebut = System.nanoTime();
+        long[] tempsDebut ={System.nanoTime()};
 
       // Oragnisation de la fenetre
 
@@ -439,7 +470,7 @@ public class MainJavaFX extends Application {
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
 
-            private long dernierTempsGraph =  System.nanoTime(); //tracker pour graphique
+            private long dernierTempsGraph = System.nanoTime(); //tracker pour graphique
 
             @Override
             public void handle(long now) {
@@ -464,29 +495,35 @@ public class MainJavaFX extends Application {
                 txtmasse.setText("Masse " + df.format(p.getMasse()) + " unité");
 
                 //Logique pour graphique
-                if ((now-dernierTempsGraph) > 500000000) {
-                //Temps
-                double tempsEcoule = ((now - tempsDebut) * 1e-9);
-                //Chercher donnees
-                double vitesseX = p.getVelocite().getX();
-                double vitesseY = p.getVelocite().getY();
-                //Ajouter sur graphique
-                serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule,vitesseX));
-                serieVitesseY.getData().add(new XYChart.Data<>(tempsEcoule,vitesseY));
+                if (!pause) {
+                    if ((now - dernierTempsGraph) > 500000000) {
+                        //Temps
+                        double tempsEcoule = ((now - tempsDebut[0]) * 1e-9);
+                        //Chercher donnees
+                        double vitesseX = p.getVelocite().getX();
+                        double vitesseY = p.getVelocite().getY();
+                        //Ajouter sur graphique
+                        serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule, vitesseX));
+                        serieVitesseY.getData().add(new XYChart.Data<>(tempsEcoule, vitesseY));
 
-                //Taille de graphique
-                double tailleFenetreGraph = 60;
-                axeX.setLowerBound(Math.max(0,tempsEcoule - tailleFenetreGraph));
-                axeX.setUpperBound(Math.max(tailleFenetreGraph,tempsEcoule));
+                        //Taille de graphique
+                        double tailleFenetreGraph = 60;
+                        axeX.setLowerBound(Math.max(0, tempsEcoule - tailleFenetreGraph));
+                        axeX.setUpperBound(Math.max(tailleFenetreGraph, tempsEcoule));
 
-                //Si on a trop de points
-                if(serieVitesseX.getData().size() > 250) {
-                    serieVitesseX.getData().remove(0);
-                    serieVitesseY.getData().remove(0);
+                        //Si on a trop de points
+                        if (serieVitesseX.getData().size() > 250) {
+                            serieVitesseX.getData().removeFirst();
+                            serieVitesseY.getData().removeFirst();
 
+                        }
+                        dernierTempsGraph = now;
+                    }
+                } else {
+                    long tempsEnPause = now - dernierTempsGraph;
+                    tempsDebut[0] = tempsDebut[0] + tempsEnPause;
+                    dernierTempsGraph = now;
                 }
-                dernierTempsGraph = now;
-            }
             }
         };
         rafraichisseur.start();
@@ -494,6 +531,7 @@ public class MainJavaFX extends Application {
         layout.getChildren().clear();
         layout.getChildren().addAll(header,contBoutons,stackPane);
         Scene scene = new Scene(layout, 450, 550);
+        scene.getStylesheets().add(getClass().getResource("/styleGraphiques.css").toExternalForm());
         fenetreDetails.setResizable(false);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
