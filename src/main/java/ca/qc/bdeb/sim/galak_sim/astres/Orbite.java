@@ -8,33 +8,42 @@ import java.util.ArrayList;
 
 public class Orbite {
 
-    private ArrayList<PointOrbite> point;
+    private ArrayList<PointOrbite> orbites;
 
     public Orbite() {
-        point = new ArrayList<>();
+        orbites = new ArrayList<>();
     }
 
     public void ajouterPointOrbite(double x, double y) {
-        point.add(new PointOrbite(x, y));
-        if (point.size() > 1000) {
-            point.remove(0);
-        }
-    }
-
-    public void ajouterPointOrbitePrediction() {
-
+        orbites.add(new PointOrbite(x, y));
     }
 
     public void update(double x, double y) {
         ajouterPointOrbite(x, y);
     }
 
-    public void draw(GraphicsContext contexte, Color color) {
+    public void draw(GraphicsContext contexte, Color color,
+                     double largeur, double hauteur,
+                     double offsetX, double offsetY,
+                     double zoom, double echelleAffichage) {
+
         contexte.setStroke(color);
 
-        for (int j = 1; j < point.size(); j++) {
-            PointOrbite p = point.get(j);
-            contexte.strokeLine(p.getX(), p.getY(), point.get(point.indexOf(p) - 1).getX(), point.get(point.indexOf(p) - 1).getY());
+        for (int i = 1; i < orbites.size(); i++) {
+            PointOrbite precedent = orbites.get(i - 1);
+            PointOrbite courant = orbites.get(i);
+
+            double x1 = largeur / 2.0 + (precedent.getX() + offsetX) * zoom * echelleAffichage;
+            double y1 = hauteur / 2.0 + (precedent.getY() + offsetY) * zoom * echelleAffichage;
+
+            double x2 = largeur / 2.0 + (courant.getX() + offsetX) * zoom * echelleAffichage;
+            double y2 = hauteur / 2.0 + (courant.getY() + offsetY) * zoom * echelleAffichage;
+
+            contexte.strokeLine(x1, y1, x2, y2);
+        }
+
+        if (orbites.size() > 1000) {
+            orbites.remove(0);
         }
     }
 }

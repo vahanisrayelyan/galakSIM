@@ -38,7 +38,9 @@ public class MainJavaFX extends Application {
     private double dernierY;
     private boolean cameraEnDeplacement = false;
     private boolean pause = false;
+
     private double vitesseSimulation = 1.0;
+
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
@@ -50,6 +52,7 @@ public class MainJavaFX extends Application {
         input.etatTouches(scene);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
+        simulation = new Simulation();
         creerInterface(panneau, canvas);
 
         var contexte = canvas.getGraphicsContext2D();
@@ -57,7 +60,6 @@ public class MainJavaFX extends Application {
         canvas.widthProperty().bind(panneau.widthProperty());
         canvas.heightProperty().bind(panneau.heightProperty());
 
-        simulation = new Simulation();
 
         // Zoom avec molette
         canvas.setOnScroll(e -> {
@@ -101,12 +103,13 @@ public class MainJavaFX extends Application {
         AnimationTimer timer = new AnimationTimer() {
 
             private long dernierTemps = System.nanoTime();
+
             @Override
             public void handle(long temps) {
                 double deltaTemps = (temps - dernierTemps) * 1e-9 * vitesseSimulation;
                 contexte.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                if(!pause) {
+                if (!pause) {
                     simulation.update(deltaTemps);
                 }
 
@@ -142,6 +145,7 @@ public class MainJavaFX extends Application {
         texteNom.setFill(Color.WHITE);
         var saisiNom = new TextField();
 
+
         // Vitesses
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
@@ -172,7 +176,7 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setPrefHeight(200);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-        Text vitesseTexte = new Text("Vitesse de la simulation: ×"+ vitesseSimulation);
+        Text vitesseTexte = new Text("Vitesse de la simulation: ×" + vitesseSimulation);
         vitesseTexte.setFill(Color.WHITE);
         vitesseTexte.setTextAlignment(TextAlignment.CENTER);
 
@@ -204,34 +208,14 @@ public class MainJavaFX extends Application {
             vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
         });
 
-        modificationTemps.getChildren().addAll(
-                btnMoinsVite,
-                btnPause,
-                btnPlusVite
-        );
+        modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite);
         modificationTemps.setAlignment(Pos.CENTER);
         modificationTemps.setSpacing(10);
-
 
         Region espaceur = new Region();
         VBox.setVgrow(espaceur, Priority.ALWAYS);
 
-        menuLateral.getChildren().addAll(
-                texteNom,
-                saisiNom,
-                texteVitesseX,
-                saisiVitesseX,
-                texteVitesseY,
-                saisiVitesseY,
-                texteMasse,
-                saisiMasse,
-                texteAjoutPlanete,
-                btnResetVue,
-                defileurPlanetes,
-                espaceur,
-                vitesseTexte,
-                modificationTemps
-        );
+        menuLateral.getChildren().addAll(texteNom, saisiNom, texteVitesseX, saisiVitesseX, texteVitesseY, saisiVitesseY, texteMasse, saisiMasse, texteAjoutPlanete, btnResetVue, defileurPlanetes, espaceur, vitesseTexte, modificationTemps);
 
         Button btnAfficher = new Button("☰");
         btnAfficher.setVisible(false);
@@ -288,7 +272,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField nom, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -315,9 +299,9 @@ public class MainJavaFX extends Application {
         }
 
         if (positionLibre) {
-            String nomPlanete = saisiNom.getText().isEmpty() ? "Planète " + (simulation.getSizeListPlanetes() + 1) : saisiNom.getText();
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete);
+            String nomPlanete = nom.getText().isEmpty() ? "Planète " + (simulation.getSizeListPlanetes() + 1) : nom.getText();
 
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete);
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);
 
@@ -338,7 +322,7 @@ public class MainJavaFX extends Application {
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
         }
-        saisiNom.clear();
+        nom.clear();
     }
 
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
@@ -396,29 +380,29 @@ public class MainJavaFX extends Application {
         axeY.setLabel("Vitesse (m/s) ");
 
         //Graphique
-        LineChart<Number,Number> graphVitesse = new LineChart<>(axeX,axeY);
+        LineChart<Number, Number> graphVitesse = new LineChart<>(axeX, axeY);
         graphVitesse.setTitle("Évolution de vitesse");
         graphVitesse.setAnimated(false);
         graphVitesse.setCreateSymbols(false);
 
         //Lignes sur graphique pour vitesse X et Y
-        XYChart.Series<Number,Number> serieVitesseX = new XYChart.Series<>();
+        XYChart.Series<Number, Number> serieVitesseX = new XYChart.Series<>();
         serieVitesseX.setName(" Vitesse X ");
         XYChart.Series<Number, Number> serieVitesseY = new XYChart.Series<>();
         serieVitesseY.setName(" Vitesse Y ");
-        graphVitesse.getData().addAll(serieVitesseX,serieVitesseY);
+        graphVitesse.getData().addAll(serieVitesseX, serieVitesseY);
 
         //Temps inital pour graphique
-        long[] tempsDebut ={System.nanoTime()};
+        long[] tempsDebut = {System.nanoTime()};
 
-      // Oragnisation de la fenetre
+        // Oragnisation de la fenetre
 
         VBox boiteDonnees = new VBox(15);
-        boiteDonnees.setPadding(new Insets(15,0,15,0));
+        boiteDonnees.setPadding(new Insets(15, 0, 15, 0));
         boiteDonnees.getChildren().addAll(txtPos, txtVit, txtAcc, txtmasse);
 
         VBox boiteGraphs = new VBox(15);
-        boiteGraphs.setPadding(new Insets(15,0,15,0));
+        boiteGraphs.setPadding(new Insets(15, 0, 15, 0));
         boiteGraphs.getChildren().addAll(graphVitesse);
         boiteGraphs.setVisible(false);
         boiteGraphs.setManaged(false);
@@ -458,7 +442,7 @@ public class MainJavaFX extends Application {
 
         titre.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: white;");
         VBox header = new VBox(titre);
-        header.setPadding(new Insets(0,0,15,0));
+        header.setPadding(new Insets(0, 0, 15, 0));
 
         // L'AnimationTimer spécifique à cette fenêtre
         AnimationTimer rafraichisseur = new AnimationTimer() {
@@ -475,16 +459,11 @@ public class MainJavaFX extends Application {
                     fenetresOuvertes.remove(p);
                     return;
                 }
-                txtPos.setText("Position X : " + df.format(p.getPosition().getX()) + " unité" +
-                        "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité");
+                txtPos.setText("Position X : " + df.format(p.getPosition().getX()) + " unité" + "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité");
                 double vitesseAbsolue = Math.sqrt(Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2));
-                txtVit.setText("Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" +
-                        "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" +
-                        "\nVitesse : " + df.format(vitesseAbsolue) + " unité");
+                txtVit.setText("Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" + "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" + "\nVitesse : " + df.format(vitesseAbsolue) + " unité");
                 double accelerationAbsolue = Math.sqrt(Math.pow(p.getAcceleration().getX(), 2) + Math.pow(p.getAcceleration().getY(), 2));
-                txtAcc.setText("Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" +
-                        "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
-                        "\nAccélération : " + df.format(accelerationAbsolue) + " unité");
+                txtAcc.setText("Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" + "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" + "\nAccélération : " + df.format(accelerationAbsolue) + " unité");
                 txtmasse.setText("Masse " + df.format(p.getMasse()) + " unité");
 
                 //Logique pour graphique
@@ -522,7 +501,7 @@ public class MainJavaFX extends Application {
         rafraichisseur.start();
 
         layout.getChildren().clear();
-        layout.getChildren().addAll(header,contBoutons,stackPane);
+        layout.getChildren().addAll(header, contBoutons, stackPane);
         Scene scene = new Scene(layout, 450, 550);
         scene.getStylesheets().add(getClass().getResource("/styleGraphiques.css").toExternalForm());
         fenetreDetails.setResizable(false);
