@@ -49,6 +49,7 @@ public class MainJavaFX extends Application {
         input.etatTouches(scene);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
+        simulation = new Simulation();
         creerInterface(panneau, canvas);
 
         var contexte = canvas.getGraphicsContext2D();
@@ -56,7 +57,7 @@ public class MainJavaFX extends Application {
         canvas.widthProperty().bind(panneau.widthProperty());
         canvas.heightProperty().bind(panneau.heightProperty());
 
-        simulation = new Simulation();
+
 
         // Zoom avec molette
         canvas.setOnScroll(e -> {
@@ -136,6 +137,11 @@ public class MainJavaFX extends Application {
         menuLateral.setVisible(true);
         VBox listePlanete = new VBox(5);
 
+        //Nom
+        var texteNom = new Text("Nom");
+        texteNom.setFill(Color.WHITE);
+        var saisiNom = new TextField();
+
         // Vitesses
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
@@ -152,7 +158,7 @@ public class MainJavaFX extends Application {
         saisiMasse.setTextFormatter(formateurNumeriqueMasse());
 
         canvas.setOnMouseClicked(e -> {
-            ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, listePlanete);
+            ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete);
         });
 
         var texteAjoutPlanete = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
@@ -183,6 +189,8 @@ public class MainJavaFX extends Application {
         VBox.setVgrow(espaceur, Priority.ALWAYS);
 
         menuLateral.getChildren().addAll(
+                texteNom,
+                saisiNom,
                 texteVitesseX,
                 saisiVitesseX,
                 texteVitesseY,
@@ -251,7 +259,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField nom, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -266,6 +274,8 @@ public class MainJavaFX extends Application {
         double masse = saisiMasse.getText().isEmpty() ? 0 : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e14;
         double taille = 50;
 
+
+
         var positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
             double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
@@ -278,13 +288,16 @@ public class MainJavaFX extends Application {
         }
 
         if (positionLibre) {
-            String nomDeBase = "Planète " + (listePlanete.getChildren().size() + 1);
-            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomDeBase);
+            String nomPlanete = nom.getText().isEmpty()
+                    ? "Planète " + (simulation.getSizeListPlanetes() + 1)
+                    : nom.getText();
+
+            Planete nouvelle = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete);
 
             HBox lignePlanete = new HBox(10);
             lignePlanete.setAlignment(Pos.CENTER_LEFT);
 
-            Text info = new Text("Planète " + (listePlanete.getChildren().size() + 1));
+            Text info = new Text(simulation.dernierNomPlanete());
             info.setFill(Color.LIGHTGRAY);
             info.setOnMouseClicked(ev -> {
                 ouvrirFenetreDetails(nouvelle, canvas);
@@ -301,6 +314,7 @@ public class MainJavaFX extends Application {
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
         }
+        nom.clear();
     }
 
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
