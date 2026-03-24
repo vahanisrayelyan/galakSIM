@@ -29,7 +29,6 @@ public class Orbite {
             PointOrbite p = orbites.get(j);
             contexte.strokeLine(p.getX(), p.getY(), orbites.get(orbites.indexOf(p) - 1).getX(), orbites.get(orbites.indexOf(p) - 1).getY());
 
-
         }
         if (orbites.size() > 1000) {
             orbites.remove(0);

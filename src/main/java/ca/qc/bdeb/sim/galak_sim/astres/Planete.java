@@ -44,29 +44,33 @@ public class Planete extends Astre {
 
         contexte.drawImage(
                 image,
-                position.getX() - w/2,
-                position.getY() - h/2,
+                position.getX() - w / 2,
+                position.getY() - h / 2,
                 w,
                 h
         );
         contexte.setFill(Color.WHITE);
-        contexte.fillText(nom, position.getX()-w/2, position.getY()-3*h/4);
-        orbitePlanete.draw(contexte,couleurOrbite);
+        contexte.fillText(nom, position.getX() - w / 2, position.getY() - 3 * h / 4);
+        orbitePlanete.draw(contexte, couleurOrbite);
     }
 
     private static Image imageAleatoire() {
-        int index = (int)(Math.random() * IMAGES.length);
+        int index = (int) (Math.random() * IMAGES.length);
         return new Image(Planete.class.getResourceAsStream(IMAGES[index]));
     }
+
     private Color couleurAleatoire() {
-        return Color.rgb((int) (Math.random()*256), (int) (Math.random()*256), (int) (Math.random()*256));
+        return Color.rgb((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256));
     }
+
     public String getNom() {
         return nom;
     }
+
     public void setNom(String nom) {
         this.nom = nom;
     }
+
     public Point2D getPosition() {
         return new Point2D(position.getX(), position.getY());
     }

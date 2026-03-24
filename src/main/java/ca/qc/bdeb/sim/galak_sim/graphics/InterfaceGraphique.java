@@ -8,10 +8,8 @@ public class InterfaceGraphique {
     }
 
     public void update(double dt) {
-
     }
 
     public void draw(GraphicsContext gc, double w, double h) {
-
     }
 }

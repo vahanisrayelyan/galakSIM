@@ -1,0 +1,30 @@
+/*Titres axes*/
+.axis-label {
+-fx-text-fill: white;
+}
+
+/*Nombres axes*/
+.axis {
+-fx-tick-label-fill: white;
+}
+
+/*Légende*/
+.chart-legend-item {
+-fx-text-fill: white;
+}
+
+.chart-legend {
+-fx-background-color: transparent;
+}
+
+/*Graphique*/
+.chart {
+-fx-padding: 5px;
+}
+
+/*Titre graphique*/
+.chart-title {
+-fx-text-fill: white;
+-fx-text-size: 1.2em};
+-fx-font-weight: bold;
+}
