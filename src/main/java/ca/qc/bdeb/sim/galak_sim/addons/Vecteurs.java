@@ -10,13 +10,9 @@ public class Vecteurs {
             case "Aucun" -> choix = 0;
             case "Force" -> choix = 1;
             case "Vitesse" -> choix = 2;
-
         }
-
-
     }
 
     public void draw (GraphicsContext gc) {
-
     }
 }

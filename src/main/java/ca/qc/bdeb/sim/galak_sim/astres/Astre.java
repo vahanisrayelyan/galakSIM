@@ -25,7 +25,7 @@ public abstract class Astre {
 
     protected void update(double dt) {
         velocite = velocite.add(acceleration.multiply(dt));
-        // p = p + v·dt
+
         double ajoutPositionx = (velocite.getX() * dt) / scale;
         double ajoutPositiony = (velocite.getY() * dt) / scale;
 
