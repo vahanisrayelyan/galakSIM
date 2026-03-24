@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
 
 public class Simulation {
+
     private ArrayList<Planete> planetes = new ArrayList<>();
     private Physique physique = new Physique();
     private Collision collision = new Collision();
@@ -55,13 +56,6 @@ public class Simulation {
 
         contexte.clearRect(0, 0, largeur, hauteur);
 
-        contexte.save();
-
-        // Centre de l'écran + déplacement caméra + zoom
-        contexte.translate(largeur / 2.0, hauteur / 2.0);
-        contexte.scale(zoom, zoom);
-        contexte.translate(offsetX, offsetY);
-
         for (Planete p : planetes) {
             p.draw(contexte);
         }
@@ -76,9 +70,9 @@ public class Simulation {
         offsetY += dyEcran / zoom;
     }
 
-    public void zoomer(double facteur, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         double ancienZoom = zoom;
-        zoom *= facteur;
+        zoom *= facteurZoom;
 
         zoom = Math.max(0.1, Math.min(zoom, 20.0));
 
