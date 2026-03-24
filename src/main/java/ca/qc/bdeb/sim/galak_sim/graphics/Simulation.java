@@ -56,6 +56,13 @@ public class Simulation {
 
         contexte.clearRect(0, 0, largeur, hauteur);
 
+        contexte.save();
+
+        // Centre de l'écran + déplacement caméra + zoom
+        contexte.translate(largeur / 2.0, hauteur / 2.0);
+        contexte.scale(zoom, zoom);
+        contexte.translate(offsetX, offsetY);
+
         for (Planete p : planetes) {
             p.draw(contexte);
         }
