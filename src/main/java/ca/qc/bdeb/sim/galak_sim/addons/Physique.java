@@ -14,9 +14,7 @@ public class Physique {
         }
 
         for (int i = 0; i < listePlanetes.size(); i++) {
-
             for (int j = i + 1; j < listePlanetes.size(); j++) {
-
                 Planete pi = listePlanetes.get(i);
                 Planete pj = listePlanetes.get(j);
 
@@ -32,19 +30,23 @@ public class Physique {
                 double dx = x2 - x1;
                 double dy = y2 - y1;
 
-                double r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+                double r = Math.sqrt(dx * dx + dy * dy);
+
+                if (r < 1) {
+                    continue;
+                }
 
                 double ux = dx / r;
                 double uy = dy / r;
 
-                double Fg = (G * m1 * m2) / Math.pow(r, 2);
+                double Fg = (G * m1 * m2) / (r * r);
 
                 double Fgx = Fg * ux;
                 double Fgy = Fg * uy;
 
                 double ax1 = Fgx / m1;
                 double ay1 = Fgy / m1;
-                // Fab = -Fba
+
                 double ax2 = -Fgx / m2;
                 double ay2 = -Fgy / m2;
 
