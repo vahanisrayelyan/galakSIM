@@ -2,11 +2,15 @@ package ca.qc.bdeb.sim.galak_sim.graphics;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Collision;
 import ca.qc.bdeb.sim.galak_sim.addons.Physique;
+import ca.qc.bdeb.sim.galak_sim.astres.AstreFantome;
+import ca.qc.bdeb.sim.galak_sim.astres.Orbite;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import ca.qc.bdeb.sim.galak_sim.astres.PointOrbite;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Simulation {
 
@@ -48,6 +52,8 @@ public class Simulation {
         }
 
         planetes = collision.verificationCollision(planetes);
+
+        calculerPredictions(deltaTemps);
     }
 
     public void draw(GraphicsContext contexte) {
@@ -67,8 +73,71 @@ public class Simulation {
             p.draw(contexte);
         }
 
-
         contexte.restore();
+    }
+
+    public void calculerPredictions(double deltaTemps) {
+        if (planetes.isEmpty()) return;
+
+        final double G = 6.67430e-11; // même valeur que Physique
+        int nbPointsAffiche = 300;
+        double dtPred = deltaTemps;
+
+        List<AstreFantome> fantomes = new ArrayList<>();
+        for (Planete p : planetes) {
+            fantomes.add(new AstreFantome(p));
+        }
+
+        List<List<PointOrbite>> trajectoires = new ArrayList<>();
+        for (int i = 0; i < planetes.size(); i++) {
+            trajectoires.add(new ArrayList<>());
+        }
+
+        for (int etape = 0; etape < nbPointsAffiche; etape++) {
+            // Calcul des accélérations (accumulées correctement)
+            double[] ax = new double[fantomes.size()];
+            double[] ay = new double[fantomes.size()];
+
+            for (int i = 0; i < fantomes.size(); i++) {
+                for (int j = i + 1; j < fantomes.size(); j++) {
+                    AstreFantome f1 = fantomes.get(i);
+                    AstreFantome f2 = fantomes.get(j);
+
+                    double dx = f2.x - f1.x;
+                    double dy = f2.y - f1.y;
+                    double distSq = dx * dx + dy * dy;
+                    double dist = Math.sqrt(distSq);
+
+                    if (dist > 10) {
+                        double force = G / distSq;
+                        double fx = force * (dx / dist);
+                        double fy = force * (dy / dist);
+
+                        // Fab = -Fba, comme dans Physique
+                        ax[i] += fx * f2.masse;
+                        ay[i] += fy * f2.masse;
+                        ax[j] -= fx * f1.masse;
+                        ay[j] -= fy * f1.masse;
+                    }
+                }
+            }
+
+            // Application des accélérations et enregistrement des positions
+            for (int i = 0; i < fantomes.size(); i++) {
+                AstreFantome f = fantomes.get(i);
+                f.vx += (ax[i] / f.masse) * dtPred;
+                f.vy += (ay[i] / f.masse) * dtPred;
+                f.x += f.vx * dtPred;
+                f.y += f.vy * dtPred;
+                trajectoires.get(i).add(new PointOrbite(f.x, f.y));
+            }
+        }
+
+        for (int i = 0; i < planetes.size(); i++) {
+            Orbite nouvellePrediction = new Orbite();
+            nouvellePrediction.ajouterPointOrbitePrediction(trajectoires.get(i));
+            planetes.get(i).setPredictionOrbitePlanete(nouvellePrediction);
+        }
     }
 
     public void deplacerCamera(double dxEcran, double dyEcran) {

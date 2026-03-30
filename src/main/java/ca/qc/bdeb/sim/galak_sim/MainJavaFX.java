@@ -109,6 +109,8 @@ public class MainJavaFX extends Application {
 
                 if (!pause) {
                     simulation.update(deltaTemps);
+
+                    simulation.calculerPredictions(deltaTemps);
                 }
 
                 simulation.draw(contexte);

@@ -48,8 +48,17 @@ public class Physique {
                 double ax2 = -Fgx / m2;
                 double ay2 = -Fgy / m2;
 
-                pi.setAcceleration(new Point2D(ax1, ay1));
-                pj.setAcceleration(new Point2D(ax2, ay2));
+//                pi.setAcceleration(new Point2D(ax1, ay1));
+//                pj.setAcceleration(new Point2D(ax2, ay2));
+
+                pi.setAcceleration(new Point2D(
+                        pi.getAcceleration().getX() + ax1,
+                        pi.getAcceleration().getY() + ay1
+                ));
+                pj.setAcceleration(new Point2D(
+                        pj.getAcceleration().getX() + ax2,
+                        pj.getAcceleration().getY() + ay2
+                ));
             }
         }
     }
