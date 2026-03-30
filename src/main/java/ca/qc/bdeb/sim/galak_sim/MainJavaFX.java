@@ -115,7 +115,7 @@ public class MainJavaFX extends Application {
                 double deltaTemps = (temps - dernierTemps) * 1e-9 * vitesseSimulation;
 
                 if (!pause) {
-                    simulation.update(deltaTemps,contexte);
+                    simulation.update(deltaTemps);
                 }
 
                 simulation.draw(contexte);
