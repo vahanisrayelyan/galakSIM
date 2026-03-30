@@ -128,11 +128,15 @@ public class MainJavaFX extends Application {
                     simulation.calculerPredictions(deltaTemps);
                     tempsSimulation += deltaTemps;
                 }
-                double secondes = tempsSimulation;
-                int minutes = (int)(secondes / 60);
-                double reste = secondes % 60;
+                long totalSecondes = (long) tempsSimulation;
+                long annees = totalSecondes / (365 * 24 * 3600);
+                long jours  = (totalSecondes % (365 * 24 * 3600)) / (24 * 3600);
+                long heures = (totalSecondes % (24 * 3600)) / 3600;
+                long minutes = (totalSecondes % 3600) / 60;
+                long secondes = totalSecondes % 60;
 
-                texteTemps.setText(String.format("Temps : %d min %.1f s", minutes, reste));
+                texteTemps.setText(String.format("Temps : %d an(s) %d j %02dh %02dm %02ds",
+                        annees, jours, heures, minutes, secondes));
 
                 if (simulation.getPlanetes().size() != nbPlanetesAvant) {
                     rafraichirListePlanetes(listePlaneteUI, canvasPrincipal);
