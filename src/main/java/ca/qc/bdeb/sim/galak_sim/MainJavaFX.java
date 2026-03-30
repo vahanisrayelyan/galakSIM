@@ -1,6 +1,7 @@
 package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Input;
+import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
@@ -13,6 +14,9 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -26,6 +30,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +49,8 @@ public class MainJavaFX extends Application {
 
     private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
 
+    private final Vecteurs vecteurs = new Vecteurs();
+
     @Override
     public void start(Stage stage) {
         var panneau = new StackPane();
@@ -52,7 +59,7 @@ public class MainJavaFX extends Application {
         input.etatTouches(scene);
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
-        simulation = new Simulation();
+        simulation = new Simulation(vecteurs);
         creerInterface(panneau, canvas);
 
         var contexte = canvas.getGraphicsContext2D();
@@ -166,6 +173,42 @@ public class MainJavaFX extends Application {
         Button btnResetVue = new Button("Réinitialiser la vue");
         btnResetVue.setOnAction(e -> simulation.reinitialiserVue());
 
+        Text choixModeVecteurText = new Text("Choix du mode d'affichage des vecteurs:");
+        choixModeVecteurText.setFill(Color.WHITE);
+
+        VBox choixVecteursVBox = new VBox();
+        choixVecteursVBox.setSpacing(2);
+
+        RadioButton choixPasVecteurs = new RadioButton("Aucun");
+        choixPasVecteurs.setTextFill(Color.WHITE);
+        choixPasVecteurs.setOnAction(e-> vecteurs.setChoix(0));
+        choixVecteursVBox.getChildren().add(choixPasVecteurs);
+        choixPasVecteurs.setSelected(true);
+
+        RadioButton choixVecteurVitesse = new RadioButton("Vitesse");
+        choixVecteurVitesse.setTextFill(Color.WHITE);
+        choixVecteurVitesse.setOnAction(e-> vecteurs.setChoix(1));
+        choixVecteursVBox.getChildren().add(choixVecteurVitesse);
+
+        RadioButton choixVecteurAcceleration = new RadioButton("Acceleration");
+        choixVecteurAcceleration.setTextFill(Color.WHITE);
+        choixVecteurAcceleration.setOnAction(e-> vecteurs.setChoix(2));
+        choixVecteursVBox.getChildren().add(choixVecteurAcceleration);
+
+        RadioButton choixVecteurForceGravitationnelle = new RadioButton("Force");
+        choixVecteurForceGravitationnelle.setOnAction(e-> vecteurs.setChoix(3));
+        choixVecteurForceGravitationnelle.setTextFill(Color.WHITE);
+        choixVecteursVBox.getChildren().add(choixVecteurForceGravitationnelle);
+
+
+        ToggleGroup choixVecteursToggleGroup = new ToggleGroup();
+        choixPasVecteurs.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurVitesse.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurAcceleration.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurForceGravitationnelle.setToggleGroup(choixVecteursToggleGroup);
+
+
+
         var defileurPlanetes = new ScrollPane(listePlanete);
         defileurPlanetes.setFitToWidth(true);
         defileurPlanetes.setPrefHeight(200);
@@ -220,6 +263,8 @@ public class MainJavaFX extends Application {
                 saisiMasse,
                 texteAjoutPlanete,
                 btnResetVue,
+                choixModeVecteurText,
+                choixVecteursVBox,
                 defileurPlanetes,
                 espaceur,
                 vitesseTexte,

@@ -25,7 +25,7 @@ public class Collision {
 
                 double distanceEntre = Math.sqrt(Math.pow(xj - xi, 2) + Math.pow(yj - yi, 2));
 
-                if (distanceEntre - rayoni - rayonj <= 0) {
+                if (distanceEntre  - (rayoni + rayonj) <= 0) {
                     listePlanetes.remove(pi);
                     listePlanetes.remove(pj);
                 }

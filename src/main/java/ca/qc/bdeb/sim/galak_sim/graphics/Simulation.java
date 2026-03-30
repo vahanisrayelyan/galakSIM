@@ -2,6 +2,7 @@ package ca.qc.bdeb.sim.galak_sim.graphics;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Collision;
 import ca.qc.bdeb.sim.galak_sim.addons.Physique;
+import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,6 +14,7 @@ public class Simulation {
     private ArrayList<Planete> planetes = new ArrayList<>();
     private Physique physique = new Physique();
     private Collision collision = new Collision();
+    private Vecteurs vecteurs;
 
     private double zoom = 1.0;
     private double offsetX = 0;
@@ -20,7 +22,8 @@ public class Simulation {
 
     private Planete planeteSuivie = null;
 
-    public Simulation() {
+    public Simulation(Vecteurs vecteurs) {
+        this.vecteurs = vecteurs;
     }
 
     public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom) {
@@ -36,10 +39,13 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
+
         physique.effetForceGravitationelle(planetes);
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
+        vecteurs.setPlanete(planetes);
+
 
         if (planeteSuivie != null) {
             // On force l'offset à correspondre à la position de la planète
@@ -66,7 +72,7 @@ public class Simulation {
         for (Planete p : planetes) {
             p.draw(contexte);
         }
-
+        vecteurs.draw(contexte);
 
         contexte.restore();
     }

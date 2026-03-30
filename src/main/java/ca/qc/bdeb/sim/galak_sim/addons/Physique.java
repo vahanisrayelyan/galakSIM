@@ -6,51 +6,58 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 
 public class Physique {
-    private final double G = 6.67430e-11;
+        private final double G = 6.67430e-11;
 
-    public void effetForceGravitationelle(ArrayList<Planete> listePlanetes) {
-        for (Planete planete : listePlanetes) {
-            planete.setAcceleration(new Point2D(0, 0));
-        }
 
-        for (int i = 0; i < listePlanetes.size(); i++) {
+        public void effetForceGravitationelle(ArrayList<Planete> listePlanetes) {
+            for (Planete planete : listePlanetes) {
+                planete.setAcceleration(new Point2D(0,0));
+            }
 
-            for (int j = i + 1; j < listePlanetes.size(); j++) {
+            for (int i = 0; i < listePlanetes.size(); i ++) {
 
-                Planete pi = listePlanetes.get(i);
-                Planete pj = listePlanetes.get(j);
+                for (int j = i + 1; j < listePlanetes.size(); j++) {
 
-                double m1 = pi.getMasse();
-                double m2 = pj.getMasse();
+                        Planete pi = listePlanetes.get(i);
+                        Planete pj = listePlanetes.get(j);
 
-                double x1 = pi.getPosition().getX();
-                double x2 = pj.getPosition().getX();
+                        double m1 = pi.getMasse();
+                        double m2 = pj.getMasse();
 
-                double y1 = pi.getPosition().getY();
-                double y2 = pj.getPosition().getY();
+                        double x1 = pi.getPosition().getX();
+                        double x2 = pj.getPosition().getX();
 
-                double dx = x2 - x1;
-                double dy = y2 - y1;
+                        double y1 =  pi.getPosition().getY();
+                        double y2 =  pj.getPosition().getY();
 
-                double r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+                        double dx = x2 - x1;
+                        double dy = y2 - y1;
 
-                double ux = dx / r;
-                double uy = dy / r;
+                        double r = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
 
-                double Fg = (G * m1 * m2) / Math.pow(r, 2);
+                        double ux = dx/r;
+                        double uy = dy/r;
 
-                double Fgx = Fg * ux;
-                double Fgy = Fg * uy;
+                        double Fg = (G * m1 * m2) / Math.pow(r,2);
 
-                double ax1 = Fgx / m1;
-                double ay1 = Fgy / m1;
-                // Fab = -Fba
-                double ax2 = -Fgx / m2;
-                double ay2 = -Fgy / m2;
+                        double Fgx = Fg * ux;
+                        double Fgy = Fg * uy;
 
-                pi.setAcceleration(new Point2D(ax1, ay1));
-                pj.setAcceleration(new Point2D(ax2, ay2));
+                        double ax1 = Fgx / m1;
+                        double ay1 = Fgy / m1;
+                        // Fab = -Fba
+                        double ax2 = - Fgx / m2;
+                        double ay2 = - Fgy / m2;
+
+                        System.out.println(ax2);
+
+                        pi.setAcceleration(new Point2D(ax1,ay1));
+                        pj.setAcceleration(new Point2D(ax2,ay2));
+
+                }
             }
         }
-    }
+
+
+
 }

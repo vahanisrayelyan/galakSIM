@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim.astres;
 
+import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -12,8 +13,13 @@ public abstract class Astre {
     protected Point2D taille;
     protected double masse;
     protected Image image;
+    protected double Fg = 0;
 
     protected double scale = 1e7;
+
+    public void setFg(double fg) {
+        Fg = fg;
+    }
 
     public Astre(double x, double y, double vX, double vY, double taille, double masse) {
         this.position = new Point2D(x, y);
