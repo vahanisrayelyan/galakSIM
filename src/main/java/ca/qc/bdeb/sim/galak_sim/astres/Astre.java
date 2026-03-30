@@ -1,6 +1,5 @@
 package ca.qc.bdeb.sim.galak_sim.astres;
 
-import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -30,14 +29,13 @@ public abstract class Astre {
     }
 
     protected void update(double dt) {
+        // Euler simple
         velocite = velocite.add(acceleration.multiply(dt));
 
         double ajoutPositionx = (velocite.getX() * dt) / scale;
         double ajoutPositiony = (velocite.getY() * dt) / scale;
 
-        Point2D ajoutPosition = new Point2D(ajoutPositionx, ajoutPositiony);
-
-        position = position.add(ajoutPosition);
+        position = position.add(ajoutPositionx, ajoutPositiony);
     }
 
     public void draw(GraphicsContext gc) {
@@ -58,10 +56,6 @@ public abstract class Astre {
     public double getMasse() {
         return masse;
     }
-
-//    public void setPosition(Point2D position) {this.position = position;}
-//
-//    public void setVelocite(Point2D velocite) {this.velocite = velocite;}
 
     public void setAcceleration(Point2D acceleration) {
         this.acceleration = acceleration;
