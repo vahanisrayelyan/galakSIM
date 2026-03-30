@@ -115,7 +115,7 @@ public class MainJavaFX extends Application {
                 double deltaTemps = (temps - dernierTemps) * 1e-9 * vitesseSimulation;
 
                 if (!pause) {
-                    simulation.update(deltaTemps);
+                    simulation.update(deltaTemps,contexte);
                 }
 
                 simulation.draw(contexte);
@@ -148,20 +148,47 @@ public class MainJavaFX extends Application {
         texteNom.setFill(Color.WHITE);
         var saisiNom = new TextField();
 
-        // Vitesses
+
         var texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
+
+        HBox hboxVitesseX = new HBox(10);
         var saisiVitesseX = new TextField("0");
         saisiVitesseX.setTextFormatter(formateurNumerique());
+        HBox.setHgrow(saisiVitesseX, Priority.ALWAYS);
+        saisiVitesseX.setMaxWidth(Double.MAX_VALUE);
+        Text unitevx = new Text("m/s");
+        unitevx.setFill(Color.WHITE);
+        hboxVitesseX.setAlignment(Pos.CENTER_LEFT);
+        hboxVitesseX.getChildren().addAll(saisiVitesseX, unitevx);
+
+
         var texteVitesseY = new Text("Vitesse en y");
         texteVitesseY.setFill(Color.WHITE);
+
+        HBox hboxVitesseY = new HBox(10);
         var saisiVitesseY = new TextField("0");
         saisiVitesseY.setTextFormatter(formateurNumerique());
+        HBox.setHgrow(saisiVitesseY, Priority.ALWAYS);
+        saisiVitesseY.setMaxWidth(Double.MAX_VALUE);
+        Text unitevy = new Text("m/s");
+        unitevy.setFill(Color.WHITE);
+        hboxVitesseY.setAlignment(Pos.CENTER_LEFT);
+        hboxVitesseY.getChildren().addAll(saisiVitesseY, unitevy);
+
 
         var texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
-        var saisiMasse = new TextField("5");
-        saisiMasse.setTextFormatter(formateurNumeriqueMasse());
+
+        HBox hboxMasse = new HBox(10);
+        var saisiMasse = new TextField("0");
+        saisiMasse.setTextFormatter(formateurNumerique());
+        HBox.setHgrow(saisiMasse, Priority.ALWAYS);
+        saisiMasse.setMaxWidth(Double.MAX_VALUE);
+        Text uniteMasse = new Text("kg");
+        uniteMasse.setFill(Color.WHITE);
+        hboxMasse.setAlignment(Pos.CENTER_LEFT);
+        hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
 
         canvas.setOnMouseClicked(e -> {
             ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete);
@@ -256,11 +283,11 @@ public class MainJavaFX extends Application {
                 texteNom,
                 saisiNom,
                 texteVitesseX,
-                saisiVitesseX,
+                hboxVitesseX,
                 texteVitesseY,
-                saisiVitesseY,
+                hboxVitesseY,
                 texteMasse,
-                saisiMasse,
+                hboxMasse,
                 texteAjoutPlanete,
                 btnResetVue,
                 choixModeVecteurText,
@@ -602,3 +629,5 @@ public class MainJavaFX extends Application {
         fenetreDetails.show();
     }
 }
+
+//
