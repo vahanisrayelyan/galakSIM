@@ -28,7 +28,7 @@ public abstract class Astre {
         this.acceleration = Point2D.ZERO;
     }
 
-    protected void update(double dt) {
+    public void update(double dt) {
         // Euler simple
         velocite = velocite.add(acceleration.multiply(dt));
 

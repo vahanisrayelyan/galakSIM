@@ -117,6 +117,7 @@ public class MainJavaFX extends Application {
 
         AnimationTimer timer = new AnimationTimer() {
             private long dernierTemps = System.nanoTime();
+            private long dernierTempsPrediction = 0;
 
             @Override
             public void handle(long temps) {
@@ -124,10 +125,17 @@ public class MainJavaFX extends Application {
 
                 if (!pause) {
                     simulation.update(deltaTemps);
-
-                    simulation.calculerPredictions(deltaTemps);
                     tempsSimulation += deltaTemps;
+
+                    boolean planeteChangee = simulation.getPlanetes().size() != nbPlanetesAvant;
+                    boolean tempsPasse = (temps - dernierTempsPrediction) > 2_000_000_000L;
+
+                    if (planeteChangee || tempsPasse) {
+                        simulation.calculerPredictions();
+                        dernierTempsPrediction = temps;
+                    }
                 }
+
                 long totalSecondes = (long) tempsSimulation;
                 long annees = totalSecondes / (365 * 24 * 3600);
                 long jours  = (totalSecondes % (365 * 24 * 3600)) / (24 * 3600);
@@ -145,7 +153,6 @@ public class MainJavaFX extends Application {
 
                 simulation.draw(contexte);
                 dernierTemps = temps;
-
             }
         };
         timer.start();
@@ -252,10 +259,9 @@ public class MainJavaFX extends Application {
         choixVecteursVBox.getChildren().add(choixVecteurAcceleration);
 
         RadioButton choixVecteurForceGravitationnelle = new RadioButton("Force");
-        choixVecteurForceGravitationnelle.setOnAction(e -> vecteurs.setChoix(3));
         choixVecteurForceGravitationnelle.setTextFill(Color.WHITE);
+        choixVecteurForceGravitationnelle.setOnAction(e -> vecteurs.setChoix(3));
         choixVecteursVBox.getChildren().add(choixVecteurForceGravitationnelle);
-
 
         ToggleGroup choixVecteursToggleGroup = new ToggleGroup();
         choixPasVecteurs.setToggleGroup(choixVecteursToggleGroup);
@@ -263,6 +269,10 @@ public class MainJavaFX extends Application {
         choixVecteurAcceleration.setToggleGroup(choixVecteursToggleGroup);
         choixVecteurForceGravitationnelle.setToggleGroup(choixVecteursToggleGroup);
 
+        CheckBox choixPrediction = new CheckBox("Prédiction");
+        choixPrediction.setTextFill(Color.WHITE);
+        choixPrediction.setSelected(true);
+        choixPrediction.setOnAction(e -> simulation.setAfficherPrediction(choixPrediction.isSelected()));
 
         ScrollPane defileurPlanetes = new ScrollPane(listePlanete);
         defileurPlanetes.setFitToWidth(true);
@@ -317,6 +327,7 @@ public class MainJavaFX extends Application {
                 btnResetVue,
                 choixModeVecteurText,
                 choixVecteursVBox,
+                choixPrediction,
                 defileurPlanetes,
                 vitesseTexte,
                 modificationTemps
@@ -465,15 +476,15 @@ public class MainJavaFX extends Application {
 
         double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-")
                 ? 0
-                : Double.parseDouble(saisiVitesseX.getText().replace(",", ".")) * 10e7;
+                : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
 
         double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-")
                 ? 0
-                : Double.parseDouble(saisiVitesseY.getText().replace(",", ".")) * 10e7;
+                : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
 
         double masse = saisiMasse.getText().isEmpty()
                 ? 0
-                : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e14;
+                : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e5;
 
         double taille = 50;
 
@@ -747,5 +758,3 @@ public class MainJavaFX extends Application {
         fenetreDetails.show();
     }
 }
-
-//

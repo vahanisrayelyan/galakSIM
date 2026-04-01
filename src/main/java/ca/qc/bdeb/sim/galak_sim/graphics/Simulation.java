@@ -20,6 +20,7 @@ public class Simulation {
     private Physique physique = new Physique();
     private Collision collision = new Collision();
     private Vecteurs vecteurs;
+    private boolean afficherPrediction = true;
 
     private double zoom = 1.0;
     private double offsetX = 0;
@@ -60,8 +61,6 @@ public class Simulation {
 
         planetes = collision.verificationCollision(planetes);
         collision.updateExplosions();
-
-        calculerPredictions(deltaTemps);
     }
 
     public void draw(GraphicsContext contexte) {
@@ -78,19 +77,19 @@ public class Simulation {
         contexte.translate(offsetX, offsetY);
 
         for (Planete p : planetes) {
-            p.draw(contexte);
+            p.draw(contexte, afficherPrediction);
         }
         vecteurs.draw(contexte);
 
         contexte.restore();
     }
 
-    public void calculerPredictions(double deltaTemps) {
+    public void calculerPredictions() {
         if (planetes.isEmpty()) return;
 
-        final double G = 6.67430e-11; // même valeur que Physique
-        int nbPointsAffiche = 300;
-        double dtPred = deltaTemps;
+        final int NB_POINTS = 300;
+        final double DT_PRED = 500_000.0;
+        final double G = 6.67430e-11;
 
         List<AstreFantome> fantomes = new ArrayList<>();
         for (Planete p : planetes) {
@@ -102,8 +101,7 @@ public class Simulation {
             trajectoires.add(new ArrayList<>());
         }
 
-        for (int etape = 0; etape < nbPointsAffiche; etape++) {
-            // Calcul des accélérations (accumulées correctement)
+        for (int etape = 0; etape < NB_POINTS; etape++) {
             double[] ax = new double[fantomes.size()];
             double[] ay = new double[fantomes.size()];
 
@@ -112,33 +110,29 @@ public class Simulation {
                     AstreFantome f1 = fantomes.get(i);
                     AstreFantome f2 = fantomes.get(j);
 
-                    double dx = f2.x - f1.x;
-                    double dy = f2.y - f1.y;
-                    double distSq = dx * dx + dy * dy;
-                    double dist = Math.sqrt(distSq);
+                    double dx = f2.getPosition().getX() - f1.getPosition().getX();
+                    double dy = f2.getPosition().getY() - f1.getPosition().getY();
+                    double r = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist > 10) {
-                        double force = G / distSq;
-                        double fx = force * (dx / dist);
-                        double fy = force * (dy / dist);
+                    if (r < 1) continue;
 
-                        // Fab = -Fba, comme dans Physique
-                        ax[i] += fx * f2.masse;
-                        ay[i] += fy * f2.masse;
-                        ax[j] -= fx * f1.masse;
-                        ay[j] -= fy * f1.masse;
-                    }
+                    double ux = dx / r;
+                    double uy = dy / r;
+
+                    double Fg = (G * f1.getMasse() * f2.getMasse()) / (r * r);
+
+                    ax[i] += (Fg * ux) / f1.getMasse();
+                    ay[i] += (Fg * uy) / f1.getMasse();
+                    ax[j] -= (Fg * ux) / f2.getMasse();
+                    ay[j] -= (Fg * uy) / f2.getMasse();
                 }
             }
 
-            // Application des accélérations et enregistrement des positions
             for (int i = 0; i < fantomes.size(); i++) {
                 AstreFantome f = fantomes.get(i);
-                f.vx += (ax[i] / f.masse) * dtPred;
-                f.vy += (ay[i] / f.masse) * dtPred;
-                f.x += f.vx * dtPred;
-                f.y += f.vy * dtPred;
-                trajectoires.get(i).add(new PointOrbite(f.x, f.y));
+                f.setAcceleration(new Point2D(ax[i], ay[i]));
+                f.update(DT_PRED);
+                trajectoires.get(i).add(new PointOrbite(f.getPosition().getX(), f.getPosition().getY()));
             }
         }
 
@@ -210,5 +204,9 @@ public class Simulation {
         planetes.clear();
         planeteSuivie = null;
         reinitialiserVue();
+    }
+
+    public void setAfficherPrediction(boolean afficher) {
+        this.afficherPrediction = afficher;
     }
 }

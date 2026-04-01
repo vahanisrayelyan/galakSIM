@@ -39,7 +39,7 @@ public class Planete extends Astre {
         orbitePlanete.update(position.getX(), position.getY());
     }
 
-    public void draw(GraphicsContext contexte) {
+    public void draw(GraphicsContext contexte, boolean afficherPrediction) {
 
         double w = taille.getX();
         double h = taille.getY();
@@ -56,7 +56,9 @@ public class Planete extends Astre {
         contexte.fillText(nom, position.getX() - w / 2, position.getY() - 3 * h / 4);
 
         orbitePlanete.draw(contexte, couleurOrbite, false);
-        predictionOrbitePlanete.draw(contexte, couleurOrbite, true);
+        if (afficherPrediction) {
+            predictionOrbitePlanete.draw(contexte, couleurOrbite, true);
+        }
     }
 
     private static Image imageAleatoire() {
