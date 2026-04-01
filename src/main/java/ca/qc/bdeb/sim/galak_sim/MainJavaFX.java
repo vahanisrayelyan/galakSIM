@@ -16,9 +16,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -33,14 +30,13 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainJavaFX extends Application {
     private static Simulation simulation;
     public static final double LARGEUR = 1200;
-    public static final double HAUTEUR = 700;
+    public static final double HAUTEUR = 750;
     private FenetreDetails fenetreDetails;
 
     private double dernierX;
@@ -162,6 +158,8 @@ public class MainJavaFX extends Application {
         };
         timer.start();
 
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+
         stage.setMinWidth(1200);
         stage.setMinHeight(700);
         stage.getIcons().add(new Image("logoSansFond.png"));
@@ -248,23 +246,19 @@ public class MainJavaFX extends Application {
         choixVecteursVBox.setSpacing(2);
 
         RadioButton choixPasVecteurs = new RadioButton("Aucun");
-        choixPasVecteurs.setTextFill(Color.WHITE);
         choixPasVecteurs.setOnAction(e -> vecteurs.setChoix(0));
         choixVecteursVBox.getChildren().add(choixPasVecteurs);
         choixPasVecteurs.setSelected(true);
 
         RadioButton choixVecteurVitesse = new RadioButton("Vitesse");
-        choixVecteurVitesse.setTextFill(Color.WHITE);
         choixVecteurVitesse.setOnAction(e -> vecteurs.setChoix(1));
         choixVecteursVBox.getChildren().add(choixVecteurVitesse);
 
         RadioButton choixVecteurAcceleration = new RadioButton("Acceleration");
-        choixVecteurAcceleration.setTextFill(Color.WHITE);
         choixVecteurAcceleration.setOnAction(e -> vecteurs.setChoix(2));
         choixVecteursVBox.getChildren().add(choixVecteurAcceleration);
 
         RadioButton choixVecteurForceGravitationnelle = new RadioButton("Force");
-        choixVecteurForceGravitationnelle.setTextFill(Color.WHITE);
         choixVecteurForceGravitationnelle.setOnAction(e -> vecteurs.setChoix(3));
         choixVecteursVBox.getChildren().add(choixVecteurForceGravitationnelle);
 

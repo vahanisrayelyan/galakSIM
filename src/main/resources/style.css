@@ -1,0 +1,81 @@
+/*Graphiques*/
+/*Titres axes*/
+.axis-label {
+-fx-text-fill: white;
+}
+
+/*Nombres axes*/
+.axis {
+-fx-tick-label-fill: white;
+}
+
+/*Légende*/
+.chart-legend-item {
+-fx-text-fill: white;
+}
+
+.chart-legend {
+-fx-background-color: transparent;
+}
+
+/*Graphique*/
+.chart {
+-fx-padding: 5px;
+}
+
+/*Titre graphique*/
+.chart-title {
+-fx-text-fill: white;
+-fx-text-size: 1.2em;
+-fx-font-weight: bold;
+}
+
+/*RadioButton*/
+/*Texte du RadioButton*/
+.radio-button {
+    -fx-text-fill: white;
+}
+
+/*La puce (le cercle) quand elle n'est pas cochée*/
+.radio-button .radio {
+    -fx-background-color: #333333;
+    -fx-border-color: #555555;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+/*La puce quand elle est survolée par la souris*/
+.radio-button:hover .radio {
+    -fx-background-color: #444444;
+}
+
+/*Le point intérieur quand c'est sélectionné*/
+.radio-button:selected .dot {
+    -fx-background-color: #0078d7; /* Couleur bleue style Windows ou choisis ta couleur */
+    -fx-background-insets: 0;
+}
+
+/*CheckBox*/
+/*Le texte de la CheckBox*/
+.check-box {
+    -fx-text-fill: white;
+}
+
+/*La boîte carrée*/
+.check-box .box {
+    -fx-background-color: #333333;
+    -fx-border-color: #555555;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+/*La boîte quand elle est sélectionnée*/
+.check-box:selected .box {
+    -fx-background-color: #444444;
+}
+
+/*Le "V" (crochet) de sélection*/
+.check-box:selected .mark {
+    -fx-background-color: #0078d7; /* Couleur du crochet */
+    -fx-shape: "M1.73,12.91L8.1,19.28L22.79,4.59"; /* Forme du crochet si tu veux la forcer */
+}

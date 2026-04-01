@@ -235,7 +235,7 @@ public class FenetreDetails {
         layout.getChildren().addAll(header, contBoutons, stackPane);
 
         Scene scene = new Scene(layout, 500, 500);
-        scene.getStylesheets().add(getClass().getResource("/styleGraphiques.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
         fenetreDetails.setResizable(true);
         fenetreDetails.setScene(scene);
