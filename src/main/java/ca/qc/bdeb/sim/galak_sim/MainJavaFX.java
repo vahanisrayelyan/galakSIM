@@ -27,7 +27,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -169,13 +168,20 @@ public class MainJavaFX extends Application {
     }
 
     private void creerInterface(StackPane panneau, Canvas canvas) {
-        VBox menuLateral = new VBox(15);
-        menuLateral.setPadding(new Insets(60, 15, 15, 15));
-        menuLateral.setMaxWidth(250);
-        menuLateral.setStyle("-fx-background-color: rgba(60, 60, 60, 0.85); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
+        VBox contenuMenu = new VBox(15);
+        contenuMenu.setPadding(new Insets(60, 15, 15, 15));
+        contenuMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
+        contenuMenu.prefHeightProperty().bind(panneau.heightProperty());
+        contenuMenu.prefWidthProperty().bind(panneau.widthProperty());
 
         VBox boiteSpecs = new VBox(10);
+        boiteSpecs.setMaxWidth(Double.MAX_VALUE);
+        boiteSpecs.setVisible(true);
+        boiteSpecs.setManaged(true);
         VBox boitePresets = new VBox(10);
+        boitePresets.setMaxWidth(Double.MAX_VALUE);
+        boitePresets.setVisible(false);
+        boitePresets.setManaged(false);
 
         VBox listePlanete = new VBox(5);
         this.listePlaneteUI = listePlanete;
@@ -183,8 +189,6 @@ public class MainJavaFX extends Application {
         texteTemps = new Text("Temps : 0.0 s");
         texteTemps.setFill(Color.WHITE);
         texteTemps.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        StackPane.setAlignment(texteTemps, Pos.TOP_LEFT);
-        StackPane.setMargin(texteTemps, new Insets(10));
 
         Text texteNom = new Text("Nom");
         texteNom.setFill(Color.WHITE);
@@ -233,61 +237,54 @@ public class MainJavaFX extends Application {
                 ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete)
         );
 
-        Text texteAjoutPlanete = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
-        texteAjoutPlanete.setFill(Color.WHITE);
+        Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
+        texteInformations.setFill(Color.WHITE);
 
         Button btnResetVue = new Button("Réinitialiser la vue");
         btnResetVue.setOnAction(e -> simulation.reinitialiserVue());
 
-        Text choixModeVecteurText = new Text("Choix du mode d'affichage des vecteurs:");
-        choixModeVecteurText.setFill(Color.WHITE);
-
-        VBox choixVecteursVBox = new VBox();
-        choixVecteursVBox.setSpacing(2);
+        VBox choixVecteursVBox = new VBox(2);
 
         RadioButton choixPasVecteurs = new RadioButton("Aucun");
         choixPasVecteurs.setOnAction(e -> vecteurs.setChoix(0));
-        choixVecteursVBox.getChildren().add(choixPasVecteurs);
         choixPasVecteurs.setSelected(true);
 
         RadioButton choixVecteurVitesse = new RadioButton("Vitesse");
         choixVecteurVitesse.setOnAction(e -> vecteurs.setChoix(1));
-        choixVecteursVBox.getChildren().add(choixVecteurVitesse);
 
         RadioButton choixVecteurAcceleration = new RadioButton("Acceleration");
         choixVecteurAcceleration.setOnAction(e -> vecteurs.setChoix(2));
-        choixVecteursVBox.getChildren().add(choixVecteurAcceleration);
 
-        RadioButton choixVecteurForceGravitationnelle = new RadioButton("Force");
-        choixVecteurForceGravitationnelle.setOnAction(e -> vecteurs.setChoix(3));
-        choixVecteursVBox.getChildren().add(choixVecteurForceGravitationnelle);
+        RadioButton choixVecteurForce = new RadioButton("Force");
+        choixVecteurForce.setOnAction(e -> vecteurs.setChoix(3));
 
         ToggleGroup choixVecteursToggleGroup = new ToggleGroup();
         choixPasVecteurs.setToggleGroup(choixVecteursToggleGroup);
         choixVecteurVitesse.setToggleGroup(choixVecteursToggleGroup);
         choixVecteurAcceleration.setToggleGroup(choixVecteursToggleGroup);
-        choixVecteurForceGravitationnelle.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurForce.setToggleGroup(choixVecteursToggleGroup);
+
+        choixVecteursVBox.getChildren().addAll(
+                choixPasVecteurs, choixVecteurVitesse, choixVecteurAcceleration, choixVecteurForce
+        );
 
         CheckBox choixPrediction = new CheckBox("Prédiction");
-        choixPrediction.setTextFill(Color.WHITE);
         choixPrediction.setSelected(true);
         choixPrediction.setOnAction(e -> simulation.setAfficherPrediction(choixPrediction.isSelected()));
 
         ScrollPane defileurPlanetes = new ScrollPane(listePlanete);
         defileurPlanetes.setFitToWidth(true);
-        VBox.setVgrow(defileurPlanetes, Priority.ALWAYS);
-        defileurPlanetes.setMaxHeight(Double.MAX_VALUE);
+        defileurPlanetes.setMaxHeight(200);
+        defileurPlanetes.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         Text vitesseTexte = new Text("Vitesse de la simulation: x" + vitesseSimulation);
         vitesseTexte.setFill(Color.WHITE);
-        vitesseTexte.setTextAlignment(TextAlignment.CENTER);
+        vitesseTexte.setWrappingWidth(210);
 
-        HBox modificationTemps = new HBox();
-        modificationTemps.setSpacing(10);
+        HBox modificationTemps = new HBox(10);
 
         Button btnPause = new Button("⏸");
-        btnPause.setAlignment(Pos.CENTER);
         btnPause.setOnAction(e -> {
             if (pause) {
                 pause = false;
@@ -314,22 +311,12 @@ public class MainJavaFX extends Application {
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite);
 
         boiteSpecs.getChildren().addAll(
-                texteNom,
-                saisiNom,
-                texteVitesseX,
-                hboxVitesseX,
-                texteVitesseY,
-                hboxVitesseY,
-                texteMasse,
-                hboxMasse,
-                texteAjoutPlanete,
+                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
+                texteInformations,
                 btnResetVue,
-                choixModeVecteurText,
-                choixVecteursVBox,
-                choixPrediction,
-                defileurPlanetes,
-                vitesseTexte,
-                modificationTemps
+                creerSection("Affichage", choixVecteursVBox, choixPrediction),
+                creerSection("Planètes", defileurPlanetes),
+                creerSection("Simulation", vitesseTexte, modificationTemps)
         );
 
         Text titrePresets = new Text("Presets");
@@ -358,19 +345,10 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boitePresets.getChildren().addAll(
-                titrePresets,
-                btnSysteme,
-                btnVide,
-                btnCollision
-        );
+        boitePresets.getChildren().addAll(titrePresets, btnSysteme, btnVide, btnCollision);
 
-        StackPane stackSections = new StackPane(boiteSpecs, boitePresets);
-
-        boiteSpecs.setVisible(true);
-        boiteSpecs.setManaged(true);
-        boitePresets.setVisible(false);
-        boitePresets.setManaged(false);
+        VBox stackSections = new VBox(boiteSpecs, boitePresets);
+        VBox.setVgrow(stackSections, Priority.ALWAYS);
 
         Button bSpecs = new Button(" Specs ");
         Button bPresets = new Button(" Presets ");
@@ -402,22 +380,21 @@ public class MainJavaFX extends Application {
             bSpecs.setStyle(nonactif);
         });
 
-        menuLateral.getChildren().addAll(contBoutons, stackSections);
+        contenuMenu.getChildren().addAll(contBoutons, stackSections);
 
-        Button btnAfficher = new Button("☰");
-        btnAfficher.setVisible(false);
+        ScrollPane scrollMenu = new ScrollPane(contenuMenu);
+        scrollMenu.setFitToWidth(true);
+        scrollMenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollMenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollMenu.setMaxWidth(250);
+        scrollMenu.setMinWidth(250);
+        scrollMenu.setStyle("-fx-background-color: transparent; -fx-border-color: #444; -fx-border-width: 0 0 0 2; -fx-background: transparent;");
 
-        Button btnMasquer = new Button("☰");
-        btnMasquer.setOnAction(e -> {
-            menuLateral.setVisible(false);
-            btnMasquer.setVisible(false);
-            btnAfficher.setVisible(true);
-        });
-
-        btnAfficher.setOnAction(e -> {
-            menuLateral.setVisible(true);
-            btnMasquer.setVisible(true);
-            btnAfficher.setVisible(false);
+        Button btnToggleMenu = new Button("☰");
+        btnToggleMenu.setOnAction(e -> {
+            boolean visible = scrollMenu.isVisible();
+            scrollMenu.setVisible(!visible);
+            btnToggleMenu.setVisible(true);
         });
 
         Pane starLayer = new Pane();
@@ -429,20 +406,17 @@ public class MainJavaFX extends Application {
 
         StackPane centre = new StackPane(starLayer, canvas);
 
-        StackPane.setAlignment(menuLateral, Pos.TOP_RIGHT);
-        StackPane.setAlignment(btnAfficher, Pos.TOP_RIGHT);
-        StackPane.setAlignment(btnMasquer, Pos.TOP_RIGHT);
-
-        Insets marges = new Insets(10);
-        StackPane.setMargin(btnAfficher, marges);
-        StackPane.setMargin(btnMasquer, marges);
-
-        nbPlanetesAvant = simulation.getPlanetes().size();
+        StackPane.setAlignment(scrollMenu, Pos.TOP_RIGHT);
+        StackPane.setAlignment(btnToggleMenu, Pos.TOP_RIGHT);
+        
+        StackPane.setMargin(btnToggleMenu, new Insets(10));
 
         StackPane.setAlignment(texteTemps, Pos.TOP_LEFT);
         StackPane.setMargin(texteTemps, new Insets(10));
 
-        panneau.getChildren().addAll(centre, menuLateral, btnAfficher, btnMasquer, texteTemps);
+        nbPlanetesAvant = simulation.getPlanetes().size();
+
+        panneau.getChildren().addAll(centre, scrollMenu, btnToggleMenu, texteTemps);
     }
 
     public static TextFormatter<String> formateurNumerique() {
@@ -534,6 +508,28 @@ public class MainJavaFX extends Application {
             lignePlanete.getChildren().addAll(btnSupprimer, info);
             listePlanete.getChildren().add(lignePlanete);
         }
+    }
+
+    private VBox creerSection(String titre, javafx.scene.Node... contenu) {
+        VBox section = new VBox(5);
+
+        Button btnTitre = new Button("▾ " + titre);
+        btnTitre.setMaxWidth(Double.MAX_VALUE);
+        btnTitre.setStyle("-fx-background-color: #333333; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+
+        VBox corps = new VBox(8);
+        corps.getChildren().addAll(contenu);
+        corps.setPadding(new Insets(5, 0, 5, 5));
+
+        btnTitre.setOnAction(e -> {
+            boolean visible = corps.isVisible();
+            corps.setVisible(!visible);
+            corps.setManaged(!visible);
+            btnTitre.setText((visible ? "▸ " : "▾ ") + titre);
+        });
+
+        section.getChildren().addAll(btnTitre, corps);
+        return section;
     }
 
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
