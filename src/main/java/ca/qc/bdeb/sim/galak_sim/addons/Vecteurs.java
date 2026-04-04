@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
-
 public class Vecteurs {
     private int choix = 0;
     private double racineVecteurX;
@@ -24,7 +23,7 @@ public class Vecteurs {
         this.choix = choix;
     }
 
-    public void draw (GraphicsContext gc) {
+    public void draw(GraphicsContext gc) {
 
         for (Planete p : planetes) {
             if (choix != 0) {
@@ -37,9 +36,7 @@ public class Vecteurs {
 
                     gc.setStroke(Color.WHITE);
                     gc.setLineWidth(2);
-                }
-
-                else if (choix == 2) {
+                } else if (choix == 2) {
                     racineVecteurX = p.getPosition().getX();
                     racineVecteurY = p.getPosition().getY();
 
@@ -48,9 +45,7 @@ public class Vecteurs {
 
                     gc.setStroke(Color.RED);
                     gc.setLineWidth(2);
-                }
-
-                else if (choix == 3) {
+                } else if (choix == 3) {
                     racineVecteurX = p.getPosition().getX();
                     racineVecteurY = p.getPosition().getY();
 
@@ -61,7 +56,7 @@ public class Vecteurs {
                     gc.setLineWidth(2);
                 }
 
-                gc.strokeLine(racineVecteurX,racineVecteurY,boutVecteurVitesseX,boutVecteurVitesseY);
+                gc.strokeLine(racineVecteurX, racineVecteurY, boutVecteurVitesseX, boutVecteurVitesseY);
 
                 double flecheLongueur = 15;
                 double angle = Math.atan2(boutVecteurVitesseY - racineVecteurY, boutVecteurVitesseX - racineVecteurX);

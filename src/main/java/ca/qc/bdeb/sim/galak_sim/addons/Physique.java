@@ -1,65 +1,76 @@
 package ca.qc.bdeb.sim.galak_sim.addons;
 
+import ca.qc.bdeb.sim.galak_sim.astres.Astre;
+import ca.qc.bdeb.sim.galak_sim.astres.AstreFantome;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Physique {
     private final double G = 6.67430e-11;
 
-    public void effetForceGravitationelle(ArrayList<Planete> listePlanetes) {
-        for (Planete planete : listePlanetes) {
-            planete.setAcceleration(new Point2D(0, 0));
+    public void effetForceGravitationelle(ArrayList<Planete> planetes) {
+        for (Planete p : planetes) {
+            p.setAcceleration(Point2D.ZERO);
+        }
+        appliquerGravite(new ArrayList<>(planetes));
+    }
+
+    public List<List<Point2D>> calculerPredictions(ArrayList<Planete> planetes) {
+        final int NB_POINTS = 300;
+        final double DT_PRED = 500_000.0;
+
+        List<AstreFantome> fantomes = new ArrayList<>();
+        for (Planete p : planetes) {
+            fantomes.add(new AstreFantome(p));
         }
 
-        for (int i = 0; i < listePlanetes.size(); i++) {
-            for (int j = i + 1; j < listePlanetes.size(); j++) {
-                Planete pi = listePlanetes.get(i);
-                Planete pj = listePlanetes.get(j);
+        List<List<Point2D>> trajectoires = new ArrayList<>();
+        for (int i = 0; i < fantomes.size(); i++) {
+            trajectoires.add(new ArrayList<>());
+        }
 
-                double m1 = pi.getMasse();
-                double m2 = pj.getMasse();
+        for (int etape = 0; etape < NB_POINTS; etape++) {
+            for (Astre a : fantomes) {
+                a.setAcceleration(Point2D.ZERO);
+            }
+            appliquerGravite(new ArrayList<>(fantomes));
 
-                double x1 = pi.getPosition().getX();
-                double x2 = pj.getPosition().getX();
+            for (int i = 0; i < fantomes.size(); i++) {
+                fantomes.get(i).update(DT_PRED);
+                trajectoires.get(i).add(fantomes.get(i).getPosition());
+            }
+        }
 
-                double y1 = pi.getPosition().getY();
-                double y2 = pj.getPosition().getY();
+        return trajectoires;
+    }
 
-                double dx = x2 - x1;
-                double dy = y2 - y1;
+    private void appliquerGravite(ArrayList<Astre> astres) {
+        for (int i = 0; i < astres.size(); i++) {
+            for (int j = i + 1; j < astres.size(); j++) {
+                Astre a1 = astres.get(i);
+                Astre a2 = astres.get(j);
 
+                double dx = a2.getPosition().getX() - a1.getPosition().getX();
+                double dy = a2.getPosition().getY() - a1.getPosition().getY();
                 double r = Math.sqrt(dx * dx + dy * dy);
 
-                if (r < 1) {
-                    continue;
-                }
+                if (r < 1) continue;
 
                 double ux = dx / r;
                 double uy = dy / r;
 
-                double Fg = (G * m1 * m2) / (r * r);
+                double Fg = (G * a1.getMasse() * a2.getMasse()) / (r * r);
 
-                double Fgx = Fg * ux;
-                double Fgy = Fg * uy;
-
-                double ax1 = Fgx / m1;
-                double ay1 = Fgy / m1;
-
-                double ax2 = -Fgx / m2;
-                double ay2 = -Fgy / m2;
-
-//                pi.setAcceleration(new Point2D(ax1, ay1));
-//                pj.setAcceleration(new Point2D(ax2, ay2));
-
-                pi.setAcceleration(new Point2D(
-                        pi.getAcceleration().getX() + ax1,
-                        pi.getAcceleration().getY() + ay1
+                a1.setAcceleration(new Point2D(
+                        a1.getAcceleration().getX() + (Fg * ux) / a1.getMasse(),
+                        a1.getAcceleration().getY() + (Fg * uy) / a1.getMasse()
                 ));
-                pj.setAcceleration(new Point2D(
-                        pj.getAcceleration().getX() + ax2,
-                        pj.getAcceleration().getY() + ay2
+                a2.setAcceleration(new Point2D(
+                        a2.getAcceleration().getX() - (Fg * ux) / a2.getMasse(),
+                        a2.getAcceleration().getY() - (Fg * uy) / a2.getMasse()
                 ));
             }
         }
