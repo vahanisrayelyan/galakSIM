@@ -79,3 +79,11 @@
     -fx-background-color: #0078d7; /* Couleur du crochet */
     -fx-shape: "M1.73,12.91L8.1,19.28L22.79,4.59"; /* Forme du crochet si tu veux la forcer */
 }
+
+/*Débogage des régions*/
+/*
+.button, .text-field, .scroll-pane, .vbox, .hbox, .radio-button, .check-box, .stack-pane {
+    -fx-border-color: #00ff00 !important;
+    -fx-border-whidth: 2px;
+}
+*/

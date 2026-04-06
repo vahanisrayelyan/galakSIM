@@ -1,7 +1,7 @@
 package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Input;
-import ca.qc.bdeb.sim.galak_sim.addons.Presets;
+import ca.qc.bdeb.sim.galak_sim.addons.Modeles;
 import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
@@ -54,7 +54,7 @@ public class MainJavaFX extends Application {
     private final Vecteurs vecteurs = new Vecteurs();
 
     private double tempsSimulation = 0;
-    private Text texteTemps;
+    private Text texteTempsPasse;
 
     @Override
     public void start(Stage stage) {
@@ -66,7 +66,6 @@ public class MainJavaFX extends Application {
 
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
         canvas.setCursor(Cursor.HAND);
-
 
         simulation = new Simulation(vecteurs);
         creerInterface(panneau, canvas);
@@ -127,24 +126,16 @@ public class MainJavaFX extends Application {
                     simulation.update(deltaTemps);
                     tempsSimulation += deltaTemps;
 
-                    boolean planeteChangee = simulation.getPlanetes().size() != nbPlanetesAvant;
+                    boolean nbPlaneteChangee = simulation.getPlanetes().size() != nbPlanetesAvant;
                     boolean tempsPasse = (temps - dernierTempsPrediction) > 2_000_000_000L;
-
-                    if (planeteChangee || tempsPasse) {
+                    // Après 2 secondes ou s'il y a une nouvelle planète, on fait une nouvelle simulation d'orbite futur
+                    if (nbPlaneteChangee || tempsPasse) {
                         simulation.calculerPredictions();
                         dernierTempsPrediction = temps;
                     }
                 }
 
-                long totalSecondes = (long) tempsSimulation;
-                long annees = totalSecondes / (365 * 24 * 3600);
-                long jours = (totalSecondes % (365 * 24 * 3600)) / (24 * 3600);
-                long heures = (totalSecondes % (24 * 3600)) / 3600;
-                long minutes = (totalSecondes % 3600) / 60;
-                long secondes = totalSecondes % 60;
-
-                texteTemps.setText(String.format("Temps : %d an(s) %d j %02dh %02dm %02ds",
-                        annees, jours, heures, minutes, secondes));
+                texteTempsPasse.setText(tempsPasse((long) tempsSimulation));
 
                 if (simulation.getPlanetes().size() != nbPlanetesAvant) {
                     rafraichirListePlanetes(listePlaneteUI, canvasPrincipal);
@@ -167,28 +158,38 @@ public class MainJavaFX extends Application {
         stage.show();
     }
 
+    private String tempsPasse(long totalSecondes) {
+        long annees = totalSecondes / (365 * 24 * 3600);
+        long jours = (totalSecondes % (365 * 24 * 3600)) / (24 * 3600);
+        long heures = (totalSecondes % (24 * 3600)) / 3600;
+        long minutes = (totalSecondes % 3600) / 60;
+        long secondes = totalSecondes % 60;
+        return String.format("Temps : %d an(s) %d j %02dh %02dm %02ds", annees, jours, heures, minutes, secondes);
+    }
+
     private void creerInterface(StackPane panneau, Canvas canvas) {
         VBox contenuMenu = new VBox(15);
-        contenuMenu.setPadding(new Insets(60, 15, 15, 15));
+        contenuMenu.setPadding(new Insets(15));
         contenuMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
         contenuMenu.prefHeightProperty().bind(panneau.heightProperty());
         contenuMenu.prefWidthProperty().bind(panneau.widthProperty());
 
-        VBox boiteSpecs = new VBox(10);
-        boiteSpecs.setMaxWidth(Double.MAX_VALUE);
-        boiteSpecs.setVisible(true);
-        boiteSpecs.setManaged(true);
-        VBox boitePresets = new VBox(10);
-        boitePresets.setMaxWidth(Double.MAX_VALUE);
-        boitePresets.setVisible(false);
-        boitePresets.setManaged(false);
+        VBox boiteParametres = new VBox(10);
+        boiteParametres.setMaxWidth(Double.MAX_VALUE);
+        boiteParametres.setVisible(true);
+        boiteParametres.setManaged(true);
+        VBox boiteModeles = new VBox(10);
+        boiteModeles.setMaxWidth(Double.MAX_VALUE);
+        boiteModeles.setVisible(false);
+        boiteModeles.setManaged(false);
 
-        VBox listePlanete = new VBox(5);
-        this.listePlaneteUI = listePlanete;
-        this.canvasPrincipal = canvas;
-        texteTemps = new Text("Temps : 0.0 s");
-        texteTemps.setFill(Color.WHITE);
-        texteTemps.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        ScrollPane scrollMenu = new ScrollPane(contenuMenu);
+        scrollMenu.setFitToWidth(true);
+        scrollMenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollMenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollMenu.setMaxWidth(250);
+        scrollMenu.setMinWidth(250);
+        scrollMenu.setStyle("-fx-background-color: transparent; -fx-border-color: #444; -fx-border-width: 0 0 0 2; -fx-background: transparent;");
 
         Text texteNom = new Text("Nom");
         texteNom.setFill(Color.WHITE);
@@ -196,10 +197,9 @@ public class MainJavaFX extends Application {
 
         Text texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
-
         HBox hboxVitesseX = new HBox(10);
         TextField saisiVitesseX = new TextField("0");
-        saisiVitesseX.setTextFormatter(formateurNumerique());
+        saisiVitesseX.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseX, Priority.ALWAYS);
         saisiVitesseX.setMaxWidth(Double.MAX_VALUE);
         Text unitevx = new Text("m/s");
@@ -209,10 +209,9 @@ public class MainJavaFX extends Application {
 
         Text texteVitesseY = new Text("Vitesse en y");
         texteVitesseY.setFill(Color.WHITE);
-
         HBox hboxVitesseY = new HBox(10);
         TextField saisiVitesseY = new TextField("0");
-        saisiVitesseY.setTextFormatter(formateurNumerique());
+        saisiVitesseY.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseY, Priority.ALWAYS);
         saisiVitesseY.setMaxWidth(Double.MAX_VALUE);
         Text unitevy = new Text("m/s");
@@ -222,16 +221,22 @@ public class MainJavaFX extends Application {
 
         Text texteMasse = new Text("Masse");
         texteMasse.setFill(Color.WHITE);
-
         HBox hboxMasse = new HBox(10);
         TextField saisiMasse = new TextField("5");
-        saisiMasse.setTextFormatter(formateurNumeriqueMasse());
+        saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
         Text uniteMasse = new Text("kg");
         uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
+
+        VBox listePlanete = new VBox(5);
+        this.listePlaneteUI = listePlanete;
+        this.canvasPrincipal = canvas;
+        texteTempsPasse = new Text("Temps : 0.0 s");
+        texteTempsPasse.setFill(Color.WHITE);
+        texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
                 ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete)
@@ -244,17 +249,13 @@ public class MainJavaFX extends Application {
         btnResetVue.setOnAction(e -> simulation.reinitialiserVue());
 
         VBox choixVecteursVBox = new VBox(2);
-
         RadioButton choixPasVecteurs = new RadioButton("Aucun");
         choixPasVecteurs.setOnAction(e -> vecteurs.setChoix(0));
         choixPasVecteurs.setSelected(true);
-
         RadioButton choixVecteurVitesse = new RadioButton("Vitesse");
         choixVecteurVitesse.setOnAction(e -> vecteurs.setChoix(1));
-
         RadioButton choixVecteurAcceleration = new RadioButton("Acceleration");
         choixVecteurAcceleration.setOnAction(e -> vecteurs.setChoix(2));
-
         RadioButton choixVecteurForce = new RadioButton("Force");
         choixVecteurForce.setOnAction(e -> vecteurs.setChoix(3));
 
@@ -274,7 +275,8 @@ public class MainJavaFX extends Application {
 
         ScrollPane defileurPlanetes = new ScrollPane(listePlanete);
         defileurPlanetes.setFitToWidth(true);
-        defileurPlanetes.setMaxHeight(200);
+        defileurPlanetes.setMaxHeight(150);
+        defileurPlanetes.setMinHeight(150);
         defileurPlanetes.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
@@ -310,7 +312,7 @@ public class MainJavaFX extends Application {
 
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite);
 
-        boiteSpecs.getChildren().addAll(
+        boiteParametres.getChildren().addAll(
                 creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
                 texteInformations,
                 btnResetVue,
@@ -319,12 +321,12 @@ public class MainJavaFX extends Application {
                 creerSection("Simulation", vitesseTexte, modificationTemps)
         );
 
-        Text titrePresets = new Text("Presets");
-        titrePresets.setFill(Color.WHITE);
+        Text titreModeles = new Text("Modeles");
+        titreModeles.setFill(Color.WHITE);
 
         Button btnSysteme = new Button("Système solaire");
         btnSysteme.setOnAction(e -> {
-            Presets.chargerSystemeSolaire(simulation);
+            Modeles.chargerSystemeSolaire(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
@@ -338,107 +340,92 @@ public class MainJavaFX extends Application {
 
         Button btnCollision = new Button("Collision");
         btnCollision.setOnAction(e -> {
-            simulation.viderPlanetes();
-            simulation.ajouterNouvellePlanete(400, 350, 2, 0, 20, 100, "A");
-            simulation.ajouterNouvellePlanete(800, 350, -2, 0, 20, 100, "B");
+            Modeles.chargerCollision(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boitePresets.getChildren().addAll(titrePresets, btnSysteme, btnVide, btnCollision);
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision);
 
-        VBox stackSections = new VBox(boiteSpecs, boitePresets);
-        VBox.setVgrow(stackSections, Priority.ALWAYS);
+        VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
+        VBox.setVgrow(sectionsMenu, Priority.ALWAYS);
 
-        Button bSpecs = new Button(" Specs ");
-        Button bPresets = new Button(" Presets ");
+        Button btnParametres = new Button(" Paramètres ");
+        Button btnModeles = new Button(" Modèles ");
 
         String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888;";
 
-        bSpecs.setStyle(actif);
-        bPresets.setStyle(nonactif);
+        btnParametres.setStyle(actif);
+        btnModeles.setStyle(nonactif);
 
-        HBox contBoutons = new HBox(10, bSpecs, bPresets);
-        contBoutons.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
+        Button btnMenu = new Button("☰");
+        btnMenu.setOnAction(e -> {
+            boolean menuVisible = scrollMenu.isVisible();
+            scrollMenu.setVisible(!menuVisible);
 
-        bSpecs.setOnAction(e -> {
-            boiteSpecs.setVisible(true);
-            boiteSpecs.setManaged(true);
-            boitePresets.setVisible(false);
-            boitePresets.setManaged(false);
-            bSpecs.setStyle(actif);
-            bPresets.setStyle(nonactif);
+            if (!menuVisible) {
+                StackPane.setMargin(btnMenu, new Insets(10, 260, 0, 0));
+            } else {
+                StackPane.setMargin(btnMenu, new Insets(10, 10, 0, 0));
+            }
         });
 
-        bPresets.setOnAction(e -> {
-            boitePresets.setVisible(true);
-            boitePresets.setManaged(true);
-            boiteSpecs.setVisible(false);
-            boiteSpecs.setManaged(false);
-            bPresets.setStyle(actif);
-            bSpecs.setStyle(nonactif);
+        HBox choixSections = new HBox(10, btnParametres, btnModeles);
+        choixSections.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
+
+        btnParametres.setOnAction(e -> {
+            boiteParametres.setVisible(true);
+            boiteParametres.setManaged(true);
+            boiteModeles.setVisible(false);
+            boiteModeles.setManaged(false);
+            btnParametres.setStyle(actif);
+            btnModeles.setStyle(nonactif);
         });
 
-        contenuMenu.getChildren().addAll(contBoutons, stackSections);
-
-        ScrollPane scrollMenu = new ScrollPane(contenuMenu);
-        scrollMenu.setFitToWidth(true);
-        scrollMenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollMenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollMenu.setMaxWidth(250);
-        scrollMenu.setMinWidth(250);
-        scrollMenu.setStyle("-fx-background-color: transparent; -fx-border-color: #444; -fx-border-width: 0 0 0 2; -fx-background: transparent;");
-
-        Button btnToggleMenu = new Button("☰");
-        btnToggleMenu.setOnAction(e -> {
-            boolean visible = scrollMenu.isVisible();
-            scrollMenu.setVisible(!visible);
-            btnToggleMenu.setVisible(true);
+        btnModeles.setOnAction(e -> {
+            boiteParametres.setVisible(false);
+            boiteParametres.setManaged(false);
+            boiteModeles.setVisible(true);
+            boiteModeles.setManaged(true);
+            btnParametres.setStyle(nonactif);
+            btnModeles.setStyle(actif);
         });
 
-        Pane starLayer = new Pane();
-        starLayer.prefWidthProperty().bind(canvas.widthProperty());
-        starLayer.prefHeightProperty().bind(canvas.heightProperty());
+        contenuMenu.getChildren().addAll(choixSections, sectionsMenu);
 
-        ChampEtoiles champEtoiles = new ChampEtoiles(starLayer);
+        Pane espace = new Pane();
+        espace.prefWidthProperty().bind(canvas.widthProperty());
+        espace.prefHeightProperty().bind(canvas.heightProperty());
+
+        ChampEtoiles champEtoiles = new ChampEtoiles(espace);
         champEtoiles.demarrer();
 
-        StackPane centre = new StackPane(starLayer, canvas);
+        StackPane centre = new StackPane(espace, canvas);
 
         StackPane.setAlignment(scrollMenu, Pos.TOP_RIGHT);
-        StackPane.setAlignment(btnToggleMenu, Pos.TOP_RIGHT);
-        
-        StackPane.setMargin(btnToggleMenu, new Insets(10));
+        StackPane.setAlignment(btnMenu, Pos.TOP_RIGHT);
+        StackPane.setMargin(btnMenu, new Insets(10, 260, 0, 0));
 
-        StackPane.setAlignment(texteTemps, Pos.TOP_LEFT);
-        StackPane.setMargin(texteTemps, new Insets(10));
+        StackPane.setAlignment(texteTempsPasse, Pos.TOP_LEFT);
+        StackPane.setMargin(texteTempsPasse, new Insets(10));
 
         nbPlanetesAvant = simulation.getPlanetes().size();
 
-        panneau.getChildren().addAll(centre, scrollMenu, btnToggleMenu, texteTemps);
+        panneau.getChildren().addAll(centre, scrollMenu, btnMenu, texteTempsPasse);
     }
 
-    public static TextFormatter<String> formateurNumerique() {
-        return new TextFormatter<>(change -> {
-            if (change.getControlNewText().matches("^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$")) {
-                return change;
-            }
-            return null;
-        });
+    public static TextFormatter<String> formateurNumerique(boolean accepterNegatif) {
+        String regex = accepterNegatif
+                ? "^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$"
+                : "^$|^(0|[1-9]\\d*)([.,]\\d*)?$";
+
+        return new TextFormatter<>(change ->
+                change.getControlNewText().matches(regex) ? change : null
+        );
     }
 
-    public static TextFormatter<String> formateurNumeriqueMasse() {
-        return new TextFormatter<>(change -> {
-            if (change.getControlNewText().matches("^$|^(0|[1-9]\\d*)([.,]\\d*)?$")) {
-                return change;
-            }
-            return null;
-        });
-    }
-
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY,
-                                TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }

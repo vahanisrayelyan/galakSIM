@@ -2,7 +2,7 @@ package ca.qc.bdeb.sim.galak_sim.addons;
 
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 
-public class Presets {
+public class Modeles {
 
     public static void chargerSystemeSolaire(Simulation simulation) {
         simulation.viderPlanetes();
@@ -24,5 +24,13 @@ public class Presets {
         // Géantes de glace
         simulation.ajouterNouvellePlanete(1220, 0, 0, -160, 26, 4.0e6, "Uranus");
         simulation.ajouterNouvellePlanete(1480, 0, 0, -145, 24, 3.8e6, "Neptune");
+    }
+
+    public static void chargerCollision(Simulation simulation) {
+        simulation.viderPlanetes();
+        simulation.reinitialiserVue();
+
+        simulation.ajouterNouvellePlanete(-100, 0, 2, 0, 40, 4.0e6, "A");
+        simulation.ajouterNouvellePlanete(100, 0, -2, 0, 40, 4.0e6, "B");
     }
 }
