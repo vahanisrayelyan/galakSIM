@@ -7,6 +7,8 @@ import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +26,8 @@ public class Simulation {
         this.vecteurs = vecteurs;
     }
 
-    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom) {
-        planetes.add(new Planete(x, y, vX, vY, taille, masse, nom));
+    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom, Image image, Color color) {
+        planetes.add(new Planete(x, y, vX, vY, taille, masse, nom,image,color));
         return planetes.getLast();
     }
 

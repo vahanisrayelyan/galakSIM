@@ -226,7 +226,7 @@ public class MainJavaFX extends Application {
         saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
-        Text uniteMasse = new Text("kg");
+        Text uniteMasse = new Text("10e14 kg");
         uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
@@ -460,11 +460,13 @@ public class MainJavaFX extends Application {
         }
 
         if (positionLibre) {
+            Image image = null;
+            Color color = null;
             String nomPlanete = saisiNom.getText().isEmpty()
                     ? "Planète " + (simulation.getSizeListPlanetes() + 1)
                     : saisiNom.getText();
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete);
+            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }

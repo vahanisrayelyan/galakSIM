@@ -14,23 +14,31 @@ public class Planete extends Astre {
     private Color couleurOrbite;
 
     private static final String[] IMAGES = {
-            "/planetes/planete1.png",
-            "/planetes/planete2.png",
-            "/planetes/planete3.png",
-            "/planetes/planete4.png",
-            "/planetes/planete5.png",
-            "/planetes/planete6.png",
-            "/planetes/planete7.png",
-            "/planetes/planete8.png",
+            "/planetesAleatoires/planete1.png",
+            "/planetesAleatoires/planete2.png",
+            "/planetesAleatoires/planete3.png",
+            "/planetesAleatoires/planete4.png",
+            "/planetesAleatoires/planete5.png",
+            "/planetesAleatoires/planete6.png",
+            "/planetesAleatoires/planete7.png",
+            "/planetesAleatoires/planete8.png",
     };
 
-    public Planete(double x, double y, double vX, double vY, double taille, double masse, String nom) {
+    public Planete(double x, double y, double vX, double vY, double taille, double masse, String nom, Image photo, Color couleurOrbite) {
         super(x, y, vX, vY, taille, masse);
-        this.image = imageAleatoire();
+        if (photo == null) {
+            this.image = imageAleatoire();
+        } else {
+            this.image = photo;
+        }
         this.nom = nom;
         this.orbitePlanete = new Orbite();
         this.predictionOrbitePlanete = new Orbite();
-        this.couleurOrbite = couleurAleatoire();
+        if (couleurOrbite == null) {
+            this.couleurOrbite = couleurAleatoire();
+        } else {
+            this.couleurOrbite = couleurOrbite;
+        }
     }
 
     public void update(double deltaTemps) {
