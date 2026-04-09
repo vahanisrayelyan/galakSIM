@@ -15,21 +15,21 @@ public class Modeles {
 
 
         // Soleil
-        simulation.ajouterNouvellePlanete(0, 0, 0, 0, 80, 5.0e10, "Soleil",new Image(Modeles.class.getResource("/planetesSystemeSolaire/soleil.png").toExternalForm()),Color.YELLOW);
+        simulation.ajouterNouvellePlanete(0, 0, 0, 0, 80, 1.989e30, "Soleil",new Image(Modeles.class.getResource("/planetesSystemeSolaire/soleil.png").toExternalForm()),Color.YELLOW);
 
         // Planètes internes
-        simulation.ajouterNouvellePlanete(220, 0, 0, -389, 14, 8.0e5, "Mercure",new Image(Modeles.class.getResource("/planetesSystemeSolaire/mercure.png").toExternalForm()),Color.LIGHTGRAY);
-        simulation.ajouterNouvellePlanete(320, 0, 0, -323, 18, 1.2e6, "Vénus",new Image(Modeles.class.getResource("/planetesSystemeSolaire/venus.png").toExternalForm()),Color.YELLOW);
-        simulation.ajouterNouvellePlanete(430, 0, 0, -279, 20, 1.5e6, "Terre",new Image(Modeles.class.getResource("/planetesSystemeSolaire/terre.png").toExternalForm()),Color.SKYBLUE);
-        simulation.ajouterNouvellePlanete(560, 0, 0, -244, 16, 9.0e5, "Mars",new Image(Modeles.class.getResource("/planetesSystemeSolaire/mars.png").toExternalForm()),Color.INDIANRED);
+        simulation.ajouterNouvellePlanete(50, 0, 0, 47400, 14, 3.30e23, "Mercure",new Image(Modeles.class.getResource("/planetesSystemeSolaire/mercure.png").toExternalForm()),Color.LIGHTGRAY);
+        simulation.ajouterNouvellePlanete(108, 0, 0, 35000, 18, 4.87e24, "Vénus",new Image(Modeles.class.getResource("/planetesSystemeSolaire/venus.png").toExternalForm()),Color.YELLOW);
+        simulation.ajouterNouvellePlanete(150, 0, 0, 29780, 20, 5.97e24, "Terre",new Image(Modeles.class.getResource("/planetesSystemeSolaire/terre.png").toExternalForm()),Color.SKYBLUE);
+        simulation.ajouterNouvellePlanete(228, 0, 0, 24100, 16, 6.42e23, "Mars",new Image(Modeles.class.getResource("/planetesSystemeSolaire/mars.png").toExternalForm()),Color.INDIANRED);
 
         // Géantes gazeuses
-        simulation.ajouterNouvellePlanete(760, 0, 0, -210, 36, 1.2e7, "Jupiter",new Image(Modeles.class.getResource("/planetesSystemeSolaire/jupiter.png").toExternalForm()),Color.BEIGE);
-        simulation.ajouterNouvellePlanete(980, 0, 0, -185, 45, 9.0e6, "Saturne",new Image(Modeles.class.getResource("/planetesSystemeSolaire/saturne.png").toExternalForm()),Color.SADDLEBROWN);
+        simulation.ajouterNouvellePlanete(778, 0, 0, 13100, 36, 1.90e27, "Jupiter",new Image(Modeles.class.getResource("/planetesSystemeSolaire/jupiter.png").toExternalForm()),Color.BEIGE);
+        simulation.ajouterNouvellePlanete(1430, 0, 0, 9700, 45, 5.68e26, "Saturne",new Image(Modeles.class.getResource("/planetesSystemeSolaire/saturne.png").toExternalForm()),Color.SADDLEBROWN);
 
         // Géantes de glace
-        simulation.ajouterNouvellePlanete(1220, 0, 0, -160, 26, 4.0e6, "Uranus",new Image(Modeles.class.getResource("/planetesSystemeSolaire/uranus.png").toExternalForm()),Color.AQUAMARINE);
-        simulation.ajouterNouvellePlanete(1480, 0, 0, -145, 24, 3.8e6, "Neptune",new Image(Modeles.class.getResource("/planetesSystemeSolaire/neptune.png").toExternalForm()),Color.BLUEVIOLET);
+        simulation.ajouterNouvellePlanete(2870, 0, 0, 6800, 26, 8.68e25, "Uranus",new Image(Modeles.class.getResource("/planetesSystemeSolaire/uranus.png").toExternalForm()),Color.AQUAMARINE);
+        simulation.ajouterNouvellePlanete(4500, 0, 0, 5400, 24, 1.02e26, "Neptune",new Image(Modeles.class.getResource("/planetesSystemeSolaire/neptune.png").toExternalForm()),Color.BLUEVIOLET);
     }
 
     public static void chargerCollision(Simulation simulation) {
