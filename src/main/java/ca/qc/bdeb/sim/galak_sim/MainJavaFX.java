@@ -168,28 +168,15 @@ public class MainJavaFX extends Application {
     }
 
     private void creerInterface(StackPane panneau, Canvas canvas) {
-        VBox contenuMenu = new VBox(15);
-        contenuMenu.setPadding(new Insets(15));
-        contenuMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
-        contenuMenu.prefHeightProperty().bind(panneau.heightProperty());
-        contenuMenu.prefWidthProperty().bind(panneau.widthProperty());
-
         VBox boiteParametres = new VBox(10);
         boiteParametres.setMaxWidth(Double.MAX_VALUE);
         boiteParametres.setVisible(true);
         boiteParametres.setManaged(true);
+
         VBox boiteModeles = new VBox(10);
         boiteModeles.setMaxWidth(Double.MAX_VALUE);
         boiteModeles.setVisible(false);
         boiteModeles.setManaged(false);
-
-        ScrollPane scrollMenu = new ScrollPane(contenuMenu);
-        scrollMenu.setFitToWidth(true);
-        scrollMenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollMenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollMenu.setMaxWidth(250);
-        scrollMenu.setMinWidth(250);
-        scrollMenu.setStyle("-fx-background-color: transparent; -fx-border-color: #444; -fx-border-width: 0 0 0 2; -fx-background: transparent;");
 
         Text texteNom = new Text("Nom");
         texteNom.setFill(Color.WHITE);
@@ -348,6 +335,9 @@ public class MainJavaFX extends Application {
         boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
+        sectionsMenu.setFillWidth(true);
+        sectionsMenu.setMaxWidth(Double.MAX_VALUE);
+        sectionsMenu.setPrefHeight(HAUTEUR);
         VBox.setVgrow(sectionsMenu, Priority.ALWAYS);
 
         Button btnParametres = new Button(" Paramètres ");
@@ -358,21 +348,6 @@ public class MainJavaFX extends Application {
 
         btnParametres.setStyle(actif);
         btnModeles.setStyle(nonactif);
-
-        Button btnMenu = new Button("☰");
-        btnMenu.setOnAction(e -> {
-            boolean menuVisible = scrollMenu.isVisible();
-            scrollMenu.setVisible(!menuVisible);
-
-            if (!menuVisible) {
-                StackPane.setMargin(btnMenu, new Insets(10, 260, 0, 0));
-            } else {
-                StackPane.setMargin(btnMenu, new Insets(10, 10, 0, 0));
-            }
-        });
-
-        HBox choixSections = new HBox(10, btnParametres, btnModeles);
-        choixSections.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
 
         btnParametres.setOnAction(e -> {
             boiteParametres.setVisible(true);
@@ -392,7 +367,42 @@ public class MainJavaFX extends Application {
             btnModeles.setStyle(actif);
         });
 
-        contenuMenu.getChildren().addAll(choixSections, sectionsMenu);
+        HBox choixSections = new HBox(10, btnParametres, btnModeles);
+        choixSections.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
+
+        VBox hautMenu = new VBox(10);
+        hautMenu.setPadding(new Insets(15));
+        hautMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
+        hautMenu.getChildren().add(choixSections);
+
+        // Contenu défilable
+        VBox contenuMenu = new VBox(15);
+        contenuMenu.setFillWidth(true);
+        contenuMenu.setMaxWidth(Double.MAX_VALUE);
+        contenuMenu.setPadding(new Insets(15));
+        contenuMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
+        contenuMenu.getChildren().add(sectionsMenu);
+
+        ScrollPane scrollContenu = new ScrollPane(contenuMenu);
+        scrollContenu.setFitToWidth(true);
+        scrollContenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollContenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollContenu.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        // Menu complet = haut fixe + contenu défilable
+        VBox menuComplet = new VBox(hautMenu, scrollContenu);
+        menuComplet.setFillWidth(true);
+        menuComplet.setMaxWidth(250);
+        menuComplet.setMinWidth(250);
+        menuComplet.setStyle("-fx-border-color: #444; -fx-border-width: 0 0 0 2;");
+        scrollContenu.prefHeightProperty().bind(menuComplet.heightProperty().subtract(hautMenu.heightProperty()));
+
+        Button btnMenu = new Button("☰");
+        btnMenu.setOnAction(e -> {
+            boolean menuVisible = menuComplet.isVisible();
+            menuComplet.setVisible(!menuVisible);
+            StackPane.setMargin(btnMenu, new Insets(10, menuVisible ? 10 : 260, 0, 0));
+        });
 
         Pane espace = new Pane();
         espace.prefWidthProperty().bind(canvas.widthProperty());
@@ -403,7 +413,7 @@ public class MainJavaFX extends Application {
 
         StackPane centre = new StackPane(espace, canvas);
 
-        StackPane.setAlignment(scrollMenu, Pos.TOP_RIGHT);
+        StackPane.setAlignment(menuComplet, Pos.TOP_RIGHT);
         StackPane.setAlignment(btnMenu, Pos.TOP_RIGHT);
         StackPane.setMargin(btnMenu, new Insets(10, 260, 0, 0));
 
@@ -412,7 +422,7 @@ public class MainJavaFX extends Application {
 
         nbPlanetesAvant = simulation.getPlanetes().size();
 
-        panneau.getChildren().addAll(centre, scrollMenu, btnMenu, texteTempsPasse);
+        panneau.getChildren().addAll(centre, menuComplet, btnMenu, texteTempsPasse);
     }
 
     public static TextFormatter<String> formateurNumerique(boolean accepterNegatif) {

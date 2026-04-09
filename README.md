@@ -5,7 +5,7 @@
 <h1 align="center">galakSIM</h1>
 
 <p align="center">
-  <b>Équipe :</b> Vahan Isryelyan, Zachary Lachapelle, Matis Langlois et Daniil Podvolotki
+  <b>Équipe :</b> Vahan Israyelyan, Zachary Lachapelle, Matis Langlois et Daniil Podvolotki
 </p>
 
 ---
