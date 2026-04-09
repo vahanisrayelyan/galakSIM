@@ -8,7 +8,9 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.canvas.Canvas;
@@ -49,12 +51,8 @@ public class FenetreDetails {
         double centreCanvasY = canvas.localToScreen(canvas.getBoundsInLocal()).getMinY() + (canvas.getHeight() / 2);
 
         double decalageAleatoire = fenetresOuvertes.size() * 10;
-        fenetreDetails.setX(centreCanvasX - 350 - decalageAleatoire);
+        fenetreDetails.setX(centreCanvasX - 800 - decalageAleatoire);
         fenetreDetails.setY(centreCanvasY - 125 + decalageAleatoire);
-
-        VBox layout = new VBox(10);
-        layout.setPadding(new Insets(20));
-        layout.setStyle("-fx-background-color: #1a1a1a;");
 
         Text txtPos = new Text();
         txtPos.setFill(Color.WHITE);
@@ -70,20 +68,13 @@ public class FenetreDetails {
 
         DecimalFormat df = new DecimalFormat("#.####");
 
-        // Graphique vitesse
         NumberAxis axeX = new NumberAxis();
-        axeX.setLabel(" Temps (s) ");
-        axeX.setForceZeroInRange(false);
-        axeX.setAutoRanging(false);
-        axeX.setTickUnit(10);
-
         NumberAxis axeY = new NumberAxis();
-        axeY.setLabel("Vitesse (m/s) ");
+        LineChart<Number, Number> graphVitesse = creerGraphique("Évolution de vitesse", "Vitesse (m/s)", axeX, axeY);
 
-        LineChart<Number, Number> graphVitesse = new LineChart<>(axeX, axeY);
-        graphVitesse.setTitle("Évolution de vitesse");
-        graphVitesse.setAnimated(false);
-        graphVitesse.setCreateSymbols(false);
+        NumberAxis axeAccelX = new NumberAxis();
+        NumberAxis axeAccelY = new NumberAxis();
+        LineChart<Number, Number> graphAcceleration = creerGraphique("Évolution de l'accélération", "Accélération (m/s²)", axeAccelX, axeAccelY);
 
         XYChart.Series<Number, Number> serieVitesseX = new XYChart.Series<>();
         serieVitesseX.setName(" Vitesse X ");
@@ -91,31 +82,16 @@ public class FenetreDetails {
         serieVitesseY.setName(" Vitesse Y ");
         graphVitesse.getData().addAll(serieVitesseX, serieVitesseY);
 
-        // Graphique accélération
-        NumberAxis axeAccelX = new NumberAxis();
-        axeAccelX.setLabel(" Temps (s) ");
-        axeAccelX.setForceZeroInRange(false);
-        axeAccelX.setAutoRanging(false);
-        axeAccelX.setTickUnit(10);
-
-        NumberAxis axeAccelY = new NumberAxis();
-        axeAccelY.setLabel(" Accéleration (m/s²) ");
-
-        LineChart<Number, Number> graphAcceleration = new LineChart<>(axeAccelX, axeAccelY);
-        graphAcceleration.setTitle(" Évolution de l'accéleration ");
-        graphAcceleration.setAnimated(false);
-        graphAcceleration.setCreateSymbols(false);
-
         XYChart.Series<Number, Number> serieAccelX = new XYChart.Series<>();
-        serieAccelX.setName(" Accéleration X ");
+        serieAccelX.setName(" Accélération X ");
         XYChart.Series<Number, Number> serieAccelY = new XYChart.Series<>();
-        serieAccelY.setName(" Accéleration Y ");
+        serieAccelY.setName(" Accélération Y ");
         graphAcceleration.getData().addAll(serieAccelX, serieAccelY);
 
         long[] tempsDebut = {System.nanoTime()};
 
         VBox boiteDonnees = new VBox(15);
-        boiteDonnees.setPadding(new Insets(15, 0, 15, 0));
+        boiteDonnees.setPadding(new Insets(15));
         boiteDonnees.getChildren().addAll(txtPos, txtVit, txtAcc, txtMasse);
 
         VBox boiteGraphs = new VBox(15);
@@ -124,7 +100,7 @@ public class FenetreDetails {
         boiteGraphs.setVisible(false);
         boiteGraphs.setManaged(false);
 
-        StackPane stackPane = new StackPane(boiteDonnees, boiteGraphs);
+        StackPane contenuDetails = new StackPane(boiteDonnees, boiteGraphs);
 
         String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 5;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-cursor: hand;";
@@ -155,10 +131,22 @@ public class FenetreDetails {
             bDonnees.setStyle(nonactif);
         });
 
-        Text titre = new Text("DONNÉES TÉLÉMÉTRIQUES");
-        titre.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: white;");
-        VBox header = new VBox(titre);
-        header.setPadding(new Insets(0, 0, 15, 0));
+        // Haut fixe
+        VBox hautDetails = new VBox(10, contBoutons);
+        hautDetails.setPadding(new Insets(15));
+        hautDetails.setStyle("-fx-background-color: #1a1a1a;");
+
+        // Contenu défilable
+        ScrollPane defileurContenu = new ScrollPane(contenuDetails);
+        defileurContenu.setFitToWidth(true);
+        defileurContenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        defileurContenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        defileurContenu.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        VBox.setVgrow(defileurContenu, Priority.ALWAYS);
+
+        VBox layout = new VBox(hautDetails, defileurContenu);
+        layout.setStyle("-fx-background-color: #1a1a1a;");
+        VBox.setVgrow(defileurContenu, Priority.ALWAYS);
 
         AnimationTimer rafraichisseur = new AnimationTimer() {
             private long dernierTempsGraph = System.nanoTime();
@@ -172,30 +160,7 @@ public class FenetreDetails {
                     return;
                 }
 
-                txtPos.setText(
-                        "Position X : " + df.format(p.getPosition().getX()) + " unité" +
-                                "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité"
-                );
-
-                double vitesseAbsolue = Math.sqrt(
-                        Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2)
-                );
-                txtVit.setText(
-                        "Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" +
-                                "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" +
-                                "\nVitesse : " + df.format(vitesseAbsolue) + " unité"
-                );
-
-                double accelerationAbsolue = Math.sqrt(
-                        Math.pow(p.getAcceleration().getX(), 2) + Math.pow(p.getAcceleration().getY(), 2)
-                );
-                txtAcc.setText(
-                        "Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" +
-                                "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
-                                "\nAccélération : " + df.format(accelerationAbsolue) + " unité"
-                );
-
-                txtMasse.setText("Masse " + df.format(p.getMasse()) + " unité");
+                texteAJour(txtPos, txtVit, txtAcc, txtMasse, p, df);
 
                 if (!pause[0]) {
                     if ((now - dernierTempsGraph) > 500_000_000) {
@@ -232,8 +197,6 @@ public class FenetreDetails {
         };
         rafraichisseur.start();
 
-        layout.getChildren().addAll(header, contBoutons, stackPane);
-
         Scene scene = new Scene(layout, 500, 500);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
@@ -241,5 +204,47 @@ public class FenetreDetails {
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
         fenetreDetails.show();
+    }
+
+    private void texteAJour(Text txtPos, Text txtVit, Text txtAcc, Text txtMasse, Planete p, DecimalFormat df) {
+        txtPos.setText(
+                "Position X : " + df.format(p.getPosition().getX()) + " unité" +
+                        "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité"
+        );
+
+        double vitesseAbsolue = Math.sqrt(
+                Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2)
+        );
+        txtVit.setText(
+                "Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" +
+                        "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" +
+                        "\nVitesse : " + df.format(vitesseAbsolue) + " unité"
+        );
+
+        double accelerationAbsolue = Math.sqrt(
+                Math.pow(p.getAcceleration().getX(), 2) + Math.pow(p.getAcceleration().getY(), 2)
+        );
+        txtAcc.setText(
+                "Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" +
+                        "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
+                        "\nAccélération : " + df.format(accelerationAbsolue) + " unité"
+        );
+
+        txtMasse.setText("Masse " + df.format(p.getMasse()) + " unité");
+    }
+
+    private LineChart<Number, Number> creerGraphique(String titre, String labelY, NumberAxis axeX, NumberAxis axeY) {
+        axeX.setLabel(" Temps (s) ");
+        axeX.setForceZeroInRange(false);
+        axeX.setAutoRanging(false);
+        axeX.setTickUnit(10);
+        axeY.setLabel(labelY);
+
+        LineChart<Number, Number> graphique = new LineChart<>(axeX, axeY);
+        graphique.setTitle(titre);
+        graphique.setAnimated(false);
+        graphique.setCreateSymbols(false);
+        graphique.setPrefHeight(250);
+        return graphique;
     }
 }
