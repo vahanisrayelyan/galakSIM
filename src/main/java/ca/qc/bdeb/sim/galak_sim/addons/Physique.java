@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Physique {
     private final double G = 6.67430e-11;
+    private final double scale = 1e9;
 
     public void effetForceGravitationelle(ArrayList<Planete> planetes) {
         for (Planete p : planetes) {
@@ -53,8 +54,8 @@ public class Physique {
                 Astre a1 = astres.get(i);
                 Astre a2 = astres.get(j);
 
-                double dx = a2.getPosition().getX() - a1.getPosition().getX();
-                double dy = a2.getPosition().getY() - a1.getPosition().getY();
+                double dx = (a2.getPosition().getX() - a1.getPosition().getX()) * scale;
+                double dy = (a2.getPosition().getY() - a1.getPosition().getY()) * scale;
                 double r = Math.sqrt(dx * dx + dy * dy);
 
                 if (r < 1) continue;
