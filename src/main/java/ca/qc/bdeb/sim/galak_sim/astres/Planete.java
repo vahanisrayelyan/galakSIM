@@ -10,6 +10,7 @@ public class Planete extends Astre {
     private Image image;
     private String nom;
     private Orbite orbitePlanete;
+    private Orbite predictionOrbitePlanete;
     private Color couleurOrbite;
 
     private static final String[] IMAGES = {
@@ -28,6 +29,7 @@ public class Planete extends Astre {
         this.image = imageAleatoire();
         this.nom = nom;
         this.orbitePlanete = new Orbite();
+        this.predictionOrbitePlanete = new Orbite();
         this.couleurOrbite = couleurAleatoire();
     }
 
@@ -37,7 +39,7 @@ public class Planete extends Astre {
         orbitePlanete.update(position.getX(), position.getY());
     }
 
-    public void draw(GraphicsContext contexte) {
+    public void draw(GraphicsContext contexte, boolean afficherPrediction) {
 
         double w = taille.getX();
         double h = taille.getY();
@@ -49,9 +51,14 @@ public class Planete extends Astre {
                 w,
                 h
         );
+
         contexte.setFill(Color.WHITE);
         contexte.fillText(nom, position.getX() - w / 2, position.getY() - 3 * h / 4);
-        orbitePlanete.draw(contexte, couleurOrbite);
+
+        orbitePlanete.draw(contexte, couleurOrbite, false);
+        if (afficherPrediction) {
+            predictionOrbitePlanete.draw(contexte, couleurOrbite, true);
+        }
     }
 
     private static Image imageAleatoire() {
@@ -73,5 +80,13 @@ public class Planete extends Astre {
 
     public Point2D getPosition() {
         return new Point2D(position.getX(), position.getY());
+    }
+
+    public Orbite getPredictionOrbitePlanete() {
+        return predictionOrbitePlanete;
+    }
+
+    public void setPredictionOrbitePlanete(Orbite predictionOrbitePlanete) {
+        this.predictionOrbitePlanete = predictionOrbitePlanete;
     }
 }

@@ -2,12 +2,14 @@ package ca.qc.bdeb.sim.galak_sim.graphics;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Collision;
 import ca.qc.bdeb.sim.galak_sim.addons.Physique;
+import ca.qc.bdeb.sim.galak_sim.astres.Orbite;
 import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Simulation {
 
@@ -15,12 +17,8 @@ public class Simulation {
     private Physique physique = new Physique();
     private Collision collision = new Collision();
     private Vecteurs vecteurs;
-
-    private double zoom = 1.0;
-    private double offsetX = 0;
-    private double offsetY = 0;
-
-    private Planete planeteSuivie = null;
+    private boolean afficherPrediction = true;
+    private Camera camera = new Camera();
 
     public Simulation(Vecteurs vecteurs) {
         this.vecteurs = vecteurs;
@@ -32,28 +30,24 @@ public class Simulation {
     }
 
     public void supprimerPlanete(Planete planete) {
-        if (planete == planeteSuivie) {
-            planeteSuivie = null;
+        if (planete == camera.getPlaneteSuivie()) {
+            camera.arreterSuivi();
         }
         planetes.remove(planete);
     }
 
     public void update(double deltaTemps) {
-
         physique.effetForceGravitationelle(planetes);
+
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
+
         vecteurs.setPlanete(planetes);
-
-
-        if (planeteSuivie != null) {
-            // On force l'offset à correspondre à la position de la planète
-            this.offsetX = -planeteSuivie.getPosition().getX();
-            this.offsetY = -planeteSuivie.getPosition().getY();
-        }
+        camera.mettreAJourSuivi();
 
         planetes = collision.verificationCollision(planetes);
+        collision.updateExplosions();
     }
 
     public void draw(GraphicsContext contexte) {
@@ -61,62 +55,55 @@ public class Simulation {
         double hauteur = contexte.getCanvas().getHeight();
 
         contexte.clearRect(0, 0, largeur, hauteur);
-
         contexte.save();
 
-        // Centre de l'écran + déplacement caméra + zoom
         contexte.translate(largeur / 2.0, hauteur / 2.0);
-        contexte.scale(zoom, zoom);
-        contexte.translate(offsetX, offsetY);
+        contexte.scale(camera.getZoom(), camera.getZoom());
+        contexte.translate(camera.getOffsetX(), camera.getOffsetY());
 
         for (Planete p : planetes) {
-            p.draw(contexte);
+            p.draw(contexte, afficherPrediction);
         }
         vecteurs.draw(contexte);
 
         contexte.restore();
     }
 
-    public void deplacerCamera(double dxEcran, double dyEcran) {
-        planeteSuivie = null;
-        offsetX += dxEcran / zoom;
-        offsetY += dyEcran / zoom;
+    public void calculerPredictions() {
+        if (planetes.isEmpty()) return;
+
+        List<List<Point2D>> trajectoires = physique.calculerPredictions(planetes);
+
+        for (int i = 0; i < planetes.size(); i++) {
+            Orbite nouvellePrediction = new Orbite();
+            nouvellePrediction.ajouterPointOrbitePrediction(trajectoires.get(i));
+            planetes.get(i).setPredictionOrbitePlanete(nouvellePrediction);
+        }
+    }
+
+    public void deplacerCamera(double dx, double dy) {
+        camera.deplacer(dx, dy);
     }
 
     public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
-        double ancienZoom = zoom;
-        zoom *= facteurZoom;
-
-        zoom = Math.max(0.1, Math.min(zoom, 20.0));
-
-        double facteurReel = zoom / ancienZoom;
-
-        // Ajuste l'offset pour que le point sous la souris reste fixe
-        double xMondeAvant = (sourisX - largeurCanvas / 2.0) / ancienZoom - offsetX;
-        double yMondeAvant = (sourisY - hauteurCanvas / 2.0) / ancienZoom - offsetY;
-
-        double xMondeApres = (sourisX - largeurCanvas / 2.0) / zoom - offsetX;
-        double yMondeApres = (sourisY - hauteurCanvas / 2.0) / zoom - offsetY;
-
-        offsetX += (xMondeApres - xMondeAvant);
-        offsetY += (yMondeApres - yMondeAvant);
+        camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
     }
 
     public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
-        double xMonde = (xEcran - largeurCanvas / 2.0) / zoom - offsetX;
-        double yMonde = (yEcran - hauteurCanvas / 2.0) / zoom - offsetY;
-        return new Point2D(xMonde, yMonde);
+        return camera.ecranVersMonde(xEcran, yEcran, largeurCanvas, hauteurCanvas);
     }
 
     public void reinitialiserVue() {
-        zoom = 1.0;
-        offsetX = 0;
-        offsetY = 0;
+        camera.reinitialiser();
     }
 
     public void centrerSur(Planete p, double valeurZoom) {
-        this.planeteSuivie = p;
-        this.zoom = valeurZoom;
+        camera.suivrePlanete(p, valeurZoom);
+    }
+
+    public void viderPlanetes() {
+        planetes.clear();
+        camera.reinitialiser();
     }
 
     public ArrayList<Planete> getPlanetes() {
@@ -124,14 +111,14 @@ public class Simulation {
     }
 
     public double getZoom() {
-        return zoom;
+        return camera.getZoom();
     }
 
     public int getSizeListPlanetes() {
         return planetes.size();
     }
 
-    public String dernierNomPlanete() {
-        return planetes.getLast().getNom();
+    public void setAfficherPrediction(boolean afficher) {
+        this.afficherPrediction = afficher;
     }
 }
