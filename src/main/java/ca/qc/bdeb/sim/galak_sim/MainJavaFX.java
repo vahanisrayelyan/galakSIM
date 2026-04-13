@@ -629,5 +629,3 @@ public class MainJavaFX extends Application {
         fenetreDetails.show();
     }
 }
-
-//
