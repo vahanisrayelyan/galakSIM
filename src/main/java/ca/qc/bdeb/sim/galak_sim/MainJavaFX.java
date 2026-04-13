@@ -65,6 +65,8 @@ public class MainJavaFX extends Application {
         input.etatTouches(scene);
 
         Canvas canvas = new Canvas(LARGEUR, HAUTEUR);
+        canvas.widthProperty().bind(panneau.widthProperty());
+        canvas.heightProperty().bind(panneau.heightProperty());
         canvas.setCursor(Cursor.HAND);
 
         simulation = new Simulation(vecteurs);
@@ -73,9 +75,6 @@ public class MainJavaFX extends Application {
         fenetreDetails = new FenetreDetails(simulation, fenetresOuvertes, new boolean[]{pause});
 
         GraphicsContext contexte = canvas.getGraphicsContext2D();
-
-        canvas.widthProperty().bind(panneau.widthProperty());
-        canvas.heightProperty().bind(panneau.heightProperty());
 
         canvas.setOnScroll(e -> {
             double facteur = e.getDeltaY() > 0 ? 1.1 : 0.9;
@@ -257,7 +256,7 @@ public class MainJavaFX extends Application {
         );
 
         CheckBox choixPrediction = new CheckBox("Prédiction");
-        choixPrediction.setSelected(true);
+        choixPrediction.setSelected(false);
         choixPrediction.setOnAction(e -> simulation.setAfficherPrediction(choixPrediction.isSelected()));
 
         ScrollPane defileurPlanetes = new ScrollPane(listePlanete);
@@ -267,7 +266,7 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-        Text vitesseTexte = new Text("Vitesse de la simulation: x" + vitesseSimulation);
+        Text vitesseTexte = new Text("Vitesse de la simulation: " + vitesseSimulation);
         vitesseTexte.setFill(Color.WHITE);
         vitesseTexte.setWrappingWidth(210);
 
@@ -286,18 +285,54 @@ public class MainJavaFX extends Application {
 
         Button btnPlusVite = new Button("⏩");
         Button btnMoinsVite = new Button("⏪");
+        double[] paliers = {
+                1,           // 1 seconde/s
+                60,          // 1 minute/s
+                3600,        // 1 heure/s
+                86400,       // 1 jour/s
+                604800,      // 1 semaine/s
+                2592000,     // 1 mois/s
+                31536000,    // 1 an/s
+                315360000    // 10 ans/s (limite)
+        };
+
+        String[] nomspaliers = {
+                "×1 s/s",
+                "×1 min/s",
+                "×1 h/s",
+                "×1 jour/s",
+                "×1 semaine/s",
+                "×1 mois/s",
+                "×1 an/s",
+                "×10 ans/s"
+        };
+
+        int[] indexPalier = {0};
+        vitesseSimulation = paliers[0];
+        vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[0]);
 
         btnPlusVite.setOnAction(e -> {
-            vitesseSimulation *= 2;
-            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+            if (indexPalier[0] < paliers.length - 1) {
+                indexPalier[0]++;
+                vitesseSimulation = paliers[indexPalier[0]];
+                vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[indexPalier[0]]);
+            }
         });
 
         btnMoinsVite.setOnAction(e -> {
-            vitesseSimulation /= 2;
-            vitesseTexte.setText("Vitesse de la simulation: ×" + vitesseSimulation);
+            if (indexPalier[0] > 0) {
+                indexPalier[0]--;
+                vitesseSimulation = paliers[indexPalier[0]];
+                vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[indexPalier[0]]);
+            }
         });
 
-        modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite);
+        Button btnTempsZero = new Button("Temps à 0");
+        btnTempsZero.setOnAction(e -> {
+            tempsSimulation = 0;
+        });
+
+        modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
 
         boiteParametres.getChildren().addAll(
                 creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
@@ -305,7 +340,7 @@ public class MainJavaFX extends Application {
                 btnResetVue,
                 creerSection("Affichage", choixVecteursVBox, choixPrediction),
                 creerSection("Planètes", defileurPlanetes),
-                creerSection("Simulation", vitesseTexte, modificationTemps)
+                creerSection("Temps", vitesseTexte, modificationTemps)
         );
 
         Text titreModeles = new Text("Modeles");
@@ -337,7 +372,7 @@ public class MainJavaFX extends Application {
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);
         sectionsMenu.setMaxWidth(Double.MAX_VALUE);
-        sectionsMenu.setPrefHeight(HAUTEUR);
+        sectionsMenu.setPrefHeight(canvas.getHeight());
         VBox.setVgrow(sectionsMenu, Priority.ALWAYS);
 
         Button btnParametres = new Button(" Paramètres ");
@@ -390,12 +425,13 @@ public class MainJavaFX extends Application {
         scrollContenu.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
 
         // Menu complet = haut fixe + contenu défilable
-        VBox menuComplet = new VBox(hautMenu, scrollContenu);
-        menuComplet.setFillWidth(true);
+        BorderPane menuComplet = new BorderPane();
+        menuComplet.setTop(hautMenu);
+        menuComplet.setCenter(scrollContenu);
         menuComplet.setMaxWidth(250);
         menuComplet.setMinWidth(250);
         menuComplet.setStyle("-fx-border-color: #444; -fx-border-width: 0 0 0 2;");
-        scrollContenu.prefHeightProperty().bind(menuComplet.heightProperty().subtract(hautMenu.heightProperty()));
+        menuComplet.prefHeightProperty().bind(panneau.heightProperty());
 
         Button btnMenu = new Button("☰");
         btnMenu.setOnAction(e -> {
