@@ -84,11 +84,10 @@ public class Simulation {
     }
 
     public void calculerPredictions() {
-        if (planetes.isEmpty()) {
-            return;
-        }
+        if (planetes.isEmpty()) return;
 
-        List<List<Point2D>> trajectoires = physique.calculerPredictions(planetes);
+        // On envoie le zoom actuel pour adapter la longueur de la ligne
+        List<List<Point2D>> trajectoires = physique.calculerPredictions(planetes, camera.getZoom());
 
         for (int i = 0; i < planetes.size() && i < trajectoires.size(); i++) {
             Orbite nouvellePrediction = new Orbite();

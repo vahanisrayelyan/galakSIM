@@ -19,13 +19,16 @@ public class Physique {
         appliquerGravite(new ArrayList<>(planetes));
     }
 
-    public List<List<Point2D>> calculerPredictions(ArrayList<Planete> planetes) {
-        final int MAX_POINTS = 1000;
-        final double DISTANCE_MAX_ECRAN = 2000.0;
+    public List<List<Point2D>> calculerPredictions(ArrayList<Planete> planetes, double zoomActuel) {
+        final int MAX_POINTS = 1500; // Plus de points pour de plus longues orbites
+
+        // SOLUTION : On définit la limite en PIXELS REELS à l'écran.
+        // On veut que la ligne fasse environ 3000 pixels de long sur le canvas.
+        final double LIMITE_VISUELLE_PIXELS = 3000.0;
 
         List<AstreFantome> fantomes = new ArrayList<>();
         List<List<Point2D>> trajectoires = new ArrayList<>();
-        double[] distCumulee = new double[planetes.size()];
+        double[] distanceVisuelleCumulee = new double[planetes.size()];
         boolean[] estTermine = new boolean[planetes.size()];
 
         for (Planete p : planetes) {
@@ -37,7 +40,6 @@ public class Physique {
 
         for (int etape = 0; etape < MAX_POINTS; etape++) {
             for (AstreFantome f : fantomes) f.setAcceleration(Point2D.ZERO);
-
             appliquerGravite(new ArrayList<>(fantomes));
 
             boolean encoreQuelquun = false;
@@ -48,21 +50,27 @@ public class Physique {
                 AstreFantome f = fantomes.get(i);
                 Point2D avant = f.getPosition();
 
+                // Pas de temps pour le système solaire (100 000s = ~27 heures)
                 double dt = 100000.0;
 
                 f.update(dt);
                 Point2D apres = f.getPosition();
-                
-                distCumulee[i] += avant.distance(apres);
+
+                // --- LE CALCUL DE DISTANCE VISUELLE ---
+                // On calcule combien de PIXELS la planète a parcouru selon le ZOOM actuel
+                double deplacementMetres = avant.distance(apres);
+                double deplacementPixels = deplacementMetres * zoomActuel;
+
+                distanceVisuelleCumulee[i] += deplacementPixels;
                 trajectoires.get(i).add(apres);
 
-                if (distCumulee[i] >= DISTANCE_MAX_ECRAN) {
+                // On s'arrête si on a atteint la longueur visuelle voulue
+                if (distanceVisuelleCumulee[i] >= LIMITE_VISUELLE_PIXELS) {
                     estTermine[i] = true;
                 } else {
                     encoreQuelquun = true;
                 }
             }
-
             if (!encoreQuelquun) break;
         }
         return trajectoires;
