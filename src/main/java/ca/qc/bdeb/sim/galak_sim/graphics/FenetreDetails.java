@@ -163,7 +163,7 @@ public class FenetreDetails {
                 texteAJour(txtPos, txtVit, txtAcc, txtMasse, p, df);
 
                 if (!pause[0]) {
-                    if ((now - dernierTempsGraph) > 500_000_000) {
+                    if ((now - dernierTempsGraph) > 50_000_000) {
                         double tempsEcoule = (now - tempsDebut[0]) * 1e-9;
 
                         serieVitesseX.getData().add(new XYChart.Data<>(tempsEcoule, p.getVelocite().getX()));
@@ -172,16 +172,16 @@ public class FenetreDetails {
                         serieAccelY.getData().add(new XYChart.Data<>(tempsEcoule, p.getAcceleration().getY()));
 
                         double tailleFenetreGraph = 60;
-                        axeX.setLowerBound(Math.max(0, tempsEcoule - tailleFenetreGraph));
-                        axeX.setUpperBound(Math.max(tailleFenetreGraph, tempsEcoule));
-                        axeAccelX.setLowerBound(Math.max(0, tempsEcoule - tailleFenetreGraph));
-                        axeAccelX.setUpperBound(Math.max(tailleFenetreGraph, tempsEcoule));
+                        axeX.setLowerBound(tempsEcoule - tailleFenetreGraph);
+                        axeX.setUpperBound(tempsEcoule);
+                        axeAccelX.setLowerBound(tempsEcoule - tailleFenetreGraph);
+                        axeAccelX.setUpperBound(tempsEcoule);
 
-                        if (serieVitesseX.getData().size() > 250) {
+                        if (serieVitesseX.getData().size() > 1000) {
                             serieVitesseX.getData().removeFirst();
                             serieVitesseY.getData().removeFirst();
                         }
-                        if (serieAccelX.getData().size() > 250) {
+                        if (serieAccelX.getData().size() > 1000) {
                             serieAccelX.getData().removeFirst();
                             serieAccelY.getData().removeFirst();
                         }
@@ -234,10 +234,22 @@ public class FenetreDetails {
     }
 
     private LineChart<Number, Number> creerGraphique(String titre, String labelY, NumberAxis axeX, NumberAxis axeY) {
-        axeX.setLabel(" Temps (s) ");
+        axeX.setLabel(null);
         axeX.setForceZeroInRange(false);
         axeX.setAutoRanging(false);
         axeX.setTickUnit(10);
+        axeX.setTickLabelsVisible(false);
+        axeY.setTickLabelFormatter(new javafx.util.StringConverter<Number>() {
+            @Override
+            public String toString(Number tickValue) {
+                if (tickValue.doubleValue() == 0 ) return  "0";
+                return  String.format("%.2e", tickValue.doubleValue());
+            }
+            @Override
+            public Number fromString(String string) {
+                return null;
+            }
+        });
         axeY.setLabel(labelY);
 
         LineChart<Number, Number> graphique = new LineChart<>(axeX, axeY);
