@@ -213,7 +213,7 @@ public class MainJavaFX extends Application {
         saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
-        Text uniteMasse = new Text("10e14 kg");
+        Text uniteMasse = new Text("10e5 kg");
         uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
@@ -456,7 +456,7 @@ public class MainJavaFX extends Application {
                 ? 0
                 : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e5;
 
-        double taille = 50;
+        double taille = 6.0e6;
 
         boolean positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
@@ -533,5 +533,9 @@ public class MainJavaFX extends Application {
 
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
         fenetreDetails.ouvrir(p, canvas);
+    }
+
+    public boolean isPause() {
+        return pause;
     }
 }

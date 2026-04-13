@@ -32,10 +32,11 @@ public abstract class Astre {
         // Euler simple
         velocite = velocite.add(acceleration.multiply(dt));
 
-        double ajoutPositionx = (velocite.getX() * dt) / scale;
-        double ajoutPositiony = (velocite.getY() * dt) / scale;
+        position = position.add(
+                velocite.getX() * dt,
+                velocite.getY() * dt
+        );
 
-        position = position.add(ajoutPositionx, ajoutPositiony);
     }
 
     public void draw(GraphicsContext gc) {

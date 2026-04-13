@@ -2,8 +2,8 @@ package ca.qc.bdeb.sim.galak_sim.graphics;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Collision;
 import ca.qc.bdeb.sim.galak_sim.addons.Physique;
-import ca.qc.bdeb.sim.galak_sim.astres.Orbite;
 import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
+import ca.qc.bdeb.sim.galak_sim.astres.Orbite;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -16,19 +16,22 @@ import java.util.List;
 public class Simulation {
 
     private ArrayList<Planete> planetes = new ArrayList<>();
-    private Physique physique = new Physique();
-    private Collision collision = new Collision();
-    private Vecteurs vecteurs;
+    private final Physique physique = new Physique();
+    private final Collision collision = new Collision();
+    private final Vecteurs vecteurs;
     private boolean afficherPrediction = true;
-    private Camera camera = new Camera();
+    private final Camera camera = new Camera();
 
     public Simulation(Vecteurs vecteurs) {
         this.vecteurs = vecteurs;
     }
 
-    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom, Image image, Color color) {
-        planetes.add(new Planete(x, y, vX, vY, taille, masse, nom,image,color));
-        return planetes.getLast();
+    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY,
+                                          double taille, double masse, String nom,
+                                          Image image, Color color) {
+        Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color);
+        planetes.add(nouvellePlanete);
+        return nouvellePlanete;
     }
 
     public void supprimerPlanete(Planete planete) {
@@ -39,17 +42,21 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
+        if (planetes.isEmpty()) {
+            return;
+        }
+
         physique.effetForceGravitationelle(planetes);
 
         for (Planete p : planetes) {
             p.update(deltaTemps);
         }
 
-        vecteurs.setPlanete(planetes);
-        camera.mettreAJourSuivi();
-
         planetes = collision.verificationCollision(planetes);
         collision.updateExplosions();
+
+        vecteurs.setPlanete(planetes);
+        camera.mettreAJourSuivi();
     }
 
     public void draw(GraphicsContext contexte) {
@@ -57,26 +64,26 @@ public class Simulation {
         double hauteur = contexte.getCanvas().getHeight();
 
         contexte.clearRect(0, 0, largeur, hauteur);
-        contexte.save();
-
-        contexte.translate(largeur / 2.0, hauteur / 2.0);
-        contexte.scale(camera.getZoom(), camera.getZoom());
-        contexte.translate(camera.getOffsetX(), camera.getOffsetY());
 
         for (Planete p : planetes) {
-            p.draw(contexte, afficherPrediction);
+            p.draw(contexte, camera, largeur, hauteur, afficherPrediction);
         }
-        vecteurs.draw(contexte);
 
-        contexte.restore();
+        // À corriger aussi dans Vecteurs si cette classe dessine encore
+        // en coordonnées monde directes.
+        vecteurs.draw(contexte, camera, largeur, hauteur);
+
+        collision.draw(contexte, camera, largeur, hauteur);
     }
 
     public void calculerPredictions() {
-        if (planetes.isEmpty()) return;
+        if (planetes.isEmpty()) {
+            return;
+        }
 
         List<List<Point2D>> trajectoires = physique.calculerPredictions(planetes);
 
-        for (int i = 0; i < planetes.size(); i++) {
+        for (int i = 0; i < planetes.size() && i < trajectoires.size(); i++) {
             Orbite nouvellePrediction = new Orbite();
             nouvellePrediction.ajouterPointOrbitePrediction(trajectoires.get(i));
             planetes.get(i).setPredictionOrbitePlanete(nouvellePrediction);
@@ -87,11 +94,13 @@ public class Simulation {
         camera.deplacer(dx, dy);
     }
 
-    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY,
+                       double largeurCanvas, double hauteurCanvas) {
         camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
     }
 
-    public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
+    public Point2D ecranVersMonde(double xEcran, double yEcran,
+                                  double largeurCanvas, double hauteurCanvas) {
         return camera.ecranVersMonde(xEcran, yEcran, largeurCanvas, hauteurCanvas);
     }
 
@@ -116,11 +125,19 @@ public class Simulation {
         return camera.getZoom();
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
+
     public int getSizeListPlanetes() {
         return planetes.size();
     }
 
     public void setAfficherPrediction(boolean afficher) {
         this.afficherPrediction = afficher;
+    }
+
+    public boolean isAfficherPrediction() {
+        return afficherPrediction;
     }
 }
