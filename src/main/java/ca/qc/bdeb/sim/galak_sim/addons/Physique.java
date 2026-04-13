@@ -20,31 +20,51 @@ public class Physique {
     }
 
     public List<List<Point2D>> calculerPredictions(ArrayList<Planete> planetes) {
-        final int NB_POINTS = 300;
-        final double DT_PRED = 500_000.0;
+        final int MAX_POINTS = 1000;
+        final double DISTANCE_MAX_ECRAN = 2000.0;
 
         List<AstreFantome> fantomes = new ArrayList<>();
+        List<List<Point2D>> trajectoires = new ArrayList<>();
+        double[] distCumulee = new double[planetes.size()];
+        boolean[] estTermine = new boolean[planetes.size()];
+
         for (Planete p : planetes) {
             fantomes.add(new AstreFantome(p));
+            List<Point2D> chemin = new ArrayList<>();
+            chemin.add(p.getPosition());
+            trajectoires.add(chemin);
         }
 
-        List<List<Point2D>> trajectoires = new ArrayList<>();
-        for (int i = 0; i < fantomes.size(); i++) {
-            trajectoires.add(new ArrayList<>());
-        }
+        for (int etape = 0; etape < MAX_POINTS; etape++) {
+            for (AstreFantome f : fantomes) f.setAcceleration(Point2D.ZERO);
 
-        for (int etape = 0; etape < NB_POINTS; etape++) {
-            for (Astre a : fantomes) {
-                a.setAcceleration(Point2D.ZERO);
-            }
             appliquerGravite(new ArrayList<>(fantomes));
 
-            for (int i = 0; i < fantomes.size(); i++) {
-                fantomes.get(i).update(DT_PRED);
-                trajectoires.get(i).add(fantomes.get(i).getPosition());
-            }
-        }
+            boolean encoreQuelquun = false;
 
+            for (int i = 0; i < fantomes.size(); i++) {
+                if (estTermine[i]) continue;
+
+                AstreFantome f = fantomes.get(i);
+                Point2D avant = f.getPosition();
+
+                double dt = 100000.0;
+
+                f.update(dt);
+                Point2D apres = f.getPosition();
+                
+                distCumulee[i] += avant.distance(apres);
+                trajectoires.get(i).add(apres);
+
+                if (distCumulee[i] >= DISTANCE_MAX_ECRAN) {
+                    estTermine[i] = true;
+                } else {
+                    encoreQuelquun = true;
+                }
+            }
+
+            if (!encoreQuelquun) break;
+        }
         return trajectoires;
     }
 

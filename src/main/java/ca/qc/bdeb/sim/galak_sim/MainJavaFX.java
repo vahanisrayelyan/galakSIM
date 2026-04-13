@@ -420,9 +420,11 @@ public class MainJavaFX extends Application {
 
         ScrollPane scrollContenu = new ScrollPane(contenuMenu);
         scrollContenu.setFitToWidth(true);
+        scrollContenu.setFitToHeight(true);
         scrollContenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollContenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollContenu.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        VBox.setVgrow(scrollContenu, Priority.ALWAYS);
 
         // Menu complet = haut fixe + contenu défilable
         BorderPane menuComplet = new BorderPane();
@@ -430,7 +432,8 @@ public class MainJavaFX extends Application {
         menuComplet.setCenter(scrollContenu);
         menuComplet.setMaxWidth(250);
         menuComplet.setMinWidth(250);
-        menuComplet.setStyle("-fx-border-color: #444; -fx-border-width: 0 0 0 2;");
+        menuComplet.setMaxHeight(Double.MAX_VALUE);
+        menuComplet.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
         menuComplet.prefHeightProperty().bind(panneau.heightProperty());
 
         Button btnMenu = new Button("☰");
@@ -569,9 +572,5 @@ public class MainJavaFX extends Application {
 
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
         fenetreDetails.ouvrir(p, canvas);
-    }
-
-    public boolean isPause() {
-        return pause;
     }
 }
