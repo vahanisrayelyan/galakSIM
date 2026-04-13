@@ -379,7 +379,7 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision, btnBinaire,btnTerreLune);
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);

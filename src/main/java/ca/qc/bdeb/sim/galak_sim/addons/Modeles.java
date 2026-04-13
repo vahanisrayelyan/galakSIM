@@ -198,6 +198,30 @@ public class Modeles {
         );
     }
 
+    public static void chargerBinaire(Simulation simulation) {
+        simulation.viderPlanetes();
+        simulation.reinitialiserVue();
+
+        double masseEtoile = 2.0e30;
+        double distance = 1.0e9;
+        // Avec cette masse et cette distance, il faut une vitesse énorme pour compenser
+        double vitesse = 258000;
+
+        simulation.ajouterNouvellePlanete(
+                -distance, 0,
+                0, vitesse,
+                5.0e7, masseEtoile,
+                "Alpha", null, Color.ORANGE
+        );
+
+        simulation.ajouterNouvellePlanete(
+                distance, 0,
+                0, -vitesse,
+                5.0e7, masseEtoile,
+                "Beta", null, Color.YELLOW
+        );
+    }
+
     private static Image chargerImage(String chemin) {
         return new Image(Modeles.class.getResource(chemin).toExternalForm());
     }
