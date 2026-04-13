@@ -367,7 +367,14 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision);
+        Button btnBinaire = new Button("Binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerBinaire(simulation);
+            rafraichirListePlanetes(listePlanete,canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnCollision, btnBinaire, btnVide);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);
