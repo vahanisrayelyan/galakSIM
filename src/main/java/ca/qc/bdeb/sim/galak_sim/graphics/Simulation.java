@@ -17,7 +17,7 @@ public class Simulation {
     private Physique physique = new Physique();
     private Collision collision = new Collision();
     private Vecteurs vecteurs;
-    private boolean afficherPrediction = true;
+    private boolean afficherPrediction = false;
     private Camera camera = new Camera();
 
     public Simulation(Vecteurs vecteurs) {

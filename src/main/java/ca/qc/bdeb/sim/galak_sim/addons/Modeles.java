@@ -30,7 +30,7 @@ public class Modeles {
         simulation.viderPlanetes();
         simulation.reinitialiserVue();
 
-        simulation.ajouterNouvellePlanete(-100, 0, 2, 0, 40, 4.0e6, "A");
-        simulation.ajouterNouvellePlanete(100, 0, -2, 0, 40, 4.0e6, "B");
+        simulation.ajouterNouvellePlanete(-100, 0, 2, 0, 40, 5.0e30, "A");
+        simulation.ajouterNouvellePlanete(100, 0, -2, 0, 40, 5.0e30, "B");
     }
 }
