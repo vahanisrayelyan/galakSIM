@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Physique {
     private final double G = 6.67430e-11;
-    private final double scale = 1e9;
+
 
     public void effetForceGravitationelle(ArrayList<Planete> planetes) {
         for (Planete p : planetes) {

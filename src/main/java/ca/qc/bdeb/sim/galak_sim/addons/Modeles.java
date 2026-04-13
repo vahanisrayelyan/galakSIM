@@ -115,8 +115,8 @@ public class Modeles {
         simulation.reinitialiserVue();
 
         simulation.ajouterNouvellePlanete(
-                -1.0e8, 0,
-                2000, 0,
+                -2.5e7, 0,
+                5000, 0,
                 1.0e7,
                 4.0e22,
                 "A",
@@ -125,8 +125,8 @@ public class Modeles {
         );
 
         simulation.ajouterNouvellePlanete(
-                1.0e8, 0,
-                -2000, 0,
+                2.5e7, 0,
+                -5000, 0,
                 1.0e7,
                 4.0e22,
                 "B",

@@ -16,7 +16,7 @@ public class Orbite {
     public void ajouterPointOrbite(double x, double y) {
         orbites.add(new Point2D(x, y));
 
-        if (orbites.size() > 2000) {
+        if (orbites.size() > 50000) {
             orbites.remove(0);
         }
     }

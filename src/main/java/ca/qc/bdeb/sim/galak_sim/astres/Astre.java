@@ -14,7 +14,7 @@ public abstract class Astre {
     protected Image image;
     protected double Fg = 0;
 
-    protected double scale = 1e9;
+
 
     public void setFg(double fg) {
         Fg = fg;

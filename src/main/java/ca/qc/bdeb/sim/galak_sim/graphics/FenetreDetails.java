@@ -45,7 +45,7 @@ public class FenetreDetails {
         fenetresOuvertes.put(p, fenetreDetails);
         fenetreDetails.setOnCloseRequest(e -> fenetresOuvertes.remove(p));
 
-        simulation.centrerSur(p, 1.0);
+        simulation.centrerSur(p, 5e-7);
 
         double centreCanvasX = canvas.localToScreen(canvas.getBoundsInLocal()).getMinX() + (canvas.getWidth() / 2);
         double centreCanvasY = canvas.localToScreen(canvas.getBoundsInLocal()).getMinY() + (canvas.getHeight() / 2);
@@ -208,29 +208,29 @@ public class FenetreDetails {
 
     private void texteAJour(Text txtPos, Text txtVit, Text txtAcc, Text txtMasse, Planete p, DecimalFormat df) {
         txtPos.setText(
-                "Position X : " + df.format(p.getPosition().getX()) + " unité" +
-                        "\nPosition Y : " + df.format(p.getPosition().getY()) + " unité"
+                "Position X : " + df.format(p.getPosition().getX()) + " m" +
+                        "\nPosition Y : " + df.format(p.getPosition().getY()) + " m"
         );
 
         double vitesseAbsolue = Math.sqrt(
                 Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2)
         );
         txtVit.setText(
-                "Vitesse X : " + df.format(p.getVelocite().getX()) + " unité" +
-                        "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " unité" +
-                        "\nVitesse : " + df.format(vitesseAbsolue) + " unité"
+                "Vitesse X : " + df.format(p.getVelocite().getX()) + " m/s" +
+                        "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " m/s" +
+                        "\nVitesse : " + df.format(vitesseAbsolue) + " m/s"
         );
 
         double accelerationAbsolue = Math.sqrt(
                 Math.pow(p.getAcceleration().getX(), 2) + Math.pow(p.getAcceleration().getY(), 2)
         );
         txtAcc.setText(
-                "Accélération X : " + df.format(p.getAcceleration().getX()) + " unité" +
-                        "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " unité" +
-                        "\nAccélération : " + df.format(accelerationAbsolue) + " unité"
+                "Accélération X : " + df.format(p.getAcceleration().getX()) + " m/s²" +
+                        "\nAccélération Y : " + df.format(p.getAcceleration().getY()) + " m/s²" +
+                        "\nAccélération : " + df.format(accelerationAbsolue) + " m/s²"
         );
 
-        txtMasse.setText("Masse " + df.format(p.getMasse()) + " unité");
+        txtMasse.setText("Masse " + df.format(p.getMasse()) + " kg");
     }
 
     private LineChart<Number, Number> creerGraphique(String titre, String labelY, NumberAxis axeX, NumberAxis axeY) {

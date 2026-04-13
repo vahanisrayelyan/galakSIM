@@ -36,7 +36,7 @@ public class Camera {
                        double largeurCanvas, double hauteurCanvas) {
         double ancienZoom = zoom;
         zoom *= facteurZoom;
-        zoom = Math.max(1e-13, Math.min(zoom, 1e-6));
+        zoom = Math.max(1e-20, Math.min(zoom, 1e-1));
 
         double xMondeAvant = (sourisX - largeurCanvas / 2.0) / ancienZoom - offsetX;
         double yMondeAvant = (sourisY - hauteurCanvas / 2.0) / ancienZoom - offsetY;

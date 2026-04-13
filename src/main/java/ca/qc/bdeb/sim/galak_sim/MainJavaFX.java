@@ -212,7 +212,7 @@ public class MainJavaFX extends Application {
         saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
-        Text uniteMasse = new Text("10e5 kg");
+        Text uniteMasse = new Text("×10^24 kg");
         uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
@@ -490,7 +490,7 @@ public class MainJavaFX extends Application {
 
         double masse = saisiMasse.getText().isEmpty()
                 ? 0
-                : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e5;
+                : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e24;
 
         double taille = 6.0e6;
 
