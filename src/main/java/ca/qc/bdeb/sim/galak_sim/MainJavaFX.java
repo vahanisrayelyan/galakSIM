@@ -232,7 +232,7 @@ public class MainJavaFX extends Application {
         texteInformations.setFill(Color.WHITE);
 
         Button btnResetVue = new Button("Réinitialiser la vue");
-        btnResetVue.setOnAction(e -> simulation.reinitialiserVue());
+        btnResetVue.setOnAction(e -> simulation.reinitialiserVue(null));
 
         VBox choixVecteursVBox = new VBox(2);
         RadioButton choixPasVecteurs = new RadioButton("Aucun");
@@ -366,8 +366,20 @@ public class MainJavaFX extends Application {
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+        Button btnBinaire = new Button("Orbite binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerPlanetesBinaires(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+        Button btnTerreLune = new Button("Terre - Lune");
+        btnTerreLune.setOnAction(e -> {
+            Modeles.chargerTerreLune(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision);
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision, btnBinaire,btnTerreLune);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);

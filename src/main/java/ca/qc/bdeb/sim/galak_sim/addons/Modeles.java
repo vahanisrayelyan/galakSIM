@@ -8,7 +8,7 @@ public class Modeles {
 
     public static void chargerSystemeSolaire(Simulation simulation) {
         simulation.viderPlanetes();
-        simulation.reinitialiserVue();
+        simulation.reinitialiserVue(null);
 
         // Soleil
         simulation.ajouterNouvellePlanete(
@@ -112,7 +112,7 @@ public class Modeles {
 
     public static void chargerCollision(Simulation simulation) {
         simulation.viderPlanetes();
-        simulation.reinitialiserVue();
+        simulation.reinitialiserVue("1e-6");
 
         simulation.ajouterNouvellePlanete(
                 -2.5e7, 0,
@@ -132,6 +132,69 @@ public class Modeles {
                 "B",
                 null,
                 Color.LIGHTBLUE
+        );
+    }
+    public static void chargerPlanetesBinaires(Simulation simulation) {
+        simulation.viderPlanetes();
+        simulation.reinitialiserVue("1e-6");
+
+        double masse = 6.0e24;      // masse de chaque planète
+        double rayon = 6.0e6;       // rayon visuel / physique
+        double distanceCentre = 2.0e8; // distance de chaque planète au centre de masse
+
+        // Distance totale entre les 2 planètes = 4.0e8 m
+        // Vitesse circulaire pour 2 masses égales :
+        // v = sqrt(G * m / (4r))
+        double v = Math.sqrt((6.67430e-11 * masse) / (4.0 * distanceCentre));
+
+        simulation.ajouterNouvellePlanete(
+                -distanceCentre, 0,
+                0, -v,
+                rayon,
+                masse,
+                "A",
+                null,
+                Color.CORNFLOWERBLUE
+        );
+
+        simulation.ajouterNouvellePlanete(
+                distanceCentre, 0,
+                0, v,
+                rayon,
+                masse,
+                "B",
+                null,
+                Color.HOTPINK
+        );
+    }
+    public static void chargerTerreLune(Simulation simulation) {
+        simulation.viderPlanetes();
+        simulation.reinitialiserVue("1e-6");
+
+        // Terre
+        simulation.ajouterNouvellePlanete(
+                0,
+                0,
+                0,
+                0,
+                6.371e6,
+                5.9722e24,
+                "Terre",
+                chargerImage("/planetesSystemeSolaire/terre.png"),
+                Color.DEEPSKYBLUE
+        );
+
+        // Lune
+        simulation.ajouterNouvellePlanete(
+                3.844e8,
+                0,
+                0,
+                1022,
+                1.7374e6,
+                7.342e22,
+                "Lune",
+                chargerImage("/planetesSystemeSolaire/mercure.png"),
+                Color.LIGHTGRAY
         );
     }
 
