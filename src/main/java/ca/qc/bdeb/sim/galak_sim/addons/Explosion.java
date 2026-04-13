@@ -1,20 +1,16 @@
 package ca.qc.bdeb.sim.galak_sim.addons;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-
 public class Explosion {
     private double x;
     private double y;
+    private double rayon;
     private int duree;
 
-    private static final Image imageExplosion =
-            new Image(Explosion.class.getResourceAsStream("/explosion.png"));
-
-    public Explosion(double x, double y, int duree) {
+    public Explosion(double x, double y, double rayon) {
         this.x = x;
         this.y = y;
-        this.duree = duree;
+        this.rayon = rayon;
+        this.duree = 30; // durée par défaut
     }
 
     public void update() {
@@ -25,11 +21,15 @@ public class Explosion {
         return duree <= 0;
     }
 
-    public void draw(GraphicsContext contexte) {
-        contexte.drawImage(
-                imageExplosion,
-                x - imageExplosion.getWidth() / 2,
-                y - imageExplosion.getHeight() / 2
-        );
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getRayon() {
+        return rayon;
     }
 }

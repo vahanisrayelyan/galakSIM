@@ -74,8 +74,8 @@ public class Physique {
                 Astre a1 = astres.get(i);
                 Astre a2 = astres.get(j);
 
-                double dx = (a2.getPosition().getX() - a1.getPosition().getX()) * scale;
-                double dy = (a2.getPosition().getY() - a1.getPosition().getY()) * scale;
+                double dx = (a2.getPosition().getX() - a1.getPosition().getX());
+                double dy = (a2.getPosition().getY() - a1.getPosition().getY());
                 double r = Math.sqrt(dx * dx + dy * dy);
 
                 if (r < 1) continue;

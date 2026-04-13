@@ -1,6 +1,7 @@
 package ca.qc.bdeb.sim.galak_sim.addons;
 
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import javafx.scene.Camera;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -23,8 +24,10 @@ public class Vecteurs {
         this.choix = choix;
     }
 
-    public void draw(GraphicsContext gc) {
-
+    public void draw(GraphicsContext gc, ca.qc.bdeb.sim.galak_sim.graphics.Camera camera, double largeurCanvas, double hauteurCanvas){
+        if (planetes == null || planetes.isEmpty() || choix == 0) {
+            return;
+        }
         for (Planete p : planetes) {
             if (choix != 0) {
                 if (choix == 1) {
@@ -77,4 +80,6 @@ public class Vecteurs {
         }
 
     }
+
+
 }

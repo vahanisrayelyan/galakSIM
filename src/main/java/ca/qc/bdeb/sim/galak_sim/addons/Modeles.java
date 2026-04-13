@@ -1,6 +1,8 @@
 package ca.qc.bdeb.sim.galak_sim.addons;
 
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 public class Modeles {
 
@@ -9,28 +11,131 @@ public class Modeles {
         simulation.reinitialiserVue();
 
         // Soleil
-        simulation.ajouterNouvellePlanete(0, 0, 0, 0, 80, 1.989e30, "Soleil");
+        simulation.ajouterNouvellePlanete(
+                0, 0,
+                0, 0,
+                6.9634e8,                 // rayon réel (m)
+                1.989e30,                 // masse réelle (kg)
+                "Soleil",
+                chargerImage("/planetesSystemeSolaire/soleil.png"),
+                Color.YELLOW
+        );
 
-        // Planètes internes
-        simulation.ajouterNouvellePlanete(58, 0, 0, 47400, 14, 3.30e23, "Mercure");
-        simulation.ajouterNouvellePlanete(108, 0, 0, 35000, 18, 4.87e24, "Vénus");
-        simulation.ajouterNouvellePlanete(150, 0, 0, 29780, 20, 5.97e24, "Terre");
-        simulation.ajouterNouvellePlanete(228, 0, 0, 24100, 16, 6.42e23, "Mars");
+        // Mercure
+        simulation.ajouterNouvellePlanete(
+                5.7909e10, 0,            // distance moyenne au Soleil (m)
+                0, 47400,                // vitesse orbitale moyenne (m/s)
+                2.4397e6,                // rayon réel (m)
+                3.3011e23,               // masse réelle (kg)
+                "Mercure",
+                chargerImage("/planetesSystemeSolaire/mercure.png"),
+                Color.LIGHTGRAY
+        );
 
-        // Géantes gazeuses
-        simulation.ajouterNouvellePlanete(778, 0, 0, 13100, 36, 1.90e27, "Jupiter");
-        simulation.ajouterNouvellePlanete(1430, 0, 0, 9700, 32, 5.68e26, "Saturne");
+        // Vénus
+        simulation.ajouterNouvellePlanete(
+                1.0821e11, 0,
+                0, 35020,
+                6.0518e6,
+                4.8675e24,
+                "Vénus",
+                chargerImage("/planetesSystemeSolaire/venus.png"),
+                Color.GOLD
+        );
 
-        // Géantes de glace
-        simulation.ajouterNouvellePlanete(2870, 0, 0, 6800, 26, 8.68e25, "Uranus");
-        simulation.ajouterNouvellePlanete(4500, 0, 0, 5400, 24, 1.02e26, "Neptune");
+        // Terre
+        simulation.ajouterNouvellePlanete(
+                1.4960e11, 0,
+                0, 29780,
+                6.3710e6,
+                5.9722e24,
+                "Terre",
+                chargerImage("/planetesSystemeSolaire/terre.png"),
+                Color.DEEPSKYBLUE
+        );
+
+        // Mars
+        simulation.ajouterNouvellePlanete(
+                2.2792e11, 0,
+                0, 24070,
+                3.3895e6,
+                6.4171e23,
+                "Mars",
+                chargerImage("/planetesSystemeSolaire/mars.png"),
+                Color.INDIANRED
+        );
+
+        // Jupiter
+        simulation.ajouterNouvellePlanete(
+                7.7857e11, 0,
+                0, 13070,
+                6.9911e7,
+                1.8982e27,
+                "Jupiter",
+                chargerImage("/planetesSystemeSolaire/jupiter.png"),
+                Color.BEIGE
+        );
+
+        // Saturne
+        simulation.ajouterNouvellePlanete(
+                1.4335e12, 0,
+                0, 9680,
+                5.8232e7,
+                5.6834e26,
+                "Saturne",
+                chargerImage("/planetesSystemeSolaire/saturne.png"),
+                Color.KHAKI
+        );
+
+        // Uranus
+        simulation.ajouterNouvellePlanete(
+                2.8725e12, 0,
+                0, 6800,
+                2.5362e7,
+                8.6810e25,
+                "Uranus",
+                chargerImage("/planetesSystemeSolaire/uranus.png"),
+                Color.AQUAMARINE
+        );
+
+        // Neptune
+        simulation.ajouterNouvellePlanete(
+                4.4951e12, 0,
+                0, 5430,
+                2.4622e7,
+                1.02413e26,
+                "Neptune",
+                chargerImage("/planetesSystemeSolaire/neptune.png"),
+                Color.ROYALBLUE
+        );
     }
 
     public static void chargerCollision(Simulation simulation) {
         simulation.viderPlanetes();
         simulation.reinitialiserVue();
 
-        simulation.ajouterNouvellePlanete(-100, 0, 2, 0, 40, 5.0e30, "A");
-        simulation.ajouterNouvellePlanete(100, 0, -2, 0, 40, 5.0e30, "B");
+        simulation.ajouterNouvellePlanete(
+                -1.0e8, 0,
+                2000, 0,
+                1.0e7,
+                4.0e22,
+                "A",
+                null,
+                Color.WHITE
+        );
+
+        simulation.ajouterNouvellePlanete(
+                1.0e8, 0,
+                -2000, 0,
+                1.0e7,
+                4.0e22,
+                "B",
+                null,
+                Color.LIGHTBLUE
+        );
+    }
+
+    private static Image chargerImage(String chemin) {
+        return new Image(Modeles.class.getResource(chemin).toExternalForm());
     }
 }

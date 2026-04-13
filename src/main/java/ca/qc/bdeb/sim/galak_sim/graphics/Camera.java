@@ -4,7 +4,7 @@ import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import javafx.geometry.Point2D;
 
 public class Camera {
-    private double zoom = 1.0;
+    private double zoom = 1e-9;
     private double offsetX = 0;
     private double offsetY = 0;
     private Planete planeteSuivie = null;
@@ -12,6 +12,7 @@ public class Camera {
     public void suivrePlanete(Planete p, double valeurZoom) {
         this.planeteSuivie = p;
         this.zoom = valeurZoom;
+        mettreAJourSuivi();
     }
 
     public void arreterSuivi() {
@@ -20,8 +21,8 @@ public class Camera {
 
     public void mettreAJourSuivi() {
         if (planeteSuivie != null) {
-            this.offsetX = -planeteSuivie.getPosition().getX();
-            this.offsetY = -planeteSuivie.getPosition().getY();
+            offsetX = -planeteSuivie.getPosition().getX();
+            offsetY = -planeteSuivie.getPosition().getY();
         }
     }
 
@@ -31,10 +32,11 @@ public class Camera {
         offsetY += dyEcran / zoom;
     }
 
-    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY,
+                       double largeurCanvas, double hauteurCanvas) {
         double ancienZoom = zoom;
         zoom *= facteurZoom;
-        zoom = Math.max(0.1, Math.min(zoom, 20.0));
+        zoom = Math.max(1e-13, Math.min(zoom, 1e-6));
 
         double xMondeAvant = (sourisX - largeurCanvas / 2.0) / ancienZoom - offsetX;
         double yMondeAvant = (sourisY - hauteurCanvas / 2.0) / ancienZoom - offsetY;
@@ -47,16 +49,24 @@ public class Camera {
     }
 
     public void reinitialiser() {
-        zoom = 1.0;
+        zoom = 1e-9;
         offsetX = 0;
         offsetY = 0;
         planeteSuivie = null;
     }
 
-    public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
+    public Point2D ecranVersMonde(double xEcran, double yEcran,
+                                  double largeurCanvas, double hauteurCanvas) {
         double xMonde = (xEcran - largeurCanvas / 2.0) / zoom - offsetX;
         double yMonde = (yEcran - hauteurCanvas / 2.0) / zoom - offsetY;
         return new Point2D(xMonde, yMonde);
+    }
+
+    public Point2D mondeVersEcran(double xMonde, double yMonde,
+                                  double largeurCanvas, double hauteurCanvas) {
+        double xEcran = (xMonde + offsetX) * zoom + largeurCanvas / 2.0;
+        double yEcran = (yMonde + offsetY) * zoom + hauteurCanvas / 2.0;
+        return new Point2D(xEcran, yEcran);
     }
 
     public double getZoom() {
