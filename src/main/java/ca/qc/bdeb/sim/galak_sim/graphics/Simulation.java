@@ -116,8 +116,8 @@ public class Simulation {
         return camera.ecranVersMonde(xEcran, yEcran, largeurCanvas, hauteurCanvas);
     }
 
-    public void reinitialiserVue() {
-        camera.reinitialiser();
+    public void reinitialiserVue(String zoom1) {
+        camera.reinitialiser(zoom1);
     }
 
     public void centrerSur(Planete p, double valeurZoom) {
@@ -126,7 +126,7 @@ public class Simulation {
 
     public void viderPlanetes() {
         planetes.clear();
-        camera.reinitialiser();
+        camera.reinitialiser(null);
     }
 
     public ArrayList<Planete> getPlanetes() {

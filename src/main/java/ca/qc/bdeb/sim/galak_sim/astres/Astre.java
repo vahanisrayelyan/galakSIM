@@ -12,6 +12,7 @@ public abstract class Astre {
     protected Point2D taille;
     protected Point2D Fg;
     protected double masse;
+    protected boolean trouNoir;
 
 
 
@@ -68,5 +69,13 @@ public abstract class Astre {
 
     public Point2D getTaille() {
         return taille;
+    }
+
+    public boolean estTrouNoir() {
+        return trouNoir;
+    }
+
+    public void setTrouNoir (boolean trouNoir){
+        this.trouNoir= trouNoir;
     }
 }
