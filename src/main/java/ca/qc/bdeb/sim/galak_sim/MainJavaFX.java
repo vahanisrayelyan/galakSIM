@@ -490,6 +490,12 @@ public class MainJavaFX extends Application {
         });
         Text texteListeModeles = new Text("Modèles sauvegardés");
         texteListeModeles.setFill(Color.WHITE);
+        Button btnTrouNoir = new Button("Trou Noir");
+        btnTrouNoir.setOnAction(e -> {
+            Modeles.chargerTrouNoir(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
 
         boiteModeles.getChildren().addAll(
                 titreModeles,
@@ -497,6 +503,7 @@ public class MainJavaFX extends Application {
                 btnCollision,
                 btnBinaire,
                 btnTerreLune,
+                btnTrouNoir,
                 btnVide,
                 btnResetVueModeles,
                 sep,

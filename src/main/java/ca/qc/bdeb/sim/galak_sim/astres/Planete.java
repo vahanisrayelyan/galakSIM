@@ -96,7 +96,23 @@ public class Planete extends Astre {
         }
 
         // Dessin de la planète
-        if (image != null) {
+        if (estTrouNoir()) {
+            contexte.setFill(Color.BLACK);
+            contexte.fillOval(
+                    posEcran.getX() - rayonPlaneteAffiche,
+                    posEcran.getY() - rayonPlaneteAffiche,
+                    largeurAffichage,
+                    hauteurAffichage
+            );
+            contexte.setStroke(Color.rgb(138, 43, 226, 0.8));
+            contexte.setLineWidth(4);
+            contexte.strokeOval(
+                    posEcran.getX() - rayonPlaneteAffiche - 4,
+                    posEcran.getY() - rayonPlaneteAffiche - 4,
+                    largeurAffichage + 8,
+                    hauteurAffichage + 8
+            );
+        } else if (image != null) {
             contexte.drawImage(
                     image,
                     posEcran.getX() - rayonPlaneteAffiche,
