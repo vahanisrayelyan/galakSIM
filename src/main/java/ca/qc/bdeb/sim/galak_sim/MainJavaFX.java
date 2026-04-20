@@ -354,13 +354,6 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        Button btnVide = new Button("Vide");
-        btnVide.setOnAction(e -> {
-            simulation.viderPlanetes();
-            rafraichirListePlanetes(listePlanete, canvas);
-            nbPlanetesAvant = simulation.getPlanetes().size();
-        });
-
         Button btnCollision = new Button("Collision");
         btnCollision.setOnAction(e -> {
             Modeles.chargerCollision(simulation);

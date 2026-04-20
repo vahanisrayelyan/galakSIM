@@ -335,7 +335,8 @@ public class Modeles {
                 3e32,
                 "Trou Noir",
                 null,
-                Color.PURPLE
+                Color.PURPLE,
+                ""
         );
         trouNoir.setTrouNoir(true);
 
@@ -348,7 +349,8 @@ public class Modeles {
                 5.9e24,
                 "Planète",
                 null,
-                Color.BLUE
+                Color.BLUE,
+                ""
         );
     }
 
