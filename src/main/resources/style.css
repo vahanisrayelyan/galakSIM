@@ -138,6 +138,11 @@
     -fx-background-color: #5a5a5a;
 }
 
+/*Text*/
+Text {
+    -fx-fill: #ffffff;
+}
+
 /*Débogage des régions*/
 /*
 .button, .text-field, .scroll-pane, .vbox, .hbox, .radio-button, .check-box, .stack-pane {

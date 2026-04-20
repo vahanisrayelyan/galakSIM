@@ -383,12 +383,21 @@ public class MainJavaFX extends Application {
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
-        Button btnBinaire = new Button("Orbite binaire");
-        btnBinaire.setOnAction(e -> {
-            Modeles.chargerPlanetesBinaires(simulation);
+
+        Button btnCercle = new Button("Orbite binaire");
+        btnCercle.setOnAction(e -> {
+            Modeles.chargerCercle(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+
+        Button btnBinaire = new Button("Orbite binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerBinaire(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
         Button btnTerreLune = new Button("Terre - Lune");
         btnTerreLune.setOnAction(e -> {
             Modeles.chargerTerreLune(simulation);

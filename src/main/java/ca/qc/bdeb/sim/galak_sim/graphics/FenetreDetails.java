@@ -26,6 +26,7 @@ public class FenetreDetails {
     private final Simulation simulation;
     private final Map<Planete, Stage> fenetresOuvertes;
     private final boolean[] pause;
+    private double vitesseMax = 0;
 
     public FenetreDetails(Simulation simulation, Map<Planete, Stage> fenetresOuvertes, boolean[] pause) {
         this.simulation = simulation;
@@ -55,16 +56,10 @@ public class FenetreDetails {
         fenetreDetails.setY(centreCanvasY - 125 + decalageAleatoire);
 
         Text txtPos = new Text();
-        txtPos.setFill(Color.WHITE);
-
         Text txtVit = new Text();
-        txtVit.setFill(Color.WHITE);
-
         Text txtAcc = new Text();
-        txtAcc.setFill(Color.WHITE);
-
         Text txtMasse = new Text();
-        txtMasse.setFill(Color.WHITE);
+        Text txtDescription = new Text();
 
         DecimalFormat df = new DecimalFormat("#.####");
 
@@ -92,7 +87,7 @@ public class FenetreDetails {
 
         VBox boiteDonnees = new VBox(15);
         boiteDonnees.setPadding(new Insets(15));
-        boiteDonnees.getChildren().addAll(txtPos, txtVit, txtAcc, txtMasse);
+        boiteDonnees.getChildren().addAll(txtPos, txtVit, txtAcc, txtMasse, txtDescription);
 
         VBox boiteGraphs = new VBox(15);
         boiteGraphs.setPadding(new Insets(15, 0, 15, 0));
@@ -160,7 +155,12 @@ public class FenetreDetails {
                     return;
                 }
 
-                texteAJour(txtPos, txtVit, txtAcc, txtMasse, p, df);
+                texteAJour(txtPos, txtVit, txtAcc, txtMasse, txtDescription, p, df);
+                txtPos.wrappingWidthProperty().bind(fenetreDetails.widthProperty().subtract(45));
+                txtVit.wrappingWidthProperty().bind(fenetreDetails.widthProperty().subtract(45));
+                txtAcc.wrappingWidthProperty().bind(fenetreDetails.widthProperty().subtract(45));
+                txtMasse.wrappingWidthProperty().bind(fenetreDetails.widthProperty().subtract(45));
+                txtDescription.wrappingWidthProperty().bind(fenetreDetails.widthProperty().subtract(45));
 
                 if (!pause[0]) {
                     if ((now - dernierTempsGraph) > 50_000_000) {
@@ -201,12 +201,14 @@ public class FenetreDetails {
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
         fenetreDetails.setResizable(true);
+        fenetreDetails.setMinWidth(350);
+        fenetreDetails.setMinHeight(350);
         fenetreDetails.setScene(scene);
         fenetreDetails.setAlwaysOnTop(true);
         fenetreDetails.show();
     }
 
-    private void texteAJour(Text txtPos, Text txtVit, Text txtAcc, Text txtMasse, Planete p, DecimalFormat df) {
+    private void texteAJour(Text txtPos, Text txtVit, Text txtAcc, Text txtMasse, Text txtDescription, Planete p, DecimalFormat df) {
         txtPos.setText(
                 "Position X : " + df.format(p.getPosition().getX()) + " m" +
                         "\nPosition Y : " + df.format(p.getPosition().getY()) + " m"
@@ -215,10 +217,14 @@ public class FenetreDetails {
         double vitesseAbsolue = Math.sqrt(
                 Math.pow(p.getVelocite().getX(), 2) + Math.pow(p.getVelocite().getY(), 2)
         );
+        if (vitesseAbsolue > vitesseMax) {
+            vitesseMax = vitesseAbsolue;
+        }
         txtVit.setText(
                 "Vitesse X : " + df.format(p.getVelocite().getX()) + " m/s" +
                         "\nVitesse Y : " + df.format(p.getVelocite().getY()) + " m/s" +
-                        "\nVitesse : " + df.format(vitesseAbsolue) + " m/s"
+                        "\nVitesse : " + df.format(vitesseAbsolue) + " m/s" +
+                        "\nVitesse maximum : " + df.format(vitesseMax) + " m/s"
         );
 
         double accelerationAbsolue = Math.sqrt(
@@ -230,7 +236,10 @@ public class FenetreDetails {
                         "\nAccélération : " + df.format(accelerationAbsolue) + " m/s²"
         );
 
-        txtMasse.setText("Masse " + df.format(p.getMasse()) + " kg");
+        txtMasse.setText("Masse : " + df.format(p.getMasse()) + " kg");
+        if (!p.getDescription().isEmpty()) {
+            txtDescription.setText("Description : " + p.getDescription());
+        }
     }
 
     private LineChart<Number, Number> creerGraphique(String titre, String labelY, NumberAxis axeX, NumberAxis axeY) {
