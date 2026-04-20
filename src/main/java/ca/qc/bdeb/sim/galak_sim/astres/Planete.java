@@ -14,6 +14,7 @@ public class Planete extends Astre {
     private Orbite orbitePlanete;
     private Orbite predictionOrbitePlanete;
     private Color couleurOrbite;
+    private String imagePath;
 
     private static final String[] IMAGES = {
             "/planetesAleatoires/planete1.png",
@@ -32,8 +33,10 @@ public class Planete extends Astre {
 
         if (photo == null) {
             this.image = imageAleatoire();
+            this.imagePath = null;
         } else {
             this.image = photo;
+            this.imagePath = photo.getUrl(); // important
         }
 
         this.nom = nom;
@@ -245,5 +248,8 @@ public class Planete extends Astre {
         double dy = yEcran - posEcran.getY();
 
         return Math.hypot(dx, dy) <= rayonCliqueable;
+    }
+    public String getImagePath() {
+        return imagePath;
     }
 }

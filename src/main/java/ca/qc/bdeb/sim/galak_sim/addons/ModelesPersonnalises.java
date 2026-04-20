@@ -2,6 +2,7 @@ package ca.qc.bdeb.sim.galak_sim.addons;
 
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.io.*;
@@ -20,7 +21,7 @@ public class ModelesPersonnalises {
             dossier.mkdirs();
         }
 
-        File fichier = new File(dossier, nomModele + ".txt");
+        File fichier = new File(dossier, nettoyerNomFichier(nomModele) + ".txt");
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(fichier), StandardCharsets.UTF_8))) {
@@ -28,17 +29,26 @@ public class ModelesPersonnalises {
             for (Planete p : simulation.getPlanetes()) {
                 Color c = p.getCouleurOrbite();
 
-                String couleur = c.getRed() + "," + c.getGreen() + "," + c.getBlue() + "," + c.getOpacity();
+                String couleur = c.getRed() + "," +
+                        c.getGreen() + "," +
+                        c.getBlue() + "," +
+                        c.getOpacity();
+
+                String imagePath = p.getImagePath();
+                if (imagePath == null || imagePath.isBlank()) {
+                    imagePath = "null";
+                }
 
                 writer.write(
-                        nettoyer(p.getNom()) + ";" +
+                        nettoyerTexte(p.getNom()) + ";" +
                                 p.getPosition().getX() + ";" +
                                 p.getPosition().getY() + ";" +
                                 p.getVelocite().getX() + ";" +
                                 p.getVelocite().getY() + ";" +
                                 p.getTaille().getX() + ";" +
                                 p.getMasse() + ";" +
-                                couleur
+                                couleur + ";" +
+                                nettoyerTexte(imagePath)
                 );
                 writer.newLine();
             }
@@ -46,7 +56,7 @@ public class ModelesPersonnalises {
     }
 
     public static void chargerModele(Simulation simulation, String nomModele) throws IOException {
-        File fichier = new File(DOSSIER, nomModele + ".txt");
+        File fichier = new File(DOSSIER, nettoyerNomFichier(nomModele) + ".txt");
 
         if (!fichier.exists()) {
             throw new FileNotFoundException("Le modèle n'existe pas : " + fichier.getAbsolutePath());
@@ -65,7 +75,7 @@ public class ModelesPersonnalises {
                 }
 
                 String[] parties = ligne.split(";");
-                if (parties.length < 8) {
+                if (parties.length < 9) {
                     continue;
                 }
 
@@ -88,40 +98,37 @@ public class ModelesPersonnalises {
                     );
                 }
 
+                String imagePath = parties[8];
+                Image image = null;
+
+                if (!imagePath.equals("null") && !imagePath.isBlank()) {
+                    try {
+                        image = new Image(imagePath);
+                        if (image.isError()) {
+                            image = null;
+                        }
+                    } catch (Exception e) {
+                        image = null;
+                    }
+                }
+
                 simulation.ajouterNouvellePlanete(
                         x, y,
                         vX, vY,
                         taille, masse,
                         nom,
-                        null,
+                        image,
                         couleur
                 );
             }
         }
     }
 
-    private static String nettoyer(String texte) {
-        return texte.replace(";", ",").trim();
-    }
-    public static void supprimerTousLesModeles() {
-        File dossier = new File("modeles_perso");
-
-        if (!dossier.exists()) {
-            return;
-        }
-
-        for (File fichier : dossier.listFiles()) {
-            if (fichier.isFile()) {
-                fichier.delete();
-            }
-        }
-
-        dossier.delete(); // supprime le dossier lui-même
-    }
     public static boolean modeleExiste(String nomModele) {
-        File fichier = new File(DOSSIER, nomModele + ".txt");
+        File fichier = new File(DOSSIER, nettoyerNomFichier(nomModele) + ".txt");
         return fichier.exists();
     }
+
     public static List<String> listerModeles() {
         File dossier = new File(DOSSIER);
         List<String> nomsModeles = new ArrayList<>();
@@ -139,14 +146,14 @@ public class ModelesPersonnalises {
 
         for (File fichier : fichiers) {
             String nom = fichier.getName();
-            nomsModeles.add(nom.substring(0, nom.length() - 4)); // enlève .txt
+            nomsModeles.add(nom.substring(0, nom.length() - 4));
         }
 
         return nomsModeles;
     }
 
     public static void supprimerModele(String nomModele) throws IOException {
-        File fichier = new File(DOSSIER, nomModele + ".txt");
+        File fichier = new File(DOSSIER, nettoyerNomFichier(nomModele) + ".txt");
 
         if (!fichier.exists()) {
             throw new FileNotFoundException("Le modèle n'existe pas : " + fichier.getAbsolutePath());
@@ -155,5 +162,49 @@ public class ModelesPersonnalises {
         if (!fichier.delete()) {
             throw new IOException("Impossible de supprimer le modèle : " + nomModele);
         }
+    }
+
+    public static void supprimerTousLesModeles() {
+        File dossier = new File(DOSSIER);
+
+        if (!dossier.exists()) {
+            return;
+        }
+
+        File[] fichiers = dossier.listFiles();
+        if (fichiers != null) {
+            for (File fichier : fichiers) {
+                if (fichier.isFile()) {
+                    fichier.delete();
+                }
+            }
+        }
+
+        dossier.delete();
+    }
+
+    private static String nettoyerTexte(String texte) {
+        if (texte == null) {
+            return "";
+        }
+        return texte.replace(";", ",").trim();
+    }
+
+    private static String nettoyerNomFichier(String nom) {
+        if (nom == null || nom.isBlank()) {
+            return "modele";
+        }
+
+        return nom.trim()
+                .replace("\\", "_")
+                .replace("/", "_")
+                .replace(":", "_")
+                .replace("*", "_")
+                .replace("?", "_")
+                .replace("\"", "_")
+                .replace("<", "_")
+                .replace(">", "_")
+                .replace("|", "_")
+                .replace(";", "_");
     }
 }
