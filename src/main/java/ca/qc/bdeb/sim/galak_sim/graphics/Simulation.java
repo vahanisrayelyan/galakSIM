@@ -29,8 +29,8 @@ public class Simulation {
 
     public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY,
                                           double taille, double masse, String nom,
-                                          Image image, Color color) {
-        Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color);
+                                          Image image, Color color, String description) {
+        Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color, description);
         planetes.add(nouvellePlanete);
         return nouvellePlanete;
     }

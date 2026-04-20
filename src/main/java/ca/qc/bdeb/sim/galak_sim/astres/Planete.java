@@ -14,6 +14,7 @@ public class Planete extends Astre {
     private Orbite orbitePlanete;
     private Orbite predictionOrbitePlanete;
     private Color couleurOrbite;
+    private String description;
 
     private static final String[] IMAGES = {
             "/planetesAleatoires/planete1.png",
@@ -27,7 +28,7 @@ public class Planete extends Astre {
     };
 
     public Planete(double x, double y, double vX, double vY, double taille, double masse,
-                   String nom, Image photo, Color couleurOrbite) {
+                   String nom, Image photo, Color couleurOrbite, String description) {
         super(x, y, vX, vY, taille, masse);
 
         if (photo == null) {
@@ -45,6 +46,8 @@ public class Planete extends Astre {
         } else {
             this.couleurOrbite = couleurOrbite;
         }
+
+        this.description = description != null ? description : "";
     }
 
     @Override
@@ -184,7 +187,6 @@ public class Planete extends Astre {
     public Orbite getPredictionOrbitePlanete() {
         return predictionOrbitePlanete;
     }
-
     public void setPredictionOrbitePlanete(Orbite predictionOrbitePlanete) {
         this.predictionOrbitePlanete = predictionOrbitePlanete;
     }
@@ -192,8 +194,10 @@ public class Planete extends Astre {
     public Color getCouleurOrbite() {
         return couleurOrbite;
     }
-
     public void setCouleurOrbite(Color couleurOrbite) {
         this.couleurOrbite = couleurOrbite;
     }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

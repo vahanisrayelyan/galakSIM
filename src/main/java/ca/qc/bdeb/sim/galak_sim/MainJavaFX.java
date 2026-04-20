@@ -354,25 +354,27 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        Button btnVide = new Button("Vide");
-        btnVide.setOnAction(e -> {
-            simulation.viderPlanetes();
-            rafraichirListePlanetes(listePlanete, canvas);
-            nbPlanetesAvant = simulation.getPlanetes().size();
-        });
-
         Button btnCollision = new Button("Collision");
         btnCollision.setOnAction(e -> {
             Modeles.chargerCollision(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
-        Button btnBinaire = new Button("Orbite binaire");
-        btnBinaire.setOnAction(e -> {
-            Modeles.chargerPlanetesBinaires(simulation);
+
+        Button btnCercle = new Button("Orbite binaire");
+        btnCercle.setOnAction(e -> {
+            Modeles.chargerCercle(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+
+        Button btnBinaire = new Button("Orbite binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerBinaire(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
         Button btnTerreLune = new Button("Terre - Lune");
         btnTerreLune.setOnAction(e -> {
             Modeles.chargerTerreLune(simulation);
@@ -380,7 +382,14 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision,btnBinaire);
+        Button btnVide = new Button("Vide");
+        btnVide.setOnAction(e -> {
+            simulation.viderPlanetes();
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnCollision, btnCercle, btnBinaire, btnTerreLune, btnVide);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);
@@ -537,7 +546,7 @@ public class MainJavaFX extends Application {
                     ? "Planète " + (simulation.getSizeListPlanetes() + 1)
                     : saisiNom.getText();
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color);
+            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color, "");
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }

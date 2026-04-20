@@ -111,6 +111,11 @@
     -fx-background-color: #2a2a2a;
 }
 
+/*Text*/
+Text {
+    -fx-fill: #ffffff;
+}
+
 /*Débogage des régions*/
 /*
 .button, .text-field, .scroll-pane, .vbox, .hbox, .radio-button, .check-box, .stack-pane {
