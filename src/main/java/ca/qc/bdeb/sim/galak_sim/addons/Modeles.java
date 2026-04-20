@@ -200,7 +200,7 @@ public class Modeles {
 
     public static void chargerBinaire(Simulation simulation) {
         simulation.viderPlanetes();
-        simulation.reinitialiserVue();
+        simulation.reinitialiserVue(null);
 
         double masseEtoile = 2.0e30;
         double distance = 1.0e9;
