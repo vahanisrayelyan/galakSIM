@@ -118,7 +118,8 @@ public class ModelesPersonnalises {
                         taille, masse,
                         nom,
                         image,
-                        couleur
+                        couleur,
+                        ""
                 );
             }
         }

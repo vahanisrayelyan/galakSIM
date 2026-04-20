@@ -14,6 +14,8 @@ public class Planete extends Astre {
     private Orbite orbitePlanete;
     private Orbite predictionOrbitePlanete;
     private Color couleurOrbite;
+    private String imagePath;
+    private String description;
 
     private static final String[] IMAGES = {
             "/planetesAleatoires/planete1.png",

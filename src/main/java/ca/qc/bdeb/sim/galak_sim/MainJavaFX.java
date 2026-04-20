@@ -682,7 +682,7 @@ public class MainJavaFX extends Application {
                     ? "Planète " + (simulation.getSizeListPlanetes() + 1)
                     : saisiNom.getText();
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color);
+            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color,"");
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }
