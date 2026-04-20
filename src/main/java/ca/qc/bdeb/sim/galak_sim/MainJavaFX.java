@@ -58,7 +58,6 @@ public class MainJavaFX extends Application {
 
     private double tempsSimulation = 0;
     private Text texteTempsPasse;
-    private VBox listeModelesUI;
 
     @Override
     public void start(Stage stage) {
@@ -184,43 +183,36 @@ public class MainJavaFX extends Application {
         boiteModeles.setManaged(false);
 
         Text texteNom = new Text("Nom");
-        texteNom.setFill(Color.WHITE);
         TextField saisiNom = new TextField();
         saisiNom.setTextFormatter(formateurAlphabetique());
 
         Text texteVitesseX = new Text("Vitesse en x");
-        texteVitesseX.setFill(Color.WHITE);
         HBox hboxVitesseX = new HBox(10);
         TextField saisiVitesseX = new TextField("0");
         saisiVitesseX.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseX, Priority.ALWAYS);
         saisiVitesseX.setMaxWidth(Double.MAX_VALUE);
         Text unitevx = new Text("m/s");
-        unitevx.setFill(Color.WHITE);
         hboxVitesseX.setAlignment(Pos.CENTER_LEFT);
         hboxVitesseX.getChildren().addAll(saisiVitesseX, unitevx);
 
         Text texteVitesseY = new Text("Vitesse en y");
-        texteVitesseY.setFill(Color.WHITE);
         HBox hboxVitesseY = new HBox(10);
         TextField saisiVitesseY = new TextField("0");
         saisiVitesseY.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseY, Priority.ALWAYS);
         saisiVitesseY.setMaxWidth(Double.MAX_VALUE);
         Text unitevy = new Text("m/s");
-        unitevy.setFill(Color.WHITE);
         hboxVitesseY.setAlignment(Pos.CENTER_LEFT);
         hboxVitesseY.getChildren().addAll(saisiVitesseY, unitevy);
 
         Text texteMasse = new Text("Masse");
-        texteMasse.setFill(Color.WHITE);
         HBox hboxMasse = new HBox(10);
         TextField saisiMasse = new TextField("5");
         saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
         Text uniteMasse = new Text("×10^24 kg");
-        uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
 
@@ -228,7 +220,6 @@ public class MainJavaFX extends Application {
         this.listePlaneteUI = listePlanete;
         this.canvasPrincipal = canvas;
         texteTempsPasse = new Text("Temps : 0.0 s");
-        texteTempsPasse.setFill(Color.WHITE);
         texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
@@ -236,7 +227,6 @@ public class MainJavaFX extends Application {
         );
 
         Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
-        texteInformations.setFill(Color.WHITE);
 
         Button btnResetVue = new Button("Réinitialiser la vue");
         btnResetVue.setOnAction(e -> simulation.reinitialiserVue(null));
@@ -279,7 +269,6 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         Text vitesseTexte = new Text("Vitesse de la simulation: " + vitesseSimulation);
-        vitesseTexte.setFill(Color.WHITE);
         vitesseTexte.setWrappingWidth(210);
 
         HBox modificationTemps = new HBox(10);
@@ -356,7 +345,6 @@ public class MainJavaFX extends Application {
         );
 
         Text titreModeles = new Text("Modèles");
-        titreModeles.setFill(Color.WHITE);
 
         Button btnSysteme = new Button("Système solaire");
         btnSysteme.setOnAction(e -> {
@@ -373,7 +361,6 @@ public class MainJavaFX extends Application {
         });
         btnVide.setStyle(
                 "-fx-background-color: #e74c3c; " +   // rouge
-                        "-fx-text-fill: white; " +
                         "-fx-font-weight: bold;"
         );
 
@@ -415,7 +402,6 @@ public class MainJavaFX extends Application {
         Separator sep = new Separator(Orientation.HORIZONTAL);
 
         VBox listeModeles = new VBox(5);
-        this.listeModelesUI = listeModeles;
         ScrollPane defileurModeles = new ScrollPane(listeModeles);
         defileurModeles.setFitToWidth(true);
         defileurModeles.setMaxHeight(150);
@@ -423,7 +409,6 @@ public class MainJavaFX extends Application {
         defileurModeles.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         defileurModeles.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         Text texteModelePerso = new Text("Nom du modèle");
-        texteModelePerso.setFill(Color.WHITE);
 
         TextField saisiNomModele = new TextField();
         saisiNomModele.setPromptText("Ex: mon_systeme");
@@ -431,7 +416,6 @@ public class MainJavaFX extends Application {
         Button btnSauvegarderModele = new Button("Sauvegarder modèle");
         btnSauvegarderModele.setStyle(
                 "-fx-background-color: #1E90FF; " +   // rouge
-                        "-fx-text-fill: white; " +
                         "-fx-font-weight: bold;"
         );
         btnSauvegarderModele.setOnAction(e -> {
@@ -498,7 +482,6 @@ public class MainJavaFX extends Application {
             }
         });
         Text texteListeModeles = new Text("Modèles sauvegardés");
-        texteListeModeles.setFill(Color.WHITE);
         Button btnTrouNoir = new Button("Trou Noir");
         btnTrouNoir.setOnAction(e -> {
             Modeles.chargerTrouNoir(simulation);
@@ -531,7 +514,7 @@ public class MainJavaFX extends Application {
         Button btnParametres = new Button(" Paramètres ");
         Button btnModeles = new Button(" Modèles ");
 
-        String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold;";
+        String actif = "-fx-background-color: #444444; -fx-font-weight: bold;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888;";
 
         btnParametres.setStyle(actif);
@@ -702,7 +685,7 @@ public class MainJavaFX extends Application {
             info.setOnMouseClicked(ev -> ouvrirFenetreDetails(p, canvas));
 
             Button btnSupprimer = new Button("X");
-            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
 
             btnSupprimer.setOnAction(ev -> {
                 simulation.supprimerPlanete(p);
@@ -720,7 +703,7 @@ public class MainJavaFX extends Application {
 
         Button btnTitre = new Button("▾ " + titre);
         btnTitre.setMaxWidth(Double.MAX_VALUE);
-        btnTitre.setStyle("-fx-background-color: #333333; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+        btnTitre.setStyle("-fx-background-color: #333333; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
 
         VBox corps = new VBox(8);
         corps.getChildren().addAll(contenu);
@@ -773,7 +756,7 @@ public class MainJavaFX extends Application {
             });
 
             Button btnSupprimer = new Button("X");
-            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
 
             btnSupprimer.setOnAction(ev -> {
                 Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
