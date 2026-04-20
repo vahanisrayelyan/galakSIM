@@ -108,6 +108,7 @@ public class Simulation {
     public void zoomer(double facteurZoom, double sourisX, double sourisY,
                        double largeurCanvas, double hauteurCanvas) {
         camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
+        vecteurs.setScaleZoom(camera.getZoom());
     }
 
     public Point2D ecranVersMonde(double xEcran, double yEcran,

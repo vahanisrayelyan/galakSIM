@@ -10,14 +10,17 @@ public abstract class Astre {
     protected Point2D velocite;
     protected Point2D acceleration;
     protected Point2D taille;
+    protected Point2D Fg;
     protected double masse;
-    protected Image image;
-    protected double Fg = 0;
 
 
 
-    public void setFg(double fg) {
-        Fg = fg;
+    public void setFg(double Fgx, double Fgy) {
+        Fg = new Point2D(Fgx,Fgy);
+    }
+
+    public Point2D getFg() {
+        return Fg;
     }
 
     public Astre(double x, double y, double vX, double vY, double taille, double masse) {
@@ -26,6 +29,7 @@ public abstract class Astre {
         this.taille = new Point2D(taille, taille);
         this.masse = masse;
         this.acceleration = Point2D.ZERO;
+        this.Fg = Point2D.ZERO;
     }
 
     public void update(double dt) {
