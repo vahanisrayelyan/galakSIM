@@ -1,5 +1,6 @@
 package ca.qc.bdeb.sim.galak_sim.addons;
 
+import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -320,4 +321,35 @@ public class Modeles {
     private static Image chargerImage(String chemin) {
         return new Image(Modeles.class.getResource(chemin).toExternalForm());
     }
+
+    public static void chargerTrouNoir (Simulation simulation){
+        simulation.viderPlanetes();
+        simulation.reinitialiserVue("5.0e-7");
+
+        Planete trouNoir = simulation.ajouterNouvellePlanete(
+                0.0,
+                0.0,
+                0,
+                0,
+                8e6,
+                3e32,
+                "Trou Noir",
+                null,
+                Color.PURPLE
+        );
+        trouNoir.setTrouNoir(true);
+
+        simulation.ajouterNouvellePlanete(
+                1.5e6,
+                0,
+                0,
+                1150000,
+                4.0e6,
+                5.9e24,
+                "Planète",
+                null,
+                Color.BLUE
+        );
+    }
+
 }

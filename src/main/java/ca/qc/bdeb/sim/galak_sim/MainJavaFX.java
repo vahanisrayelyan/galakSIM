@@ -354,6 +354,13 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
+        Button btnVide = new Button("Vide");
+        btnVide.setOnAction(e -> {
+            simulation.viderPlanetes();
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
         Button btnCollision = new Button("Collision");
         btnCollision.setOnAction(e -> {
             Modeles.chargerCollision(simulation);
@@ -381,6 +388,12 @@ public class MainJavaFX extends Application {
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+        Button btnTrouNoir = new Button("Trou Noir");
+        btnTrouNoir.setOnAction(e -> {
+            Modeles.chargerTrouNoir(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
 
         Button btnVide = new Button("Vide");
         btnVide.setOnAction(e -> {
@@ -389,7 +402,7 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnCollision, btnCercle, btnBinaire, btnTerreLune, btnVide);
+        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnCollision, btnCercle, btnBinaire, btnTerreLune, btnTrouNoir, btnVide);
 
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);
