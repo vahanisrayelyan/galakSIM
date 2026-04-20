@@ -110,6 +110,33 @@
     -fx-border-color: #ffffff;
     -fx-background-color: #2a2a2a;
 }
+.fenetre-details {
+    -fx-background-color: #1a1a1a;
+}
+
+.fenetre-details .header-panel {
+    -fx-background-color: #1a1a1a;
+}
+
+.fenetre-details .content.label {
+    -fx-text-fill: white;
+}
+
+.fenetre-details:header *.header-panel *.label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.fenetre-details .button {
+    -fx-background-color: #444444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+}
+
+.fenetre-details .button:hover {
+    -fx-background-color: #5a5a5a;
+}
 
 /*Débogage des régions*/
 /*

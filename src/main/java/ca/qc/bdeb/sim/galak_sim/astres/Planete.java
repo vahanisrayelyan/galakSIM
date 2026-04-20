@@ -196,4 +196,38 @@ public class Planete extends Astre {
     public void setCouleurOrbite(Color couleurOrbite) {
         this.couleurOrbite = couleurOrbite;
     }
+    public boolean contientPointEcran(double xEcran, double yEcran,
+                                      Camera camera,
+                                      double largeurCanvas, double hauteurCanvas) {
+
+        Point2D posEcran = camera.mondeVersEcran(
+                position.getX(),
+                position.getY(),
+                largeurCanvas,
+                hauteurCanvas
+        );
+
+        double rayonEcran = taille.getX() * camera.getZoom();
+
+        double rayonAffichageMin = 4.0;
+        if ("Soleil".equalsIgnoreCase(nom)) {
+            rayonAffichageMin = 8.0;
+        }
+
+        double rayonPlaneteAffiche = Math.max(rayonEcran, rayonAffichageMin);
+
+        double seuilCercleRepere = 6.0;
+        double rayonCercleRepere = 10.0;
+
+        double rayonCliqueable = rayonPlaneteAffiche;
+
+        if (rayonEcran < seuilCercleRepere) {
+            rayonCliqueable = Math.max(rayonCliqueable, rayonCercleRepere);
+        }
+
+        double dx = xEcran - posEcran.getX();
+        double dy = yEcran - posEcran.getY();
+
+        return Math.hypot(dx, dy) <= rayonCliqueable;
+    }
 }
