@@ -24,7 +24,7 @@ public class Physique {
 
         // SOLUTION : On définit la limite en PIXELS REELS à l'écran.
         // On veut que la ligne fasse environ 3000 pixels de long sur le canvas.
-        final double LIMITE_VISUELLE_PIXELS = 3000.0;
+        final double LIMITE_VISUELLE_PIXELS = 1500;
 
         List<AstreFantome> fantomes = new ArrayList<>();
         List<List<Point2D>> trajectoires = new ArrayList<>();

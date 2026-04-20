@@ -1,37 +1,24 @@
-/*Graphiques*/
-/*Titres axes*/
+/*Graphique*/
 .axis-label {
 -fx-text-fill: white;
 }
-
-/*Nombres axes*/
 .axis {
 -fx-tick-label-fill: white;
 }
-
-/*Légende*/
 .chart-legend-item {
 -fx-text-fill: white;
 }
-
 .chart-legend {
 -fx-background-color: transparent;
 }
-
-/*Graphique*/
 .chart {
 -fx-padding: 5px;
 }
-
-/*Titre graphique*/
 .chart-title {
 -fx-text-fill: white;
 -fx-font-size: 1.2em;
 -fx-font-weight: bold;
 }
-
-/*Lignes arriere plan*/
-
 .axis-tick-mark, .axis-minor-tick-mark {
     -fx-stroke: rgba(255, 255, 255, 0.2);
 }
@@ -40,53 +27,88 @@
 }
 
 /*RadioButton*/
-/*Texte du RadioButton*/
 .radio-button {
     -fx-text-fill: white;
 }
-
-/*La puce (le cercle) quand elle n'est pas cochée*/
 .radio-button .radio {
     -fx-background-color: #333333;
     -fx-border-color: #555555;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
 }
-
-/*La puce quand elle est survolée par la souris*/
 .radio-button:hover .radio {
     -fx-background-color: #444444;
 }
-
-/*Le point intérieur quand c'est sélectionné*/
 .radio-button:selected .dot {
-    -fx-background-color: #0078d7; /* Couleur bleue style Windows ou choisis ta couleur */
+    -fx-background-color: #0078d7;
     -fx-background-insets: 0;
 }
 
 /*CheckBox*/
-/*Le texte de la CheckBox*/
 .check-box {
     -fx-text-fill: white;
 }
-
-/*La boîte carrée*/
+.check-box:hover .box {
+    -fx-background-color: #444444;
+}
 .check-box .box {
     -fx-background-color: #333333;
     -fx-border-color: #555555;
     -fx-border-radius: 3px;
     -fx-background-radius: 3px;
 }
-
-/*La boîte quand elle est sélectionnée*/
 .check-box:selected .box {
     -fx-background-color: #444444;
 }
-
-/*Le "V" (crochet) de sélection*/
 .check-box:selected .mark {
-    -fx-background-color: #0078d7; /* Couleur du crochet */
-    -fx-shape: "M1.73,12.91L8.1,19.28L22.79,4.59"; /* Forme du crochet si tu veux la forcer */
+    -fx-background-color: #0078d7;
+}
+
+/*Button*/
+.button {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+    -fx-border-color: #666666;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-background-color: #444444;
+}
+.button:pressed {
+    -fx-background-color: #222222;
+}
+
+/* Panneau latéral et menus */
+.vbox, .hbox {
+    -fx-background-color: rgba(30, 30, 30, 0.85);
+}
+
+/* Le ScrollPane (Liste des planètes) */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* Cacher les barres de défilement moches */
+.scroll-pane .scroll-bar:vertical,
+.scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+/*TextField*/
+.text-field {
+    -fx-background-color: #222222;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #444444;
+    -fx-border-radius: 3px;
+    -fx-prompt-text-fill: #666666;
+}
+.text-field:focused {
+    -fx-border-color: #ffffff;
+    -fx-background-color: #2a2a2a;
 }
 
 /*Débogage des régions*/

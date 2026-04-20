@@ -180,6 +180,7 @@ public class MainJavaFX extends Application {
         Text texteNom = new Text("Nom");
         texteNom.setFill(Color.WHITE);
         TextField saisiNom = new TextField();
+        saisiNom.setTextFormatter(formateurAlphabetique());
 
         Text texteVitesseX = new Text("Vitesse en x");
         texteVitesseX.setFill(Color.WHITE);
@@ -484,6 +485,15 @@ public class MainJavaFX extends Application {
         return new TextFormatter<>(change ->
                 change.getControlNewText().matches(regex) ? change : null
         );
+    }
+
+    public static TextFormatter<String> formateurAlphabetique() {
+        return new TextFormatter<>(change -> {
+            if (change.getControlNewText().length() <= 20) {
+                return change;
+            }
+            return null;
+        });
     }
 
     private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {

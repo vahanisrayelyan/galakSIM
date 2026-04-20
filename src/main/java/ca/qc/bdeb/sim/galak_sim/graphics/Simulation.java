@@ -49,6 +49,11 @@ public class Simulation {
 
         double pasMax = 1000.0; // secondes simulées max par sous-étape
         int nbSousEtapes = Math.max(1, (int) Math.ceil(deltaTemps / pasMax));
+
+        if (nbSousEtapes > 1000) {
+            nbSousEtapes = 1000;
+        }
+
         double sousDeltaTemps = deltaTemps / nbSousEtapes;
 
         for (int etape = 0; etape < nbSousEtapes; etape++) {
