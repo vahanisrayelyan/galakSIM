@@ -14,31 +14,67 @@ public class Collision {
 
     private final ArrayList<Explosion> explosions = new ArrayList<>();
 
-    public ArrayList<Planete> verificationCollision(ArrayList<Planete> listePlanetes) {
+    public void verificationCollision(ArrayList<Planete> listePlanetes) {
         Set<Planete> aSupprimer = new HashSet<>();
 
         for (int i = 0; i < listePlanetes.size(); i++) {
+            Planete pi = listePlanetes.get(i);
+
             for (int j = i + 1; j < listePlanetes.size(); j++) {
 
-                Planete pi = listePlanetes.get(i);
                 Planete pj = listePlanetes.get(j);
+
+                boolean collision = false;
 
                 double rayoni = pi.getTaille().getX() / 2.0;
                 double rayonj = pj.getTaille().getX() / 2.0;
 
-                double xi = pi.getPosition().getX();
-                double yi = pi.getPosition().getY();
+                double rayonTotal = rayoni + rayonj;
 
-                double xj = pj.getPosition().getX();
-                double yj = pj.getPosition().getY();
+                Point2D piPosPrec = pi.getPositionPrecedante();
+                Point2D pjPosPrec = pj.getPositionPrecedante();
 
-                double dx = xj - xi;
-                double dy = yj - yi;
-                double distanceEntre = Math.hypot(dx, dy);
+                // Sécurité si pas encore initialisé
+                if (piPosPrec == null || pjPosPrec == null) continue;
 
-                if (distanceEntre <= rayoni + rayonj) {
-                    double centrex = (xi + xj) / 2.0;
-                    double centrey = (yi + yj) / 2.0;
+                // Position relative initiale de chaque planète
+                double rx = pjPosPrec.getX() - piPosPrec.getX();
+                double ry = pjPosPrec.getY() - piPosPrec.getY();
+
+                // Velocité relative de chaque planète
+                double vrx = (pj.getPosition().getX() - pjPosPrec.getX()) - (pi.getPosition().getX() - piPosPrec.getX());
+                double vry = (pj.getPosition().getY() - pjPosPrec.getY()) - (pi.getPosition().getY() - piPosPrec.getY());
+
+                // Coefficients du polynôme (calcul mathématique)
+                // Formule pour savoir la vitesses relative par rapport l'une à l'autre
+                double a = vrx * vrx + vry * vry;
+                // Formule pour savoir si les planètes s'approhent ou s'éloignent
+                double b = 2 * (rx * vrx + ry * vry);
+                // Formule pour trouver la différence en position par rapport à la position initiale
+                double c = rx * rx + ry * ry - rayonTotal * rayonTotal;
+
+                double discriminant = b * b - 4 * a * c;
+
+                // Si déjà en collision (vérification)
+                if (c <= 0) {
+                    collision = true;
+                }
+
+                // Si collision pendant le déplacement (vérification)
+                else if (discriminant >= 0 && a > 0) {
+
+                    double t = (-b - Math.sqrt(discriminant)) / (2 * a);
+
+                    if (t >= 0 && t <= 1) {
+                        collision = true;
+                    }
+                }
+
+                // Action lors d'une collision
+                if (collision) {
+
+                    double centrex = (pi.getPosition().getX() + pj.getPosition().getX()) / 2.0;
+                    double centrey = (pi.getPosition().getY() + pj.getPosition().getY()) / 2.0;
 
                     double rayonExplosion = Math.max(1.0e7, Math.max(rayoni, rayonj) * 0.25);
                     explosions.add(new Explosion(centrex, centrey, rayonExplosion));
@@ -48,9 +84,8 @@ public class Collision {
                 }
             }
         }
-
+        // Supprimation des planètes en collison
         listePlanetes.removeIf(aSupprimer::contains);
-        return listePlanetes;
     }
 
     public ArrayList<Explosion> getExplosions() {

@@ -2,11 +2,11 @@ package ca.qc.bdeb.sim.galak_sim.astres;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 
 public abstract class Astre {
 
     protected Point2D position;
+    private Point2D positionPrecedante;
     protected Point2D velocite;
     protected Point2D acceleration;
     protected Point2D taille;
@@ -33,10 +33,15 @@ public abstract class Astre {
         this.Fg = Point2D.ZERO;
     }
 
+
+    public Point2D getPositionPrecedante() {
+        return positionPrecedante;
+    }
+
     public void update(double dt) {
         // Euler simple
         velocite = velocite.add(acceleration.multiply(dt));
-
+        positionPrecedante = position;
         position = position.add(
                 velocite.getX() * dt,
                 velocite.getY() * dt
