@@ -174,6 +174,8 @@ public class MainJavaFX extends Application {
     }
 
     private void creerInterface(StackPane panneau, Canvas canvas) {
+        Separator s1, s2, s3 = new Separator(Orientation.HORIZONTAL);
+
         VBox boiteParametres = new VBox(10);
         boiteParametres.setMaxWidth(Double.MAX_VALUE);
         boiteParametres.setVisible(true);
@@ -218,6 +220,10 @@ public class MainJavaFX extends Application {
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
 
+        Text texteCouleurOrbite = new Text("Couleur de l'orbite");
+        ColorPicker choixCouleurOrbite = new ColorPicker(Color.WHITE);
+        choixCouleurOrbite.setMinHeight(30);
+
         CheckBox choixTrouNoir = new CheckBox("Trou Noir");
         choixTrouNoir.setStyle("-fx-text-fill: white;");
 
@@ -228,7 +234,7 @@ public class MainJavaFX extends Application {
         texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
-                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete,choixTrouNoir)
+                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete, choixCouleurOrbite, choixTrouNoir)
         );
 
         Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
@@ -341,12 +347,12 @@ public class MainJavaFX extends Application {
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
 
         boiteParametres.getChildren().addAll(
-                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse,choixTrouNoir),
                 texteInformations,
                 btnResetVue,
-                creerSection("Affichage", choixVecteursVBox, choixPrediction),
-                creerSection("Planètes", defileurPlanetes),
-                creerSection("Temps", vitesseTexte, modificationTemps)
+                creerSection("Ajouter une planète",true, texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse,new Separator(Orientation.HORIZONTAL), texteCouleurOrbite, choixCouleurOrbite,new Separator(Orientation.HORIZONTAL), choixTrouNoir),
+                creerSection("Affichage",false,choixVecteursVBox, choixPrediction),
+                creerSection("Planètes",false, defileurPlanetes),
+                creerSection("Temps",false, vitesseTexte, modificationTemps)
         );
 
         Text titreModeles = new Text("Modèles");
@@ -623,7 +629,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, CheckBox choixTrouNoir) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, ColorPicker choixColeurOrbite, CheckBox choixTrouNoir) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -669,7 +675,7 @@ public class MainJavaFX extends Application {
 
         if (positionLibre) {
             Image image = null;
-            Color color = modeTrouNoir ? Color.PURPLE : null;
+            Color color = modeTrouNoir ? Color.PURPLE : choixColeurOrbite.getValue();
 
             String nomDefaut = (modeTrouNoir ? "Trou Noir " : "Planète ") + (simulation.getSizeListPlanetes() + 1);
             String nomPlanete = saisiNom.getText().isEmpty() ? nomDefaut : saisiNom.getText();
@@ -711,7 +717,7 @@ public class MainJavaFX extends Application {
         }
     }
 
-    private VBox creerSection(String titre, javafx.scene.Node... contenu) {
+    private VBox creerSection(String titre,boolean ouvert, javafx.scene.Node... contenu) {
         VBox section = new VBox(5);
 
         Button btnTitre = new Button("▾ " + titre);
@@ -722,12 +728,16 @@ public class MainJavaFX extends Application {
         corps.getChildren().addAll(contenu);
         corps.setPadding(new Insets(5, 0, 5, 5));
 
+        corps.setVisible(ouvert);
+        corps.setManaged(ouvert);
+
         btnTitre.setOnAction(e -> {
             boolean visible = corps.isVisible();
             corps.setVisible(!visible);
             corps.setManaged(!visible);
             btnTitre.setText((visible ? "▸ " : "▾ ") + titre);
         });
+
 
         section.getChildren().addAll(btnTitre, corps);
         return section;
@@ -778,6 +788,7 @@ public class MainJavaFX extends Application {
 
         alert.showAndWait();
     }
+
     private void rafraichirListeModeles(VBox listeModeles, VBox listePlanete, Canvas canvas) {
         listeModeles.getChildren().clear();
 

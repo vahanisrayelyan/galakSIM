@@ -23,33 +23,19 @@ public class ModelesPersonnalises {
 
         File fichier = new File(dossier, nettoyerNomFichier(nomModele) + ".txt");
 
-        try (BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(fichier), StandardCharsets.UTF_8))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichier), StandardCharsets.UTF_8))) {
 
             for (Planete p : simulation.getPlanetes()) {
                 Color c = p.getCouleurOrbite();
 
-                String couleur = c.getRed() + "," +
-                        c.getGreen() + "," +
-                        c.getBlue() + "," +
-                        c.getOpacity();
+                String couleur = c.getRed() + "," + c.getGreen() + "," + c.getBlue() + "," + c.getOpacity();
 
                 String imagePath = p.getImagePath();
                 if (imagePath == null || imagePath.isBlank()) {
                     imagePath = "null";
                 }
 
-                writer.write(
-                        nettoyerTexte(p.getNom()) + ";" +
-                                p.getPosition().getX() + ";" +
-                                p.getPosition().getY() + ";" +
-                                p.getVelocite().getX() + ";" +
-                                p.getVelocite().getY() + ";" +
-                                p.getTaille().getX() + ";" +
-                                p.getMasse() + ";" +
-                                couleur + ";" +
-                                nettoyerTexte(imagePath)
-                );
+                writer.write(nettoyerTexte(p.getNom()) + ";" + p.getPosition().getX() + ";" + p.getPosition().getY() + ";" + p.getVelocite().getX() + ";" + p.getVelocite().getY() + ";" + p.getTaille().getX() + ";" + p.getMasse() + ";" + couleur + ";" + nettoyerTexte(imagePath));
                 writer.newLine();
             }
         }
@@ -65,8 +51,7 @@ public class ModelesPersonnalises {
         simulation.viderPlanetes();
         simulation.reinitialiserVue(null);
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(fichier), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), StandardCharsets.UTF_8))) {
 
             String ligne;
             while ((ligne = reader.readLine()) != null) {
@@ -90,12 +75,7 @@ public class ModelesPersonnalises {
                 String[] rgba = parties[7].split(",");
                 Color couleur = Color.WHITE;
                 if (rgba.length == 4) {
-                    couleur = new Color(
-                            Double.parseDouble(rgba[0]),
-                            Double.parseDouble(rgba[1]),
-                            Double.parseDouble(rgba[2]),
-                            Double.parseDouble(rgba[3])
-                    );
+                    couleur = new Color(Double.parseDouble(rgba[0]), Double.parseDouble(rgba[1]), Double.parseDouble(rgba[2]), Double.parseDouble(rgba[3]));
                 }
 
                 String imagePath = parties[8];
@@ -112,15 +92,7 @@ public class ModelesPersonnalises {
                     }
                 }
 
-                simulation.ajouterNouvellePlanete(
-                        x, y,
-                        vX, vY,
-                        taille, masse,
-                        nom,
-                        image,
-                        couleur,
-                        ""
-                );
+                simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nom, image, couleur, "");
             }
         }
     }
@@ -196,16 +168,6 @@ public class ModelesPersonnalises {
             return "modele";
         }
 
-        return nom.trim()
-                .replace("\\", "_")
-                .replace("/", "_")
-                .replace(":", "_")
-                .replace("*", "_")
-                .replace("?", "_")
-                .replace("\"", "_")
-                .replace("<", "_")
-                .replace(">", "_")
-                .replace("|", "_")
-                .replace(";", "_");
+        return nom.trim().replace("\\", "_").replace("/", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_").replace(";", "_");
     }
 }
