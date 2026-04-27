@@ -76,7 +76,12 @@ public class Collision {
                     double centrex = (pi.getPosition().getX() + pj.getPosition().getX()) / 2.0;
                     double centrey = (pi.getPosition().getY() + pj.getPosition().getY()) / 2.0;
 
-                    if(pi.estTrouNoir() && !pj.estTrouNoir()) {
+                    if (pi.estTrouNoir() && pj.estTrouNoir()){
+                        pi.setMasse(pi.getMasse() + pj.getMasse());
+                        aSupprimer.add(pj);
+                        
+                    }
+                    else if (pi.estTrouNoir() && !pj.estTrouNoir()) {
                         pi.setMasse(pi.getMasse() + pj.getMasse());
                         aSupprimer.add(pj);
                     }
