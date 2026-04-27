@@ -14,6 +14,8 @@ public class Planete extends Astre {
     private Orbite orbitePlanete;
     private Orbite predictionOrbitePlanete;
     private Color couleurOrbite;
+    private String imagePath;
+    private String description;
 
     private static final String[] IMAGES = {
             "/planetesAleatoires/planete1.png",
@@ -27,13 +29,15 @@ public class Planete extends Astre {
     };
 
     public Planete(double x, double y, double vX, double vY, double taille, double masse,
-                   String nom, Image photo, Color couleurOrbite) {
+                   String nom, Image photo, Color couleurOrbite, String description) {
         super(x, y, vX, vY, taille, masse);
 
         if (photo == null) {
             this.image = imageAleatoire();
+            this.imagePath = null;
         } else {
             this.image = photo;
+            this.imagePath = photo.getUrl(); // important
         }
 
         this.nom = nom;
@@ -45,6 +49,8 @@ public class Planete extends Astre {
         } else {
             this.couleurOrbite = couleurOrbite;
         }
+
+        this.description = description != null ? description : "";
     }
 
     @Override
@@ -212,4 +218,44 @@ public class Planete extends Astre {
     public void setCouleurOrbite(Color couleurOrbite) {
         this.couleurOrbite = couleurOrbite;
     }
+    public boolean contientPointEcran(double xEcran, double yEcran,
+                                      Camera camera,
+                                      double largeurCanvas, double hauteurCanvas) {
+
+        Point2D posEcran = camera.mondeVersEcran(
+                position.getX(),
+                position.getY(),
+                largeurCanvas,
+                hauteurCanvas
+        );
+
+        double rayonEcran = taille.getX() * camera.getZoom();
+
+        double rayonAffichageMin = 4.0;
+        if ("Soleil".equalsIgnoreCase(nom)) {
+            rayonAffichageMin = 8.0;
+        }
+
+        double rayonPlaneteAffiche = Math.max(rayonEcran, rayonAffichageMin);
+
+        double seuilCercleRepere = 6.0;
+        double rayonCercleRepere = 10.0;
+
+        double rayonCliqueable = rayonPlaneteAffiche;
+
+        if (rayonEcran < seuilCercleRepere) {
+            rayonCliqueable = Math.max(rayonCliqueable, rayonCercleRepere);
+        }
+
+        double dx = xEcran - posEcran.getX();
+        double dy = yEcran - posEcran.getY();
+
+        return Math.hypot(dx, dy) <= rayonCliqueable;
+    }
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

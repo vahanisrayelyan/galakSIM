@@ -29,8 +29,8 @@ public class Simulation {
 
     public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY,
                                           double taille, double masse, String nom,
-                                          Image image, Color color) {
-        Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color);
+                                          Image image, Color color, String description) {
+        Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color, description);
         planetes.add(nouvellePlanete);
         return nouvellePlanete;
     }
@@ -106,19 +106,17 @@ public class Simulation {
         camera.deplacer(dx, dy);
     }
 
-    public void zoomer(double facteurZoom, double sourisX, double sourisY,
-                       double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
         vecteurs.setScaleZoom(camera.getZoom());
     }
 
-    public Point2D ecranVersMonde(double xEcran, double yEcran,
-                                  double largeurCanvas, double hauteurCanvas) {
+    public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
         return camera.ecranVersMonde(xEcran, yEcran, largeurCanvas, hauteurCanvas);
     }
 
-    public void reinitialiserVue(String zoom1) {
-        camera.reinitialiser(zoom1);
+    public void reinitialiserVue(String zoomDefaut) {
+        camera.reinitialiser(zoomDefaut);
     }
 
     public void centrerSur(Planete p, double valeurZoom) {

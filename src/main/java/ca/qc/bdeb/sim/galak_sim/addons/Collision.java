@@ -76,11 +76,22 @@ public class Collision {
                     double centrex = (pi.getPosition().getX() + pj.getPosition().getX()) / 2.0;
                     double centrey = (pi.getPosition().getY() + pj.getPosition().getY()) / 2.0;
 
-                    double rayonExplosion = Math.max(1.0e7, Math.max(rayoni, rayonj) * 0.25);
-                    explosions.add(new Explosion(centrex, centrey, rayonExplosion));
+                    if(pi.estTrouNoir() && !pj.estTrouNoir()) {
+                        pi.setMasse(pi.getMasse() + pj.getMasse());
+                        aSupprimer.add(pj);
+                    }
+                    else if (pj.estTrouNoir() && !pi.estTrouNoir()){
+                        pj.setMasse(pj.getMasse() + pi.getMasse());
+                        aSupprimer.add(pi);
+                    }
+                    else {
+                        double rayonExplosion = Math.max(1.0e7, Math.max(rayoni, rayonj) * 0.25);
+                        explosions.add(new Explosion(centrex, centrey, rayonExplosion));
 
-                    aSupprimer.add(pi);
-                    aSupprimer.add(pj);
+                        aSupprimer.add(pi);
+                        aSupprimer.add(pj);
+                    }
+
                 }
             }
         }

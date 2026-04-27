@@ -2,14 +2,17 @@ package ca.qc.bdeb.sim.galak_sim;
 
 import ca.qc.bdeb.sim.galak_sim.addons.Input;
 import ca.qc.bdeb.sim.galak_sim.addons.Modeles;
+import ca.qc.bdeb.sim.galak_sim.addons.ModelesPersonnalises;
 import ca.qc.bdeb.sim.galak_sim.addons.Vecteurs;
 import ca.qc.bdeb.sim.galak_sim.astres.Planete;
 import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.FenetreDetails;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -28,9 +31,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MainJavaFX extends Application {
     private static Simulation simulation;
@@ -109,7 +114,9 @@ public class MainJavaFX extends Application {
             }
         });
 
-        stage.setOnCloseRequest(e -> fenetresOuvertes.values().forEach(Stage::close));
+        stage.setOnCloseRequest(e -> {
+            fenetresOuvertes.values().forEach(Stage::close);
+        });
 
         nbPlanetesAvant = simulation.getPlanetes().size();
 
@@ -178,62 +185,61 @@ public class MainJavaFX extends Application {
         boiteModeles.setManaged(false);
 
         Text texteNom = new Text("Nom");
-        texteNom.setFill(Color.WHITE);
         TextField saisiNom = new TextField();
         saisiNom.setTextFormatter(formateurAlphabetique());
 
         Text texteVitesseX = new Text("Vitesse en x");
-        texteVitesseX.setFill(Color.WHITE);
         HBox hboxVitesseX = new HBox(10);
         TextField saisiVitesseX = new TextField("0");
         saisiVitesseX.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseX, Priority.ALWAYS);
         saisiVitesseX.setMaxWidth(Double.MAX_VALUE);
         Text unitevx = new Text("m/s");
-        unitevx.setFill(Color.WHITE);
         hboxVitesseX.setAlignment(Pos.CENTER_LEFT);
         hboxVitesseX.getChildren().addAll(saisiVitesseX, unitevx);
 
         Text texteVitesseY = new Text("Vitesse en y");
-        texteVitesseY.setFill(Color.WHITE);
         HBox hboxVitesseY = new HBox(10);
         TextField saisiVitesseY = new TextField("0");
         saisiVitesseY.setTextFormatter(formateurNumerique(true));
         HBox.setHgrow(saisiVitesseY, Priority.ALWAYS);
         saisiVitesseY.setMaxWidth(Double.MAX_VALUE);
         Text unitevy = new Text("m/s");
-        unitevy.setFill(Color.WHITE);
         hboxVitesseY.setAlignment(Pos.CENTER_LEFT);
         hboxVitesseY.getChildren().addAll(saisiVitesseY, unitevy);
 
         Text texteMasse = new Text("Masse");
-        texteMasse.setFill(Color.WHITE);
         HBox hboxMasse = new HBox(10);
         TextField saisiMasse = new TextField("5");
         saisiMasse.setTextFormatter(formateurNumerique(false));
         HBox.setHgrow(saisiMasse, Priority.ALWAYS);
         saisiMasse.setMaxWidth(Double.MAX_VALUE);
         Text uniteMasse = new Text("×10^24 kg");
-        uniteMasse.setFill(Color.WHITE);
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
+
+        CheckBox choixTrouNoir = new CheckBox("Trou Noir");
+        choixTrouNoir.setStyle("-fx-text-fill: white;");
 
         VBox listePlanete = new VBox(5);
         this.listePlaneteUI = listePlanete;
         this.canvasPrincipal = canvas;
         texteTempsPasse = new Text("Temps : 0.0 s");
-        texteTempsPasse.setFill(Color.WHITE);
         texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
-                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete)
+                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete,choixTrouNoir)
         );
 
         Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
-        texteInformations.setFill(Color.WHITE);
 
         Button btnResetVue = new Button("Réinitialiser la vue");
         btnResetVue.setOnAction(e -> simulation.reinitialiserVue(null));
+        btnResetVue.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;"
+        );
 
         VBox choixVecteursVBox = new VBox(2);
         RadioButton choixPasVecteurs = new RadioButton("Aucun");
@@ -268,7 +274,6 @@ public class MainJavaFX extends Application {
         defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
         Text vitesseTexte = new Text("Vitesse de la simulation: " + vitesseSimulation);
-        vitesseTexte.setFill(Color.WHITE);
         vitesseTexte.setWrappingWidth(210);
 
         HBox modificationTemps = new HBox(10);
@@ -336,7 +341,7 @@ public class MainJavaFX extends Application {
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
 
         boiteParametres.getChildren().addAll(
-                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
+                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse,choixTrouNoir),
                 texteInformations,
                 btnResetVue,
                 creerSection("Affichage", choixVecteursVBox, choixPrediction),
@@ -344,8 +349,7 @@ public class MainJavaFX extends Application {
                 creerSection("Temps", vitesseTexte, modificationTemps)
         );
 
-        Text titreModeles = new Text("Modeles");
-        titreModeles.setFill(Color.WHITE);
+        Text titreModeles = new Text("Modèles");
 
         Button btnSysteme = new Button("Système solaire");
         btnSysteme.setOnAction(e -> {
@@ -360,6 +364,10 @@ public class MainJavaFX extends Application {
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+        btnVide.setStyle(
+                "-fx-background-color: #e74c3c; " +   // rouge
+                        "-fx-font-weight: bold;"
+        );
 
         Button btnCollision = new Button("Collision");
         btnCollision.setOnAction(e -> {
@@ -367,18 +375,118 @@ public class MainJavaFX extends Application {
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
-        Button btnBinaire = new Button("Orbite binaire");
-        btnBinaire.setOnAction(e -> {
-            Modeles.chargerPlanetesBinaires(simulation);
+
+        Button btnCercle = new Button("Orbite binaire");
+        btnCercle.setOnAction(e -> {
+            Modeles.chargerCercle(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+
+        Button btnBinaire = new Button("Orbite binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerBinaire(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
         Button btnTerreLune = new Button("Terre - Lune");
         btnTerreLune.setOnAction(e -> {
             Modeles.chargerTerreLune(simulation);
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
+        Button btnResetVueModeles = new Button("Réinitialiser la vue");
+        btnResetVueModeles.setOnAction(e -> simulation.reinitialiserVue(null));
+        btnResetVueModeles.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;"
+        );
+
+        Separator sep = new Separator(Orientation.HORIZONTAL);
+
+        VBox listeModeles = new VBox(5);
+        ScrollPane defileurModeles = new ScrollPane(listeModeles);
+        defileurModeles.setFitToWidth(true);
+        defileurModeles.setMaxHeight(150);
+        defileurModeles.setMinHeight(150);
+        defileurModeles.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        defileurModeles.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        Text texteModelePerso = new Text("Nom du modèle");
+
+        TextField saisiNomModele = new TextField();
+        saisiNomModele.setPromptText("Ex: mon_systeme");
+
+        Button btnSauvegarderModele = new Button("Sauvegarder modèle");
+        btnSauvegarderModele.setStyle(
+                "-fx-background-color: #1E90FF; " +   // rouge
+                        "-fx-font-weight: bold;"
+        );
+        btnSauvegarderModele.setOnAction(e -> {
+            String nomModele = saisiNomModele.getText().trim();
+
+            if (nomModele.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez donner un nom au modèle.");
+                return;
+            }
+
+            if (simulation.getPlanetes().isEmpty()) {
+                afficherAlerte("Erreur", "Il n'y a aucune planète à sauvegarder.");
+                return;
+            }
+
+            try {
+                if (ModelesPersonnalises.modeleExiste(nomModele)) {
+                    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmation.setTitle("Modèle existant");
+                    confirmation.setHeaderText("Un modèle avec ce nom existe déjà.");
+                    confirmation.setContentText("Voulez-vous l'écraser?");
+
+                    ButtonType btnOui = new ButtonType("Écraser");
+                    ButtonType btnNon = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                    confirmation.getButtonTypes().setAll(btnOui, btnNon);
+
+                    Optional<ButtonType> resultat = confirmation.showAndWait();
+
+                    if (resultat.isEmpty() || resultat.get() != btnOui) {
+                        return;
+                    }
+                }
+
+                ModelesPersonnalises.sauvegarderModele(simulation, nomModele);
+                rafraichirListeModeles(listeModeles, listePlanete, canvas);
+                afficherAlerte("Succès", "Modèle sauvegardé : " + nomModele);
+
+            } catch (Exception ex) {
+                afficherAlerte("Erreur", "Impossible de sauvegarder le modèle.\n" + ex.getMessage());
+            }
+        });
+        Button btnChargerModele = new Button("Charger modèle");
+        btnChargerModele.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: #1E90FF; " +
+                        "-fx-font-weight: bold;"
+        );
+        btnChargerModele.setOnAction(e -> {
+            String nomModele = saisiNomModele.getText().trim();
+
+            if (nomModele.isEmpty()) {
+                afficherAlerte("Erreur", "Donne un nom au modèle.");
+                return;
+            }
+
+            try {
+                ModelesPersonnalises.chargerModele(simulation, nomModele);
+                rafraichirListePlanetes(listePlanete, canvas);
+                nbPlanetesAvant = simulation.getPlanetes().size();
+                afficherAlerte("Succès", "Modèle chargé : " + nomModele);
+            } catch (Exception ex) {
+                afficherAlerte("Erreur", "Impossible de charger le modèle.\n" + ex.getMessage());
+            }
+        });
+        Text texteListeModeles = new Text("Modèles sauvegardés");
         Button btnTrouNoir = new Button("Trou Noir");
         btnTrouNoir.setOnAction(e -> {
             Modeles.chargerTrouNoir(simulation);
@@ -386,8 +494,22 @@ public class MainJavaFX extends Application {
             nbPlanetesAvant = simulation.getPlanetes().size();
         });
 
-        boiteModeles.getChildren().addAll(titreModeles, btnSysteme, btnVide, btnCollision,btnBinaire,btnTrouNoir);
-
+        boiteModeles.getChildren().addAll(
+                titreModeles,
+                btnSysteme,
+                btnCollision,
+                btnBinaire,
+                btnTerreLune,
+                btnTrouNoir,
+                btnVide,
+                btnResetVueModeles,
+                sep,
+                texteModelePerso,
+                saisiNomModele,
+                btnSauvegarderModele,
+                texteListeModeles,
+                defileurModeles
+        );
         VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
         sectionsMenu.setFillWidth(true);
         sectionsMenu.setMaxWidth(Double.MAX_VALUE);
@@ -397,7 +519,7 @@ public class MainJavaFX extends Application {
         Button btnParametres = new Button(" Paramètres ");
         Button btnModeles = new Button(" Modèles ");
 
-        String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold;";
+        String actif = "-fx-background-color: #444444; -fx-font-weight: bold;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888;";
 
         btnParametres.setStyle(actif);
@@ -457,9 +579,7 @@ public class MainJavaFX extends Application {
 
         Button btnMenu = new Button("☰");
         btnMenu.setOnAction(e -> {
-            boolean menuVisible = menuComplet.isVisible();
-            menuComplet.setVisible(!menuVisible);
-            StackPane.setMargin(btnMenu, new Insets(10, menuVisible ? 10 : 260, 0, 0));
+            animationMenu(menuComplet, btnMenu);
         });
 
         Pane espace = new Pane();
@@ -481,6 +601,7 @@ public class MainJavaFX extends Application {
         nbPlanetesAvant = simulation.getPlanetes().size();
 
         panneau.getChildren().addAll(centre, menuComplet, btnMenu, texteTempsPasse);
+        rafraichirListeModeles(listeModeles, listePlanete, canvas);
     }
 
     public static TextFormatter<String> formateurNumerique(boolean accepterNegatif) {
@@ -502,7 +623,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, CheckBox choixTrouNoir) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -525,11 +646,21 @@ public class MainJavaFX extends Application {
 
         double taille = 6.0e6;
 
+        boolean modeTrouNoir = choixTrouNoir.isSelected();
+        if (modeTrouNoir) {
+            masse = 3.0e32;
+            taille = 2.0e8;
+        }
+
         boolean positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
-            double distance = Math.sqrt(Math.pow(x - p.getPosition().getX(), 2) + Math.pow(y - p.getPosition().getY(), 2));
-
-            if (distance < (p.getTaille().getX() / 2) + taille / 2) {
+            if (p.contientPointEcran(
+                    e.getX(),
+                    e.getY(),
+                    simulation.getCamera(),
+                    canvas.getWidth(),
+                    canvas.getHeight()
+            )) {
                 positionLibre = false;
                 ouvrirFenetreDetails(p, canvas);
                 break;
@@ -538,12 +669,16 @@ public class MainJavaFX extends Application {
 
         if (positionLibre) {
             Image image = null;
-            Color color = null;
-            String nomPlanete = saisiNom.getText().isEmpty()
-                    ? "Planète " + (simulation.getSizeListPlanetes() + 1)
-                    : saisiNom.getText();
+            Color color = modeTrouNoir ? Color.PURPLE : null;
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color);
+            String nomDefaut = (modeTrouNoir ? "Trou Noir " : "Planète ") + (simulation.getSizeListPlanetes() + 1);
+            String nomPlanete = saisiNom.getText().isEmpty() ? nomDefaut : saisiNom.getText();
+            Planete nouvellePlanete = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
+
+            if (modeTrouNoir) {
+                nouvellePlanete.setTrouNoir(true);
+            }
+
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }
@@ -563,7 +698,7 @@ public class MainJavaFX extends Application {
             info.setOnMouseClicked(ev -> ouvrirFenetreDetails(p, canvas));
 
             Button btnSupprimer = new Button("X");
-            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 10;");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
 
             btnSupprimer.setOnAction(ev -> {
                 simulation.supprimerPlanete(p);
@@ -581,7 +716,7 @@ public class MainJavaFX extends Application {
 
         Button btnTitre = new Button("▾ " + titre);
         btnTitre.setMaxWidth(Double.MAX_VALUE);
-        btnTitre.setStyle("-fx-background-color: #333333; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+        btnTitre.setStyle("-fx-background-color: #333333; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
 
         VBox corps = new VBox(8);
         corps.getChildren().addAll(contenu);
@@ -598,7 +733,101 @@ public class MainJavaFX extends Application {
         return section;
     }
 
+    private void animationMenu(BorderPane menuComplet, Button btnMenu) {
+        boolean menuEstCache = !menuComplet.isVisible();
+
+        TranslateTransition animMenu = new TranslateTransition(Duration.millis(300), menuComplet);
+        TranslateTransition animBouton = new TranslateTransition(Duration.millis(300), btnMenu);
+
+        if (menuEstCache) {
+            menuComplet.setVisible(true);
+
+            animMenu.setFromX(250);
+            animMenu.setToX(0);
+
+            animBouton.setFromX(250);
+            animBouton.setToX(0);
+
+        } else {
+            animMenu.setFromX(0);
+            animMenu.setToX(250);
+
+            animBouton.setFromX(0);
+            animBouton.setToX(250);
+
+            animMenu.setOnFinished(event -> menuComplet.setVisible(false));
+        }
+
+        animMenu.play();
+        animBouton.play();
+    }
+
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
         fenetreDetails.ouvrir(p, canvas);
+    }
+
+    private void afficherAlerte(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        dialogPane.getStyleClass().add("fenetre-details");
+
+        alert.showAndWait();
+    }
+    private void rafraichirListeModeles(VBox listeModeles, VBox listePlanete, Canvas canvas) {
+        listeModeles.getChildren().clear();
+
+        for (String nomModele : ModelesPersonnalises.listerModeles()) {
+            HBox ligneModele = new HBox(10);
+            ligneModele.setAlignment(Pos.CENTER_LEFT);
+
+            Text info = new Text(nomModele);
+            info.setFill(Color.LIGHTGRAY);
+
+            info.setOnMouseClicked(ev -> {
+                try {
+                    ModelesPersonnalises.chargerModele(simulation, nomModele);
+                    rafraichirListePlanetes(listePlanete, canvas);
+                    nbPlanetesAvant = simulation.getPlanetes().size();
+                } catch (Exception ex) {
+                    afficherAlerte("Erreur", "Impossible de charger le modèle.\n" + ex.getMessage());
+                }
+            });
+
+            Button btnSupprimer = new Button("X");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
+
+            btnSupprimer.setOnAction(ev -> {
+                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmation.setTitle("Supprimer le modèle");
+                confirmation.setHeaderText("Supprimer \"" + nomModele + "\" ?");
+                confirmation.setContentText("Cette action est irréversible.");
+                DialogPane dialogPane = confirmation.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+                dialogPane.getStyleClass().add("fenetre-details");
+
+                ButtonType btnOui = new ButtonType("Supprimer");
+                ButtonType btnNon = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+                confirmation.getButtonTypes().setAll(btnOui, btnNon);
+
+                Optional<ButtonType> resultat = confirmation.showAndWait();
+
+                if (resultat.isPresent() && resultat.get() == btnOui) {
+                    try {
+                        ModelesPersonnalises.supprimerModele(nomModele);
+                        rafraichirListeModeles(listeModeles, listePlanete, canvas);
+                    } catch (Exception ex) {
+                        afficherAlerte("Erreur", "Impossible de supprimer le modèle.\n" + ex.getMessage());
+                    }
+                }
+            });
+
+            ligneModele.getChildren().addAll(btnSupprimer, info);
+            listeModeles.getChildren().add(ligneModele);
+        }
     }
 }
