@@ -686,8 +686,7 @@ public class MainJavaFX extends Application {
             if (modeTrouNoir) {
                 nouvellePlanete.setTrouNoir(true);
             }
-
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
+            
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }
