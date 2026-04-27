@@ -10,7 +10,12 @@ import java.util.ArrayList;
 
 public class Vecteurs {
     private int choix = 0;
+    private double scaleZoom = 0;
     private ArrayList<Planete> planetes;
+
+    public void setScaleZoom(double scaleZoom) {
+        this.scaleZoom = scaleZoom;
+    }
 
     public void setPlanete(ArrayList<Planete> planetes) {
         this.planetes = planetes;
@@ -26,32 +31,33 @@ public class Vecteurs {
         }
 
         for (Planete p : planetes) {
-            double vecteurX;
-            double vecteurY;
-            double facteurAffichage;
+            double vecteurX = 0;
+            double vecteurY = 0;
 
+            // Si choix est Vitesse dans le UI
             if (choix == 1) {
-                vecteurX = p.getVelocite().getX();
-                vecteurY = p.getVelocite().getY();
-                facteurAffichage = 2e4;
+                vecteurX = p.getVelocite().getX() * 1e7;
+                vecteurY = p.getVelocite().getY() * 1e7;
                 gc.setStroke(Color.WHITE);
-            } else if (choix == 2) {
-                vecteurX = p.getAcceleration().getX();
-                vecteurY = p.getAcceleration().getY();
-                facteurAffichage = 5e8;
+            }
+            // Si choix est Accélération dans le UI
+            else if (choix == 2) {
+                vecteurX = p.getAcceleration().getX() * 1e12;
+                vecteurY = p.getAcceleration().getY() * 1e12;
                 gc.setStroke(Color.RED);
-            } else {
-                // Force = m * a
-                vecteurX = p.getAcceleration().getX() * p.getMasse();
-                vecteurY = p.getAcceleration().getY() * p.getMasse();
-                facteurAffichage = 1e-17;
+            }
+            // Si choix est Force dans le UI
+            else if (choix == 3) {
+                vecteurX = p.getFg().getX() / 1e12;
+                vecteurY = p.getFg().getY() / 1e12;
                 gc.setStroke(Color.BLUE);
             }
 
+            // Partie du code qui définie les positions nécessaires à la futur visualisation des vecteurs
             Point2D racineMonde = p.getPosition();
             Point2D boutMonde = new Point2D(
-                    racineMonde.getX() + vecteurX * facteurAffichage,
-                    racineMonde.getY() + vecteurY * facteurAffichage
+                    racineMonde.getX() + vecteurX,
+                    racineMonde.getY() + vecteurY
             );
 
             Point2D racineEcran = camera.mondeVersEcran(
@@ -73,10 +79,12 @@ public class Vecteurs {
             double dy = boutEcran.getY() - racineEcran.getY();
             double longueur = Math.hypot(dx, dy);
 
-            if (longueur < 2) {
+            // Pour échapper division par 0
+            if (longueur < 1) {
                 continue;
             }
 
+            // Partie du code qui visiualise les vecteurs
             double angle = Math.atan2(dy, dx);
             double flecheLongueur = 10;
 

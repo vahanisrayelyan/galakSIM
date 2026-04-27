@@ -14,6 +14,7 @@ public class Physique {
 
     public void effetForceGravitationelle(ArrayList<Planete> planetes) {
         for (Planete p : planetes) {
+            p.setFg(0,0);
             p.setAcceleration(Point2D.ZERO);
         }
         appliquerGravite(new ArrayList<>(planetes));
@@ -80,20 +81,25 @@ public class Physique {
                 double dy = (a2.getPosition().getY() - a1.getPosition().getY());
                 double r = Math.sqrt(dx * dx + dy * dy);
 
-                if (r < 1) continue;
+                if (r <= 0) continue;
 
                 double ux = dx / r;
                 double uy = dy / r;
 
                 double Fg = (G * a1.getMasse() * a2.getMasse()) / (r * r);
+                double Fgx = Fg * ux;
+                double Fgy = Fg * uy;
+
+                a1.setFg(a1.getFg().getX() + Fgx, a1.getFg().getY() + Fgy);
+                a2.setFg(a2.getFg().getX() - Fgx, a2.getFg().getY() - Fgy);
 
                 a1.setAcceleration(new Point2D(
-                        a1.getAcceleration().getX() + (Fg * ux) / a1.getMasse(),
-                        a1.getAcceleration().getY() + (Fg * uy) / a1.getMasse()
+                        a1.getAcceleration().getX() + Fgx / a1.getMasse(),
+                        a1.getAcceleration().getY() + Fgy / a1.getMasse()
                 ));
                 a2.setAcceleration(new Point2D(
-                        a2.getAcceleration().getX() - (Fg * ux) / a2.getMasse(),
-                        a2.getAcceleration().getY() - (Fg * uy) / a2.getMasse()
+                        a2.getAcceleration().getX() - Fgx / a2.getMasse(),
+                        a2.getAcceleration().getY() - Fgy / a2.getMasse()
                 ));
             }
         }

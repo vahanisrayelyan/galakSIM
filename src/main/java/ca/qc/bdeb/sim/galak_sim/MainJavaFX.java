@@ -218,6 +218,13 @@ public class MainJavaFX extends Application {
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
 
+        Text texteCouleurOrbite = new Text("Couleur de l'orbite");
+        ColorPicker choixCouleurOrbite = new ColorPicker(Color.WHITE);
+        choixCouleurOrbite.setMinHeight(30);
+
+        CheckBox choixTrouNoir = new CheckBox("Trou Noir");
+        choixTrouNoir.setStyle("-fx-text-fill: white;");
+
         VBox listePlanete = new VBox(5);
         this.listePlaneteUI = listePlanete;
         this.canvasPrincipal = canvas;
@@ -225,7 +232,7 @@ public class MainJavaFX extends Application {
         texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
-                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete)
+                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete, choixCouleurOrbite, choixTrouNoir)
         );
 
         Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
@@ -338,12 +345,12 @@ public class MainJavaFX extends Application {
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
 
         boiteParametres.getChildren().addAll(
-                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
                 texteInformations,
                 btnResetVue,
-                creerSection("Affichage", choixVecteursVBox, choixPrediction),
-                creerSection("Planètes", defileurPlanetes),
-                creerSection("Temps", vitesseTexte, modificationTemps)
+                creerSection("Ajouter une planète",true, texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse,new Separator(Orientation.HORIZONTAL), texteCouleurOrbite, choixCouleurOrbite,new Separator(Orientation.HORIZONTAL), choixTrouNoir),
+                creerSection("Affichage",false,choixVecteursVBox, choixPrediction),
+                creerSection("Planètes",false, defileurPlanetes),
+                creerSection("Temps",false, vitesseTexte, modificationTemps)
         );
 
         Text titreModeles = new Text("Modèles");
@@ -624,7 +631,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, ColorPicker choixColeurOrbite, CheckBox choixTrouNoir) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -647,6 +654,12 @@ public class MainJavaFX extends Application {
 
         double taille = 6.0e6;
 
+        boolean modeTrouNoir = choixTrouNoir.isSelected();
+        if (modeTrouNoir) {
+            masse = 3.0e32;
+            taille = 2.0e8;
+        }
+
         boolean positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
             if (p.contientPointEcran(
@@ -664,10 +677,15 @@ public class MainJavaFX extends Application {
 
         if (positionLibre) {
             Image image = null;
-            Color color = null;
-            String nomPlanete = saisiNom.getText().isEmpty()
-                    ? "Planète " + (simulation.getSizeListPlanetes() + 1)
-                    : saisiNom.getText();
+            Color color = modeTrouNoir ? Color.PURPLE : choixColeurOrbite.getValue();
+
+            String nomDefaut = (modeTrouNoir ? "Trou Noir " : "Planète ") + (simulation.getSizeListPlanetes() + 1);
+            String nomPlanete = saisiNom.getText().isEmpty() ? nomDefaut : saisiNom.getText();
+            Planete nouvellePlanete = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
+
+            if (modeTrouNoir) {
+                nouvellePlanete.setTrouNoir(true);
+            }
 
             simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
             rafraichirListePlanetes(listePlanete, canvas);
@@ -702,7 +720,7 @@ public class MainJavaFX extends Application {
         }
     }
 
-    private VBox creerSection(String titre, javafx.scene.Node... contenu) {
+    private VBox creerSection(String titre,boolean ouvert, javafx.scene.Node... contenu) {
         VBox section = new VBox(5);
 
         Button btnTitre = new Button("▾ " + titre);
@@ -712,6 +730,9 @@ public class MainJavaFX extends Application {
         VBox corps = new VBox(8);
         corps.getChildren().addAll(contenu);
         corps.setPadding(new Insets(5, 0, 5, 5));
+
+        corps.setVisible(ouvert);
+        corps.setManaged(ouvert);
 
         btnTitre.setOnAction(e -> {
             boolean visible = corps.isVisible();

@@ -47,24 +47,25 @@ public class Simulation {
             return;
         }
 
-        double pasMax = 1000.0; // secondes simulées max par sous-étape
+        double pasMax = 0.1; // secondes simulées max par sous-étape
         int nbSousEtapes = Math.max(1, (int) Math.ceil(deltaTemps / pasMax));
 
-        if (nbSousEtapes > 1000) {
-            nbSousEtapes = 1000;
-        }
+        nbSousEtapes = Math.min(nbSousEtapes, 200);
 
         double sousDeltaTemps = deltaTemps / nbSousEtapes;
 
         for (int etape = 0; etape < nbSousEtapes; etape++) {
+
             physique.effetForceGravitationelle(planetes);
 
             for (Planete p : planetes) {
                 p.update(sousDeltaTemps);
             }
 
-            planetes = collision.verificationCollision(planetes);
+//            planetes = collision.verificationCollision(planetes);
+            collision.verificationCollision(planetes);
             collision.updateExplosions();
+
         }
 
         vecteurs.setPlanete(planetes);
@@ -107,6 +108,7 @@ public class Simulation {
 
     public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
+        vecteurs.setScaleZoom(camera.getZoom());
     }
 
     public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {

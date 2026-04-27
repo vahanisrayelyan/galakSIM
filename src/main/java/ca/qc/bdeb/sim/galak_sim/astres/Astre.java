@@ -2,23 +2,26 @@ package ca.qc.bdeb.sim.galak_sim.astres;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 
 public abstract class Astre {
 
     protected Point2D position;
+    private Point2D positionPrecedante;
     protected Point2D velocite;
     protected Point2D acceleration;
     protected Point2D taille;
+    protected Point2D Fg;
     protected double masse;
-    protected Image image;
-    protected double Fg = 0;
     protected boolean trouNoir;
 
 
 
-    public void setFg(double fg) {
-        Fg = fg;
+    public void setFg(double Fgx, double Fgy) {
+        Fg = new Point2D(Fgx,Fgy);
+    }
+
+    public Point2D getFg() {
+        return Fg;
     }
 
     public Astre(double x, double y, double vX, double vY, double taille, double masse) {
@@ -27,12 +30,18 @@ public abstract class Astre {
         this.taille = new Point2D(taille, taille);
         this.masse = masse;
         this.acceleration = Point2D.ZERO;
+        this.Fg = Point2D.ZERO;
+    }
+
+
+    public Point2D getPositionPrecedante() {
+        return positionPrecedante;
     }
 
     public void update(double dt) {
         // Euler simple
         velocite = velocite.add(acceleration.multiply(dt));
-
+        positionPrecedante = position;
         position = position.add(
                 velocite.getX() * dt,
                 velocite.getY() * dt
@@ -74,4 +83,6 @@ public abstract class Astre {
     public void setTrouNoir (boolean trouNoir){
         this.trouNoir= trouNoir;
     }
+
+    public void setMasse (double masse) {this.masse = masse;}
 }

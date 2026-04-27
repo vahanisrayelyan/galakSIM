@@ -257,7 +257,7 @@ public class Modeles {
                 0.0,
                 0,
                 0,
-                8e6,
+                2e8,
                 3e32,
                 "Trou Noir",
                 null,
@@ -267,7 +267,7 @@ public class Modeles {
         trouNoir.setTrouNoir(true);
 
         simulation.ajouterNouvellePlanete(
-                1.5e6,
+                1.5e10,
                 0,
                 0,
                 1150000,
