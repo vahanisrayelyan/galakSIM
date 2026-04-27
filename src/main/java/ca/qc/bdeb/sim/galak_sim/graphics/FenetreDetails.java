@@ -101,30 +101,35 @@ public class FenetreDetails {
         String actif = "-fx-background-color: #444444; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 5;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-cursor: hand;";
 
-        Button bDonnees = new Button(" Données ");
-        Button bGraphs = new Button(" Graphiques ");
-        bDonnees.setStyle(actif);
-        bGraphs.setStyle(nonactif);
+        Button btnDonnees = new Button(" Données ");
+        btnDonnees.setMaxWidth(Double.MAX_VALUE);
+        Button btnGraphs = new Button(" Graphiques ");
+        btnGraphs.setMaxWidth(Double.MAX_VALUE);
 
-        HBox contBoutons = new HBox(10, bDonnees, bGraphs);
+        btnDonnees.setStyle(actif);
+        btnGraphs.setStyle(nonactif);
+
+        HBox contBoutons = new HBox(10, btnDonnees, btnGraphs);
+        HBox.setHgrow(btnDonnees, Priority.ALWAYS);
+        HBox.setHgrow(btnGraphs, Priority.ALWAYS);
         contBoutons.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
 
-        bDonnees.setOnAction(e -> {
+        btnDonnees.setOnAction(e -> {
             boiteDonnees.setVisible(true);
             boiteDonnees.setManaged(true);
             boiteGraphs.setVisible(false);
             boiteGraphs.setManaged(false);
-            bDonnees.setStyle(actif);
-            bGraphs.setStyle(nonactif);
+            btnDonnees.setStyle(actif);
+            btnGraphs.setStyle(nonactif);
         });
 
-        bGraphs.setOnAction(e -> {
+        btnGraphs.setOnAction(e -> {
             boiteGraphs.setVisible(true);
             boiteGraphs.setManaged(true);
             boiteDonnees.setVisible(false);
             boiteDonnees.setManaged(false);
-            bGraphs.setStyle(actif);
-            bDonnees.setStyle(nonactif);
+            btnGraphs.setStyle(actif);
+            btnDonnees.setStyle(nonactif);
         });
 
         // Haut fixe
@@ -252,9 +257,10 @@ public class FenetreDetails {
         axeY.setTickLabelFormatter(new javafx.util.StringConverter<Number>() {
             @Override
             public String toString(Number tickValue) {
-                if (tickValue.doubleValue() == 0 ) return  "0";
-                return  String.format("%.2e", tickValue.doubleValue());
+                if (tickValue.doubleValue() == 0) return "0";
+                return String.format("%.2e", tickValue.doubleValue());
             }
+
             @Override
             public Number fromString(String string) {
                 return null;

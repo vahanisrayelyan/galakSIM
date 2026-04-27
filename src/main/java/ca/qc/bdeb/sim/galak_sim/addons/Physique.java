@@ -20,10 +20,8 @@ public class Physique {
     }
 
     public List<List<Point2D>> calculerPredictions(ArrayList<Planete> planetes, double zoomActuel) {
-        final int MAX_POINTS = 1500; // Plus de points pour de plus longues orbites
+        final int MAX_POINTS = 1500;
 
-        // SOLUTION : On définit la limite en PIXELS REELS à l'écran.
-        // On veut que la ligne fasse environ 3000 pixels de long sur le canvas.
         final double LIMITE_VISUELLE_PIXELS = 1500;
 
         List<AstreFantome> fantomes = new ArrayList<>();
@@ -47,24 +45,20 @@ public class Physique {
             for (int i = 0; i < fantomes.size(); i++) {
                 if (estTermine[i]) continue;
 
-                AstreFantome f = fantomes.get(i);
-                Point2D avant = f.getPosition();
+                AstreFantome fantome = fantomes.get(i);
+                Point2D avant = fantome.getPosition();
 
-                // Pas de temps pour le système solaire (100 000s = ~27 heures)
                 double dt = 100000.0;
 
-                f.update(dt);
-                Point2D apres = f.getPosition();
+                fantome.update(dt);
+                Point2D apres = fantome.getPosition();
 
-                // --- LE CALCUL DE DISTANCE VISUELLE ---
-                // On calcule combien de PIXELS la planète a parcouru selon le ZOOM actuel
                 double deplacementMetres = avant.distance(apres);
                 double deplacementPixels = deplacementMetres * zoomActuel;
 
                 distanceVisuelleCumulee[i] += deplacementPixels;
                 trajectoires.get(i).add(apres);
 
-                // On s'arrête si on a atteint la longueur visuelle voulue
                 if (distanceVisuelleCumulee[i] >= LIMITE_VISUELLE_PIXELS) {
                     estTermine[i] = true;
                 } else {

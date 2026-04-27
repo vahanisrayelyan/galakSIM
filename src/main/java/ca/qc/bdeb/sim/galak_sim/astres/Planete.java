@@ -218,6 +218,7 @@ public class Planete extends Astre {
     public void setCouleurOrbite(Color couleurOrbite) {
         this.couleurOrbite = couleurOrbite;
     }
+
     public boolean contientPointEcran(double xEcran, double yEcran,
                                       Camera camera,
                                       double largeurCanvas, double hauteurCanvas) {
@@ -252,10 +253,8 @@ public class Planete extends Astre {
 
         return Math.hypot(dx, dy) <= rayonCliqueable;
     }
-    public String getImagePath() {
-        return imagePath;
-    }
 
+    public String getImagePath() { return imagePath; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 }

@@ -514,7 +514,9 @@ public class MainJavaFX extends Application {
         VBox.setVgrow(sectionsMenu, Priority.ALWAYS);
 
         Button btnParametres = new Button(" Paramètres ");
+        btnParametres.setMaxWidth(Double.MAX_VALUE);
         Button btnModeles = new Button(" Modèles ");
+        btnModeles.setMaxWidth(Double.MAX_VALUE);
 
         String actif = "-fx-background-color: #444444; -fx-font-weight: bold;";
         String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888;";
@@ -541,6 +543,8 @@ public class MainJavaFX extends Application {
         });
 
         HBox choixSections = new HBox(10, btnParametres, btnModeles);
+        HBox.setHgrow(btnParametres, Priority.ALWAYS);
+        HBox.setHgrow(btnModeles, Priority.ALWAYS);
         choixSections.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
 
         VBox hautMenu = new VBox(10);
@@ -665,7 +669,7 @@ public class MainJavaFX extends Application {
                     ? "Planète " + (simulation.getSizeListPlanetes() + 1)
                     : saisiNom.getText();
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color,"");
+            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }
@@ -765,6 +769,7 @@ public class MainJavaFX extends Application {
 
         alert.showAndWait();
     }
+
     private void rafraichirListeModeles(VBox listeModeles, VBox listePlanete, Canvas canvas) {
         listeModeles.getChildren().clear();
 
