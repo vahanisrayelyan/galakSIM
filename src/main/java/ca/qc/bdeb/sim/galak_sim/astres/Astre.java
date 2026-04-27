@@ -74,4 +74,6 @@ public abstract class Astre {
     public void setTrouNoir (boolean trouNoir){
         this.trouNoir= trouNoir;
     }
+
+    public void setMasse (double masse) {this.masse = masse;}
 }
