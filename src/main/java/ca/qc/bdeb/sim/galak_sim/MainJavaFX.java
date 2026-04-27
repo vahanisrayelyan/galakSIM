@@ -218,6 +218,9 @@ public class MainJavaFX extends Application {
         hboxMasse.setAlignment(Pos.CENTER_LEFT);
         hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
 
+        CheckBox choixTrouNoir = new CheckBox("Trou Noir");
+        choixTrouNoir.setStyle("-fx-text-fill: white;");
+
         VBox listePlanete = new VBox(5);
         this.listePlaneteUI = listePlanete;
         this.canvasPrincipal = canvas;
@@ -225,7 +228,7 @@ public class MainJavaFX extends Application {
         texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         canvas.setOnMouseClicked(e ->
-                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete)
+                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete,choixTrouNoir)
         );
 
         Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
@@ -338,7 +341,7 @@ public class MainJavaFX extends Application {
         modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
 
         boiteParametres.getChildren().addAll(
-                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse),
+                creerSection("Ajouter une planète", texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse,choixTrouNoir),
                 texteInformations,
                 btnResetVue,
                 creerSection("Affichage", choixVecteursVBox, choixPrediction),
@@ -620,7 +623,7 @@ public class MainJavaFX extends Application {
         });
     }
 
-    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete) {
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, CheckBox choixTrouNoir) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -643,6 +646,12 @@ public class MainJavaFX extends Application {
 
         double taille = 6.0e6;
 
+        boolean modeTrouNoir = choixTrouNoir.isSelected();
+        if (modeTrouNoir) {
+            masse = 3.0e32;
+            taille = 2.0e8;
+        }
+
         boolean positionLibre = true;
         for (Planete p : simulation.getPlanetes()) {
             if (p.contientPointEcran(
@@ -660,12 +669,16 @@ public class MainJavaFX extends Application {
 
         if (positionLibre) {
             Image image = null;
-            Color color = null;
-            String nomPlanete = saisiNom.getText().isEmpty()
-                    ? "Planète " + (simulation.getSizeListPlanetes() + 1)
-                    : saisiNom.getText();
+            Color color = modeTrouNoir ? Color.PURPLE : null;
 
-            simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete,image,color,"");
+            String nomDefaut = (modeTrouNoir ? "Trou Noir " : "Planète ") + (simulation.getSizeListPlanetes() + 1);
+            String nomPlanete = saisiNom.getText().isEmpty() ? nomDefaut : saisiNom.getText();
+            Planete nouvellePlanete = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
+
+            if (modeTrouNoir) {
+                nouvellePlanete.setTrouNoir(true);
+            }
+
             rafraichirListePlanetes(listePlanete, canvas);
             nbPlanetesAvant = simulation.getPlanetes().size();
         }
