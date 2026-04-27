@@ -37,6 +37,7 @@ public class FenetreDetails {
     public void ouvrir(Planete p, Canvas canvas) {
         if (fenetresOuvertes.containsKey(p)) {
             fenetresOuvertes.get(p).toFront();
+            simulation.centrerSur(p, 5e-7);
             return;
         }
 

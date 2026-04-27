@@ -105,18 +105,16 @@ public class Simulation {
         camera.deplacer(dx, dy);
     }
 
-    public void zoomer(double facteurZoom, double sourisX, double sourisY,
-                       double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         camera.zoomer(facteurZoom, sourisX, sourisY, largeurCanvas, hauteurCanvas);
     }
 
-    public Point2D ecranVersMonde(double xEcran, double yEcran,
-                                  double largeurCanvas, double hauteurCanvas) {
+    public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
         return camera.ecranVersMonde(xEcran, yEcran, largeurCanvas, hauteurCanvas);
     }
 
-    public void reinitialiserVue(String zoom1) {
-        camera.reinitialiser(zoom1);
+    public void reinitialiserVue(String zoomDefaut) {
+        camera.reinitialiser(zoomDefaut);
     }
 
     public void centrerSur(Planete p, double valeurZoom) {

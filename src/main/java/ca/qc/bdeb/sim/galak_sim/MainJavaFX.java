@@ -9,6 +9,7 @@ import ca.qc.bdeb.sim.galak_sim.graphics.ChampEtoiles;
 import ca.qc.bdeb.sim.galak_sim.graphics.FenetreDetails;
 import ca.qc.bdeb.sim.galak_sim.graphics.Simulation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -30,6 +31,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -574,9 +576,7 @@ public class MainJavaFX extends Application {
 
         Button btnMenu = new Button("☰");
         btnMenu.setOnAction(e -> {
-            boolean menuVisible = menuComplet.isVisible();
-            menuComplet.setVisible(!menuVisible);
-            StackPane.setMargin(btnMenu, new Insets(10, menuVisible ? 10 : 260, 0, 0));
+            animationMenu(menuComplet, btnMenu);
         });
 
         Pane espace = new Pane();
@@ -720,9 +720,39 @@ public class MainJavaFX extends Application {
         return section;
     }
 
+    private void animationMenu(BorderPane menuComplet, Button btnMenu) {
+        boolean menuEstCache = !menuComplet.isVisible();
+
+        TranslateTransition animMenu = new TranslateTransition(Duration.millis(300), menuComplet);
+        TranslateTransition animBouton = new TranslateTransition(Duration.millis(300), btnMenu);
+
+        if (menuEstCache) {
+            menuComplet.setVisible(true);
+
+            animMenu.setFromX(250);
+            animMenu.setToX(0);
+
+            animBouton.setFromX(250);
+            animBouton.setToX(0);
+
+        } else {
+            animMenu.setFromX(0);
+            animMenu.setToX(250);
+
+            animBouton.setFromX(0);
+            animBouton.setToX(250);
+
+            animMenu.setOnFinished(event -> menuComplet.setVisible(false));
+        }
+
+        animMenu.play();
+        animBouton.play();
+    }
+
     private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
         fenetreDetails.ouvrir(p, canvas);
     }
+
     private void afficherAlerte(String titre, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titre);
