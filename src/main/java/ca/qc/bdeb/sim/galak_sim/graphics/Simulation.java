@@ -21,6 +21,7 @@ public class Simulation {
     private final Vecteurs vecteurs;
     private boolean afficherPrediction = false;
     private final Camera camera = new Camera();
+    private Scale scale = new Scale(camera);
 
     public Simulation(Vecteurs vecteurs) {
         this.vecteurs = vecteurs;
@@ -73,6 +74,7 @@ public class Simulation {
     }
 
     public void draw(GraphicsContext contexte) {
+
         double largeur = contexte.getCanvas().getWidth();
         double hauteur = contexte.getCanvas().getHeight();
 
@@ -82,11 +84,11 @@ public class Simulation {
             p.draw(contexte, camera, largeur, hauteur, afficherPrediction);
         }
 
-        // À corriger aussi dans Vecteurs si cette classe dessine encore
-        // en coordonnées monde directes.
         vecteurs.draw(contexte, camera, largeur, hauteur);
 
         collision.draw(contexte, camera, largeur, hauteur);
+
+        scale.draw(contexte);
     }
 
     public void calculerPredictions() {
