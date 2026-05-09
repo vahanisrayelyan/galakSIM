@@ -89,16 +89,9 @@ public class Planete extends Astre {
         double largeurAffichage = rayonPlaneteAffiche * 2;
         double hauteurAffichage = rayonPlaneteAffiche * 2;
 
-        // Marge hors écran
-        double marge = 200;
-        if (posEcran.getX() < -marge || posEcran.getX() > largeurCanvas + marge
-                || posEcran.getY() < -marge || posEcran.getY() > hauteurCanvas + marge) {
-
-            orbitePlanete.draw(contexte, camera, largeurCanvas, hauteurCanvas, couleurOrbite, false);
-            if (afficherPrediction) {
-                predictionOrbitePlanete.draw(contexte, camera, largeurCanvas, hauteurCanvas, couleurOrbite, true);
-            }
-            return;
+        orbitePlanete.draw(contexte, camera, largeurCanvas, hauteurCanvas, couleurOrbite, false);
+        if (afficherPrediction) {
+            predictionOrbitePlanete.draw(contexte, camera, largeurCanvas, hauteurCanvas, couleurOrbite, true);
         }
 
         // Dessin de la planète

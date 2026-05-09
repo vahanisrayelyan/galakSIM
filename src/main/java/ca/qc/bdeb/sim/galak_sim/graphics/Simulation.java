@@ -23,14 +23,16 @@ public class Simulation {
     private final Camera camera = new Camera();
     private Scale scale = new Scale(camera);
 
+    private boolean enPause = false;
+    private double vitesseSimulation = 1.0;
+    private double tempsAccumule = 0;
+
     public Simulation(Vecteurs vecteurs) {
         this.vecteurs = vecteurs;
         this.vecteurs.setPlanete(planetes);
     }
 
-    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY,
-                                          double taille, double masse, String nom,
-                                          Image image, Color color, String description) {
+    public Planete ajouterNouvellePlanete(double x, double y, double vX, double vY, double taille, double masse, String nom, Image image, Color color, String description) {
         Planete nouvellePlanete = new Planete(x, y, vX, vY, taille, masse, nom, image, color, description);
         planetes.add(nouvellePlanete);
         return nouvellePlanete;
@@ -63,7 +65,6 @@ public class Simulation {
                 p.update(sousDeltaTemps);
             }
 
-//            planetes = collision.verificationCollision(planetes);
             collision.verificationCollision(planetes);
             collision.updateExplosions();
 
@@ -71,10 +72,11 @@ public class Simulation {
 
         vecteurs.setPlanete(planetes);
         camera.mettreAJourSuivi();
+
+        tempsAccumule += deltaTemps;
     }
 
     public void draw(GraphicsContext contexte) {
-
         double largeur = contexte.getCanvas().getWidth();
         double hauteur = contexte.getCanvas().getHeight();
 
@@ -85,9 +87,7 @@ public class Simulation {
         }
 
         vecteurs.draw(contexte, camera, largeur, hauteur);
-
         collision.draw(contexte, camera, largeur, hauteur);
-
         scale.draw(contexte);
     }
 
@@ -152,5 +152,33 @@ public class Simulation {
 
     public boolean isAfficherPrediction() {
         return afficherPrediction;
+    }
+
+    public void setEnPause(boolean enPause) {
+        this.enPause = enPause;
+    }
+
+    public boolean isEnPause() {
+        return enPause;
+    }
+
+    public void setVitesseSimulation(double vitesse) {
+        this.vitesseSimulation = vitesse;
+    }
+
+    public double getVitesseSimulation() {
+        return vitesseSimulation;
+    }
+
+    public double getTempsAccumule() {
+        return tempsAccumule;
+    }
+
+    public void resetTemps() {
+        this.tempsAccumule = 0;
+    }
+
+    public Vecteurs getVecteurs() {
+        return vecteurs;
     }
 }

@@ -14,7 +14,7 @@ public class Physique {
 
     public void effetForceGravitationelle(ArrayList<Planete> planetes) {
         for (Planete p : planetes) {
-            p.setFg(0,0);
+            p.setFg(0, 0);
             p.setAcceleration(Point2D.ZERO);
         }
         appliquerGravite(new ArrayList<>(planetes));

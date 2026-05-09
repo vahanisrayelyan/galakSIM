@@ -15,9 +15,8 @@ public abstract class Astre {
     protected boolean trouNoir;
 
 
-
     public void setFg(double Fgx, double Fgy) {
-        Fg = new Point2D(Fgx,Fgy);
+        Fg = new Point2D(Fgx, Fgy);
     }
 
     public Point2D getFg() {
@@ -46,7 +45,6 @@ public abstract class Astre {
                 velocite.getX() * dt,
                 velocite.getY() * dt
         );
-
     }
 
     public void draw(GraphicsContext gc) {
@@ -80,9 +78,11 @@ public abstract class Astre {
         return trouNoir;
     }
 
-    public void setTrouNoir (boolean trouNoir){
-        this.trouNoir= trouNoir;
+    public void setTrouNoir(boolean trouNoir) {
+        this.trouNoir = trouNoir;
     }
 
-    public void setMasse (double masse) {this.masse = masse;}
+    public void setMasse(double masse) {
+        this.masse = masse;
+    }
 }

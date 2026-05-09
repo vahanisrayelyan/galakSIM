@@ -1,0 +1,742 @@
+package ca.qc.bdeb.sim.galak_sim.graphics;
+
+import ca.qc.bdeb.sim.galak_sim.addons.Modeles;
+import ca.qc.bdeb.sim.galak_sim.addons.ModelesPersonnalises;
+import ca.qc.bdeb.sim.galak_sim.astres.Planete;
+import javafx.animation.TranslateTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+public class Affichage {
+    private Simulation simulation;
+    private VBox listePlanete;
+    private Canvas canvasPrincipal;
+    private Text texteTempsPasse;
+    private boolean pause = false;
+    private double vitesseSimulation = 1.0;
+    private double tempsSimulation = 0;
+    private int nbPlanetesAvant = 0;
+    private FenetreDetails fenetreDetails;
+    private final Map<Planete, Stage> fenetresOuvertes = new HashMap<>();
+
+    public Affichage(Simulation simulation) {
+        this.simulation = simulation;
+        this.fenetreDetails = new FenetreDetails(simulation, fenetresOuvertes, new boolean[]{pause});
+    }
+
+    public void creerInterface(StackPane panneau, Canvas canvas) {
+        VBox boiteParametres = new VBox(10);
+        boiteParametres.setMaxWidth(Double.MAX_VALUE);
+        boiteParametres.setVisible(true);
+        boiteParametres.setManaged(true);
+
+        VBox boiteModeles = new VBox(10);
+        boiteModeles.setMaxWidth(Double.MAX_VALUE);
+        boiteModeles.setVisible(false);
+        boiteModeles.setManaged(false);
+
+        Text texteNom = new Text("Nom");
+        TextField saisiNom = new TextField();
+        saisiNom.setTextFormatter(formateurAlphabetique());
+
+        Text texteVitesseX = new Text("Vitesse en x");
+        HBox hboxVitesseX = new HBox(10);
+        TextField saisiVitesseX = new TextField("0");
+        saisiVitesseX.setTextFormatter(formateurNumerique(true));
+        HBox.setHgrow(saisiVitesseX, Priority.ALWAYS);
+        saisiVitesseX.setMaxWidth(Double.MAX_VALUE);
+        Text unitevx = new Text("m/s");
+        hboxVitesseX.setAlignment(Pos.CENTER_LEFT);
+        hboxVitesseX.getChildren().addAll(saisiVitesseX, unitevx);
+
+        Text texteVitesseY = new Text("Vitesse en y");
+        HBox hboxVitesseY = new HBox(10);
+        TextField saisiVitesseY = new TextField("0");
+        saisiVitesseY.setTextFormatter(formateurNumerique(true));
+        HBox.setHgrow(saisiVitesseY, Priority.ALWAYS);
+        saisiVitesseY.setMaxWidth(Double.MAX_VALUE);
+        Text unitevy = new Text("m/s");
+        hboxVitesseY.setAlignment(Pos.CENTER_LEFT);
+        hboxVitesseY.getChildren().addAll(saisiVitesseY, unitevy);
+
+        Text texteMasse = new Text("Masse");
+        HBox hboxMasse = new HBox(10);
+        TextField saisiMasse = new TextField("5");
+        saisiMasse.setTextFormatter(formateurNumerique(false));
+        HBox.setHgrow(saisiMasse, Priority.ALWAYS);
+        saisiMasse.setMaxWidth(Double.MAX_VALUE);
+        Text uniteMasse = new Text("×10^24 kg");
+        hboxMasse.setAlignment(Pos.CENTER_LEFT);
+        hboxMasse.getChildren().addAll(saisiMasse, uniteMasse);
+
+        Text texteCouleurOrbite = new Text("Couleur de l'orbite");
+        ColorPicker choixCouleurOrbite = new ColorPicker(Color.WHITE);
+        choixCouleurOrbite.setMinHeight(30);
+
+        CheckBox choixTrouNoir = new CheckBox("Trou Noir");
+        choixTrouNoir.setStyle("-fx-text-fill: white;");
+
+        VBox listePlanete = new VBox(5);
+        this.listePlanete = listePlanete;
+        this.canvasPrincipal = canvas;
+        texteTempsPasse = new Text("Temps : 0.0 s");
+        texteTempsPasse.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        canvas.setOnMouseClicked(e ->
+                ajouterPlanete(e, canvas, saisiVitesseX, saisiVitesseY, saisiMasse, saisiNom, listePlanete, choixCouleurOrbite, choixTrouNoir)
+        );
+
+        Text texteInformations = new Text("Cliquez gauche pour ajouter une planète\nMolette pour zoomer\nClic droit pour déplacer la vue");
+
+        Button btnResetVue = new Button("Réinitialiser la vue");
+        btnResetVue.setOnAction(e -> simulation.reinitialiserVue(null));
+        btnResetVue.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;"
+        );
+
+        Button btnVide1 = nouveauBoutonVide(canvas);
+
+        VBox choixVecteursVBox = new VBox(2);
+        RadioButton choixPasVecteurs = new RadioButton("Aucun");
+        choixPasVecteurs.setOnAction(e -> simulation.getVecteurs().setChoix(0));
+        choixPasVecteurs.setSelected(true);
+        RadioButton choixVecteurVitesse = new RadioButton("Vitesse");
+        choixVecteurVitesse.setOnAction(e -> simulation.getVecteurs().setChoix(1));
+        RadioButton choixVecteurAcceleration = new RadioButton("Acceleration");
+        choixVecteurAcceleration.setOnAction(e -> simulation.getVecteurs().setChoix(2));
+        RadioButton choixVecteurForce = new RadioButton("Force");
+        choixVecteurForce.setOnAction(e -> simulation.getVecteurs().setChoix(3));
+
+        ToggleGroup choixVecteursToggleGroup = new ToggleGroup();
+        choixPasVecteurs.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurVitesse.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurAcceleration.setToggleGroup(choixVecteursToggleGroup);
+        choixVecteurForce.setToggleGroup(choixVecteursToggleGroup);
+
+        choixVecteursVBox.getChildren().addAll(
+                choixPasVecteurs, choixVecteurVitesse, choixVecteurAcceleration, choixVecteurForce
+        );
+
+        CheckBox choixPrediction = new CheckBox("Prédiction");
+        choixPrediction.setSelected(false);
+        choixPrediction.setOnAction(e -> simulation.setAfficherPrediction(choixPrediction.isSelected()));
+
+        ScrollPane defileurPlanetes = new ScrollPane(listePlanete);
+        defileurPlanetes.setFitToWidth(true);
+        defileurPlanetes.setMaxHeight(150);
+        defileurPlanetes.setMinHeight(150);
+        defileurPlanetes.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        defileurPlanetes.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        Text vitesseTexte = new Text("Vitesse de la simulation: " + vitesseSimulation);
+        vitesseTexte.setWrappingWidth(210);
+
+        HBox modificationTemps = new HBox(10);
+
+        Button btnPause = new Button("⏸");
+        btnPause.setOnAction(e -> {
+            if (simulation.isEnPause()) {
+                simulation.setEnPause(false);
+                btnPause.setText("⏸");
+            } else {
+                simulation.setEnPause(true);
+                btnPause.setText("▶");
+            }
+        });
+
+        Button btnPlusVite = new Button("⏩");
+        Button btnMoinsVite = new Button("⏪");
+        double[] paliers = {
+                1,           // 1 seconde/s
+                60,          // 1 minute/s
+                3600,        // 1 heure/s
+                86400,       // 1 jour/s
+                604800,      // 1 semaine/s
+                2592000,     // 1 mois/s
+                31536000,    // 1 an/s
+                315360000    // 10 ans/s (limite)
+        };
+
+        String[] nomspaliers = {
+                "×1 s/s",
+                "×1 min/s",
+                "×1 h/s",
+                "×1 jour/s",
+                "×1 semaine/s",
+                "×1 mois/s",
+                "×1 an/s",
+                "×10 ans/s"
+        };
+
+        int[] indexPalier = {0};
+        vitesseSimulation = paliers[0];
+        vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[0]);
+
+        btnPlusVite.setOnAction(e -> {
+            if (indexPalier[0] < paliers.length - 1) {
+                indexPalier[0]++;
+                vitesseSimulation = paliers[indexPalier[0]];
+                vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[indexPalier[0]]);
+                simulation.setVitesseSimulation(vitesseSimulation);
+            }
+        });
+
+        btnMoinsVite.setOnAction(e -> {
+            if (indexPalier[0] > 0) {
+                indexPalier[0]--;
+                vitesseSimulation = paliers[indexPalier[0]];
+                vitesseTexte.setText("Vitesse de la simulation: " + nomspaliers[indexPalier[0]]);
+                simulation.setVitesseSimulation(vitesseSimulation);
+            }
+        });
+
+        Button btnTempsZero = new Button("Temps à 0");
+        btnTempsZero.setOnAction(e -> {
+            simulation.resetTemps();
+        });
+
+        modificationTemps.getChildren().addAll(btnMoinsVite, btnPause, btnPlusVite, btnTempsZero);
+
+        boiteParametres.getChildren().addAll(
+                texteInformations,
+                btnResetVue,
+                btnVide1,
+                creerSection("Ajouter une planète", true, texteNom, saisiNom, texteVitesseX, hboxVitesseX, texteVitesseY, hboxVitesseY, texteMasse, hboxMasse, new Separator(Orientation.HORIZONTAL), texteCouleurOrbite, choixCouleurOrbite, new Separator(Orientation.HORIZONTAL), choixTrouNoir),
+                creerSection("Affichage", false, choixVecteursVBox, choixPrediction),
+                creerSection("Planètes", false, defileurPlanetes),
+                creerSection("Temps", false, vitesseTexte, modificationTemps)
+        );
+
+        Text titreModeles = new Text("Modèles");
+
+        Button btnSysteme = new Button("Système solaire");
+        btnSysteme.setOnAction(e -> {
+            Modeles.chargerSystemeSolaire(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        Button btnVide2 = nouveauBoutonVide(canvas);
+
+        Button btnCollision = new Button("Collision");
+        btnCollision.setOnAction(e -> {
+            Modeles.chargerCollision(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        Button btnCercle = new Button("Orbite cercle");
+        btnCercle.setOnAction(e -> {
+            Modeles.chargerCercle(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        Button btnBinaire = new Button("Orbite binaire");
+        btnBinaire.setOnAction(e -> {
+            Modeles.chargerBinaire(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        Button btnTerreLune = new Button("Terre - Lune");
+        btnTerreLune.setOnAction(e -> {
+            Modeles.chargerTerreLune(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+        Button btnResetVueModeles = new Button("Réinitialiser la vue");
+        btnResetVueModeles.setOnAction(e -> simulation.reinitialiserVue(null));
+        btnResetVueModeles.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;"
+        );
+
+        Separator sep = new Separator(Orientation.HORIZONTAL);
+
+        VBox listeModeles = new VBox(5);
+        ScrollPane defileurModeles = new ScrollPane(listeModeles);
+        defileurModeles.setFitToWidth(true);
+        defileurModeles.setMaxHeight(150);
+        defileurModeles.setMinHeight(150);
+        defileurModeles.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        defileurModeles.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        Text texteModelePerso = new Text("Nom du modèle");
+
+        TextField saisiNomModele = new TextField();
+        saisiNomModele.setPromptText("Ex: mon_systeme");
+
+        Button btnSauvegarderModele = new Button("Sauvegarder modèle");
+        btnSauvegarderModele.setStyle(
+                "-fx-background-color: #1E90FF; " +   // rouge
+                        "-fx-font-weight: bold;"
+        );
+        btnSauvegarderModele.setOnAction(e -> {
+            String nomModele = saisiNomModele.getText().trim();
+
+            if (nomModele.isEmpty()) {
+                afficherAlerte("Erreur", "Veuillez donner un nom au modèle.");
+                return;
+            }
+
+            if (simulation.getPlanetes().isEmpty()) {
+                afficherAlerte("Erreur", "Il n'y a aucune planète à sauvegarder.");
+                return;
+            }
+
+            try {
+                if (ModelesPersonnalises.modeleExiste(nomModele)) {
+                    Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmation.setTitle("Modèle existant");
+                    confirmation.setHeaderText("Un modèle avec ce nom existe déjà.");
+                    confirmation.setContentText("Voulez-vous l'écraser?");
+
+                    ButtonType btnOui = new ButtonType("Écraser");
+                    ButtonType btnNon = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                    confirmation.getButtonTypes().setAll(btnOui, btnNon);
+
+                    Optional<ButtonType> resultat = confirmation.showAndWait();
+
+                    if (resultat.isEmpty() || resultat.get() != btnOui) {
+                        return;
+                    }
+                }
+
+                ModelesPersonnalises.sauvegarderModele(simulation, nomModele);
+                rafraichirListeModeles(listeModeles, listePlanete, canvas);
+                afficherAlerte("Succès", "Modèle sauvegardé : " + nomModele);
+
+            } catch (Exception ex) {
+                afficherAlerte("Erreur", "Impossible de sauvegarder le modèle.\n" + ex.getMessage());
+            }
+        });
+        Button btnChargerModele = new Button("Charger modèle");
+        btnChargerModele.setStyle(
+                "-fx-background-color: #FFFFFF; " +   // rouge
+                        "-fx-text-fill: #1E90FF; " +
+                        "-fx-font-weight: bold;"
+        );
+        btnChargerModele.setOnAction(e -> {
+            String nomModele = saisiNomModele.getText().trim();
+
+            if (nomModele.isEmpty()) {
+                afficherAlerte("Erreur", "Donne un nom au modèle.");
+                return;
+            }
+
+            try {
+                ModelesPersonnalises.chargerModele(simulation, nomModele);
+                rafraichirListePlanetes(listePlanete, canvas);
+                nbPlanetesAvant = simulation.getPlanetes().size();
+                afficherAlerte("Succès", "Modèle chargé : " + nomModele);
+            } catch (Exception ex) {
+                afficherAlerte("Erreur", "Impossible de charger le modèle.\n" + ex.getMessage());
+            }
+        });
+        Text texteListeModeles = new Text("Modèles sauvegardés");
+        Button btnTrouNoir = new Button("Trou Noir");
+        btnTrouNoir.setOnAction(e -> {
+            Modeles.chargerTrouNoir(simulation);
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+
+        boiteModeles.getChildren().addAll(
+                titreModeles,
+                btnSysteme,
+                btnCollision,
+                btnBinaire,
+                btnCercle,
+                btnTerreLune,
+                btnTrouNoir,
+                btnVide2,
+                btnResetVueModeles,
+                sep,
+                texteModelePerso,
+                saisiNomModele,
+                btnSauvegarderModele,
+                texteListeModeles,
+                defileurModeles
+        );
+        VBox sectionsMenu = new VBox(boiteParametres, boiteModeles);
+        sectionsMenu.setFillWidth(true);
+        sectionsMenu.setMaxWidth(Double.MAX_VALUE);
+        sectionsMenu.setPrefHeight(canvas.getHeight());
+        VBox.setVgrow(sectionsMenu, Priority.ALWAYS);
+
+        Button btnParametres = new Button(" Paramètres ");
+        btnParametres.setMaxWidth(Double.MAX_VALUE);
+        Button btnModeles = new Button(" Modèles ");
+        btnModeles.setMaxWidth(Double.MAX_VALUE);
+
+        String actif = "-fx-background-color: #444444; -fx-font-weight: bold;";
+        String nonactif = "-fx-background-color: transparent; -fx-text-fill: #888888;";
+
+        btnParametres.setStyle(actif);
+        btnModeles.setStyle(nonactif);
+
+        btnParametres.setOnAction(e -> {
+            boiteParametres.setVisible(true);
+            boiteParametres.setManaged(true);
+            boiteModeles.setVisible(false);
+            boiteModeles.setManaged(false);
+            btnParametres.setStyle(actif);
+            btnModeles.setStyle(nonactif);
+        });
+
+        btnModeles.setOnAction(e -> {
+            boiteParametres.setVisible(false);
+            boiteParametres.setManaged(false);
+            boiteModeles.setVisible(true);
+            boiteModeles.setManaged(true);
+            btnParametres.setStyle(nonactif);
+            btnModeles.setStyle(actif);
+        });
+
+        HBox choixSections = new HBox(10, btnParametres, btnModeles);
+        HBox.setHgrow(btnParametres, Priority.ALWAYS);
+        HBox.setHgrow(btnModeles, Priority.ALWAYS);
+        choixSections.setStyle("-fx-background-color: #222222; -fx-padding: 5; -fx-background-radius: 8;");
+
+        VBox hautMenu = new VBox(10);
+        hautMenu.setPadding(new Insets(15));
+        hautMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
+        hautMenu.getChildren().add(choixSections);
+
+        // Contenu défilable
+        VBox contenuMenu = new VBox(15);
+        contenuMenu.setFillWidth(true);
+        contenuMenu.setMaxWidth(Double.MAX_VALUE);
+        contenuMenu.setPadding(new Insets(15));
+        contenuMenu.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75);");
+        contenuMenu.getChildren().add(sectionsMenu);
+
+        ScrollPane scrollContenu = new ScrollPane(contenuMenu);
+        scrollContenu.setFitToWidth(true);
+        scrollContenu.setFitToHeight(true);
+        scrollContenu.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollContenu.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollContenu.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        VBox.setVgrow(scrollContenu, Priority.ALWAYS);
+
+        // Menu complet = haut fixe + contenu défilable
+        BorderPane menuComplet = new BorderPane();
+        menuComplet.setTop(hautMenu);
+        menuComplet.setCenter(scrollContenu);
+        menuComplet.setMaxWidth(250);
+        menuComplet.setMinWidth(250);
+        menuComplet.setMaxHeight(Double.MAX_VALUE);
+        menuComplet.setStyle("-fx-background-color: rgba(30, 30, 30, 0.75); -fx-border-color: #444; -fx-border-width: 0 0 0 2;");
+        menuComplet.prefHeightProperty().bind(panneau.heightProperty());
+
+        Button btnMenu = new Button("☰");
+        btnMenu.setOnAction(e -> {
+            animationMenu(menuComplet, btnMenu);
+        });
+
+        Pane espace = new Pane();
+        espace.prefWidthProperty().bind(canvas.widthProperty());
+        espace.prefHeightProperty().bind(canvas.heightProperty());
+
+        ChampEtoiles champEtoiles = new ChampEtoiles(espace);
+        champEtoiles.demarrer();
+
+        StackPane centre = new StackPane(espace, canvas);
+
+        StackPane.setAlignment(menuComplet, Pos.TOP_RIGHT);
+        StackPane.setAlignment(btnMenu, Pos.TOP_RIGHT);
+        StackPane.setMargin(btnMenu, new Insets(10, 260, 0, 0));
+
+        StackPane.setAlignment(texteTempsPasse, Pos.TOP_LEFT);
+        StackPane.setMargin(texteTempsPasse, new Insets(10));
+
+        nbPlanetesAvant = simulation.getPlanetes().size();
+
+        panneau.getChildren().addAll(centre, menuComplet, btnMenu, texteTempsPasse);
+        rafraichirListeModeles(listeModeles, listePlanete, canvas);
+    }
+
+    private Button nouveauBoutonVide(Canvas canvas) {
+        Button btnVide = new Button("Vide");
+        btnVide.setOnAction(e -> {
+            simulation.viderPlanetes();
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        });
+        btnVide.setStyle(
+                "-fx-background-color: #e74c3c; " +   // rouge
+                        "-fx-font-weight: bold;"
+        );
+        return btnVide;
+    }
+
+    private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, ColorPicker choixColeurOrbite, CheckBox choixTrouNoir) {
+        if (e.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
+
+        Point2D monde = simulation.ecranVersMonde(e.getX(), e.getY(), canvas.getWidth(), canvas.getHeight());
+        double x = monde.getX();
+        double y = monde.getY();
+
+        double vX = saisiVitesseX.getText().isEmpty() || saisiVitesseX.getText().equals("-")
+                ? 0
+                : Double.parseDouble(saisiVitesseX.getText().replace(",", "."));
+
+        double vY = saisiVitesseY.getText().isEmpty() || saisiVitesseY.getText().equals("-")
+                ? 0
+                : Double.parseDouble(saisiVitesseY.getText().replace(",", "."));
+
+        double masse = saisiMasse.getText().isEmpty()
+                ? 0
+                : Double.parseDouble(saisiMasse.getText().replace(",", ".")) * 10e24;
+
+        double taille = 6.0e6;
+
+        boolean modeTrouNoir = choixTrouNoir.isSelected();
+        if (modeTrouNoir) {
+            masse = 3.0e32;
+            taille = 2.0e8;
+        }
+
+        boolean positionLibre = true;
+        for (Planete p : simulation.getPlanetes()) {
+            if (p.contientPointEcran(
+                    e.getX(),
+                    e.getY(),
+                    simulation.getCamera(),
+                    canvas.getWidth(),
+                    canvas.getHeight()
+            )) {
+                positionLibre = false;
+                ouvrirFenetreDetails(p, canvas);
+                break;
+            }
+        }
+
+        if (positionLibre) {
+            Image image = null;
+            Color color = modeTrouNoir ? Color.PURPLE : choixColeurOrbite.getValue();
+
+            String nomDefaut = (modeTrouNoir ? "Trou Noir " : "Planète ") + (simulation.getSizeListPlanetes() + 1);
+            String nomPlanete = saisiNom.getText().isEmpty() ? nomDefaut : saisiNom.getText();
+            Planete nouvellePlanete = simulation.ajouterNouvellePlanete(x, y, vX, vY, taille, masse, nomPlanete, image, color, "");
+
+            if (modeTrouNoir) {
+                nouvellePlanete.setTrouNoir(true);
+            }
+
+            rafraichirListePlanetes(listePlanete, canvas);
+            nbPlanetesAvant = simulation.getPlanetes().size();
+        }
+
+        saisiNom.clear();
+    }
+
+    private VBox creerSection(String titre, boolean ouvert, javafx.scene.Node... contenu) {
+        VBox section = new VBox(5);
+
+        Button btnTitre = new Button("▾ " + titre);
+        btnTitre.setMaxWidth(Double.MAX_VALUE);
+        btnTitre.setStyle("-fx-background-color: #333333; -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
+
+        VBox corps = new VBox(8);
+        corps.getChildren().addAll(contenu);
+        corps.setPadding(new Insets(5, 0, 5, 5));
+
+        corps.setVisible(ouvert);
+        corps.setManaged(ouvert);
+
+        btnTitre.setOnAction(e -> {
+            boolean visible = corps.isVisible();
+            corps.setVisible(!visible);
+            corps.setManaged(!visible);
+            btnTitre.setText((visible ? "▸ " : "▾ ") + titre);
+        });
+
+        section.getChildren().addAll(btnTitre, corps);
+        return section;
+    }
+
+    private void rafraichirListeModeles(VBox listeModeles, VBox listePlanete, Canvas canvas) {
+        listeModeles.getChildren().clear();
+
+        for (String nomModele : ModelesPersonnalises.listerModeles()) {
+            HBox ligneModele = new HBox(10);
+            ligneModele.setAlignment(Pos.CENTER_LEFT);
+
+            Text info = new Text(nomModele);
+            info.setFill(Color.LIGHTGRAY);
+
+            info.setOnMouseClicked(ev -> {
+                try {
+                    ModelesPersonnalises.chargerModele(simulation, nomModele);
+                    rafraichirListePlanetes(listePlanete, canvas);
+                    nbPlanetesAvant = simulation.getPlanetes().size();
+                } catch (Exception ex) {
+                    afficherAlerte("Erreur", "Impossible de charger le modèle.\n" + ex.getMessage());
+                }
+            });
+
+            Button btnSupprimer = new Button("X");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
+
+            btnSupprimer.setOnAction(ev -> {
+                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmation.setTitle("Supprimer le modèle");
+                confirmation.setHeaderText("Supprimer \"" + nomModele + "\" ?");
+                confirmation.setContentText("Cette action est irréversible.");
+                DialogPane dialogPane = confirmation.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+                dialogPane.getStyleClass().add("fenetre-details");
+
+                ButtonType btnOui = new ButtonType("Supprimer");
+                ButtonType btnNon = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+                confirmation.getButtonTypes().setAll(btnOui, btnNon);
+
+                Optional<ButtonType> resultat = confirmation.showAndWait();
+
+                if (resultat.isPresent() && resultat.get() == btnOui) {
+                    try {
+                        ModelesPersonnalises.supprimerModele(nomModele);
+                        rafraichirListeModeles(listeModeles, listePlanete, canvas);
+                    } catch (Exception ex) {
+                        afficherAlerte("Erreur", "Impossible de supprimer le modèle.\n" + ex.getMessage());
+                    }
+                }
+            });
+
+            ligneModele.getChildren().addAll(btnSupprimer, info);
+            listeModeles.getChildren().add(ligneModele);
+        }
+    }
+
+    private void afficherAlerte(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        dialogPane.getStyleClass().add("fenetre-details");
+
+        alert.showAndWait();
+    }
+
+    public void rafraichirListePlanetes(VBox listePlanete, Canvas canvas) {
+        listePlanete.getChildren().clear();
+
+        for (Planete p : simulation.getPlanetes()) {
+            HBox lignePlanete = new HBox(10);
+            lignePlanete.setAlignment(Pos.CENTER_LEFT);
+
+            Text info = new Text(p.getNom());
+            info.setFill(Color.LIGHTGRAY);
+            info.setOnMouseClicked(ev -> ouvrirFenetreDetails(p, canvas));
+
+            Button btnSupprimer = new Button("X");
+            btnSupprimer.setStyle("-fx-background-color: #ff4444; -fx-font-size: 10;");
+
+            btnSupprimer.setOnAction(ev -> {
+                simulation.supprimerPlanete(p);
+                rafraichirListePlanetes(listePlanete, canvas);
+                nbPlanetesAvant = simulation.getPlanetes().size();
+            });
+
+            lignePlanete.getChildren().addAll(btnSupprimer, info);
+            listePlanete.getChildren().add(lignePlanete);
+        }
+    }
+
+    private void animationMenu(BorderPane menuComplet, Button btnMenu) {
+        boolean menuEstCache = !menuComplet.isVisible();
+
+        TranslateTransition animMenu = new TranslateTransition(Duration.millis(300), menuComplet);
+        TranslateTransition animBouton = new TranslateTransition(Duration.millis(300), btnMenu);
+
+        if (menuEstCache) {
+            menuComplet.setVisible(true);
+
+            animMenu.setFromX(250);
+            animMenu.setToX(0);
+
+            animBouton.setFromX(250);
+            animBouton.setToX(0);
+
+        } else {
+            animMenu.setFromX(0);
+            animMenu.setToX(250);
+
+            animBouton.setFromX(0);
+            animBouton.setToX(250);
+
+            animMenu.setOnFinished(event -> menuComplet.setVisible(false));
+        }
+
+        animMenu.play();
+        animBouton.play();
+    }
+
+    private void ouvrirFenetreDetails(Planete p, Canvas canvas) {
+        fenetreDetails.ouvrir(p, canvas);
+    }
+
+    public static TextFormatter<String> formateurNumerique(boolean accepterNegatif) {
+        String regex = accepterNegatif
+                ? "^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$"
+                : "^$|^(0|[1-9]\\d*)([.,]\\d*)?$";
+
+        return new TextFormatter<>(change ->
+                change.getControlNewText().matches(regex) ? change : null
+        );
+    }
+
+    public static TextFormatter<String> formateurAlphabetique() {
+        return new TextFormatter<>(change -> {
+            if (change.getControlNewText().length() <= 20) {
+                return change;
+            }
+            return null;
+        });
+    }
+
+    public void fermerToutesFenetres() {
+        fenetresOuvertes.values().forEach(Stage::close);
+    }
+
+    public Text getTexteTempsPasse() {
+        return this.texteTempsPasse;
+    }
+
+    public VBox getListePlanete() {
+        return listePlanete;
+    }
+
+    public Canvas getCanvasPrincipal() {
+        return canvasPrincipal;
+    }
+}

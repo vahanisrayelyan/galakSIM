@@ -49,10 +49,10 @@ public class Camera {
     }
 
     public void reinitialiser(String zoom1) {
-        if(zoom1 == null){
-        zoom = 1e-9;
-        }else{
-            zoom= Double.parseDouble(zoom1);
+        if (zoom1 == null) {
+            zoom = 1e-9;
+        } else {
+            zoom = Double.parseDouble(zoom1);
         }
         offsetX = 0;
         offsetY = 0;

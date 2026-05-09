@@ -148,6 +148,7 @@ public class Modeles {
                 ""
         );
     }
+
     public static void chargerCercle(Simulation simulation) {
         simulation.viderPlanetes();
         simulation.reinitialiserVue("1e-6");
@@ -182,6 +183,7 @@ public class Modeles {
                 ""
         );
     }
+
     public static void chargerTerreLune(Simulation simulation) {
         simulation.viderPlanetes();
         simulation.reinitialiserVue("1e-6");
@@ -248,7 +250,7 @@ public class Modeles {
         return new Image(Modeles.class.getResource(chemin).toExternalForm());
     }
 
-    public static void chargerTrouNoir (Simulation simulation){
+    public static void chargerTrouNoir(Simulation simulation) {
         simulation.viderPlanetes();
         simulation.reinitialiserVue("5.0e-7");
 
@@ -296,7 +298,6 @@ public class Modeles {
         } catch (Exception e) {
             return "Erreur de lecture : " + e.getMessage();
         }
-
         return contenu.toString().trim();
     }
 }
