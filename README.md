@@ -18,6 +18,11 @@ Le simulateur **galakSIM** permet d'explorer les mécaniques célestes avec une 
 * **Analyse de données :** Cliquez sur un astre pour afficher ses graphiques et ses constantes physiques.
 
 ### Physique
-C'est grâce à la loi universelle de la gravitation découverte par Isaac Newton, que le simulateur peut calculer les interractions entre les astres.
+C'est grâce à la loi universelle de la gravitation découverte par Isaac Newton, que le simulateur peut calculer les 
+interractions entre les astres.
 
 $F = G \frac{m_1 m_2}{d^2}$
+
+### Fonctionnement
+Quand on ouvre le programme, un panneau latéral contient tout ce qu'on doit savoir. Ajout d'une planète, gestion de 
+l'affichage, des planètes et du temps. En plus d'offrir des modèles et la possibilité d'enregistrer les nôtres.

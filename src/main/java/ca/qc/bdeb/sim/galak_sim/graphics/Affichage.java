@@ -493,6 +493,7 @@ public class Affichage {
         return btnVide;
     }
 
+    //Gestion de l'ajout d'une planète basé sur les informations reçues
     private void ajouterPlanete(MouseEvent e, Canvas canvas, TextField saisiVitesseX, TextField saisiVitesseY, TextField saisiMasse, TextField saisiNom, VBox listePlanete, ColorPicker choixColeurOrbite, CheckBox choixTrouNoir) {
         if (e.getButton() != MouseButton.PRIMARY) {
             return;
@@ -556,6 +557,7 @@ public class Affichage {
         saisiNom.clear();
     }
 
+    //Permet de créer une section dans le menu latéral
     private VBox creerSection(String titre, boolean ouvert, javafx.scene.Node... contenu) {
         VBox section = new VBox(5);
 
@@ -581,6 +583,7 @@ public class Affichage {
         return section;
     }
 
+    //Gestion de l'affichage des modèles dans le menu latéral
     private void rafraichirListeModeles(VBox listeModeles, VBox listePlanete, Canvas canvas) {
         listeModeles.getChildren().clear();
 
@@ -647,6 +650,7 @@ public class Affichage {
         alert.showAndWait();
     }
 
+    //Gestion de l'affichage des planètes dans le menu latéral
     public void rafraichirListePlanetes(VBox listePlanete, Canvas canvas) {
         listePlanete.getChildren().clear();
 
@@ -672,6 +676,7 @@ public class Affichage {
         }
     }
 
+    //Glissement du menu latéral
     private void animationMenu(BorderPane menuComplet, Button btnMenu) {
         boolean menuEstCache = !menuComplet.isVisible();
 
@@ -706,6 +711,7 @@ public class Affichage {
     }
 
     public static TextFormatter<String> formateurNumerique(boolean accepterNegatif) {
+        //Filtre l'entrée de chiffre négatif ou non
         String regex = accepterNegatif
                 ? "^-?$|^-?(0|[1-9]\\d*)([.,]\\d*)?$"
                 : "^$|^(0|[1-9]\\d*)([.,]\\d*)?$";

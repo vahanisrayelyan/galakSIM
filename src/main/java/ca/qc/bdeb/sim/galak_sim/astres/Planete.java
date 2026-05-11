@@ -212,9 +212,7 @@ public class Planete extends Astre {
         this.couleurOrbite = couleurOrbite;
     }
 
-    public boolean contientPointEcran(double xEcran, double yEcran,
-                                      Camera camera,
-                                      double largeurCanvas, double hauteurCanvas) {
+    public boolean contientPointEcran(double xEcran, double yEcran, Camera camera, double largeurCanvas, double hauteurCanvas) {
 
         Point2D posEcran = camera.mondeVersEcran(
                 position.getX(),

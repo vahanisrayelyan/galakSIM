@@ -97,7 +97,7 @@ public class Collision {
                 }
             }
         }
-        // Supprimation des planètes en collison
+        // Supression des planètes en collison
         listePlanetes.removeIf(aSupprimer::contains);
     }
 
