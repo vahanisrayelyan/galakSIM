@@ -28,8 +28,7 @@ public class Planete extends Astre {
             "/planetesAleatoires/planete8.png",
     };
 
-    public Planete(double x, double y, double vX, double vY, double taille, double masse,
-                   String nom, Image photo, Color couleurOrbite, String description) {
+    public Planete(double x, double y, double vX, double vY, double taille, double masse, String nom, Image photo, Color couleurOrbite, String description) {
         super(x, y, vX, vY, taille, masse);
 
         if (photo == null) {
@@ -59,9 +58,7 @@ public class Planete extends Astre {
         orbitePlanete.update(position.getX(), position.getY());
     }
 
-    public void draw(GraphicsContext contexte, Camera camera,
-                     double largeurCanvas, double hauteurCanvas,
-                     boolean afficherPrediction) {
+    public void draw(GraphicsContext contexte, Camera camera, double largeurCanvas, double hauteurCanvas, boolean afficherPrediction) {
 
         Point2D posEcran = camera.mondeVersEcran(
                 position.getX(),

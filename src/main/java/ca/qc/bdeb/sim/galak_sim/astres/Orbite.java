@@ -38,13 +38,7 @@ public class Orbite {
         orbitesPrediction.clear();
     }
 
-    public void draw(GraphicsContext contexte,
-                     Camera camera,
-                     double largeurCanvas,
-                     double hauteurCanvas,
-                     Color couleur,
-                     boolean afficherPointille) {
-
+    public void draw(GraphicsContext contexte, Camera camera, double largeurCanvas, double hauteurCanvas, Color couleur, boolean afficherPointille) {
         if (couleur == null) {
             couleur = Color.WHITE;
         }

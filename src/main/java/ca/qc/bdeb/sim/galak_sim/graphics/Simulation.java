@@ -46,6 +46,7 @@ public class Simulation {
     }
 
     public void update(double deltaTemps) {
+        tempsAccumule += deltaTemps;
         if (planetes.isEmpty()) {
             return;
         }
@@ -72,8 +73,6 @@ public class Simulation {
 
         vecteurs.setPlanete(planetes);
         camera.mettreAJourSuivi();
-
-        tempsAccumule += deltaTemps;
     }
 
     public void draw(GraphicsContext contexte) {

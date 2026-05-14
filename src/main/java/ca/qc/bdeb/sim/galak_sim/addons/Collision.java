@@ -93,7 +93,6 @@ public class Collision {
                         aSupprimer.add(pi);
                         aSupprimer.add(pj);
                     }
-
                 }
             }
         }

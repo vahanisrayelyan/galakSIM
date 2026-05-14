@@ -32,8 +32,7 @@ public class Camera {
         offsetY += dyEcran / zoom;
     }
 
-    public void zoomer(double facteurZoom, double sourisX, double sourisY,
-                       double largeurCanvas, double hauteurCanvas) {
+    public void zoomer(double facteurZoom, double sourisX, double sourisY, double largeurCanvas, double hauteurCanvas) {
         double ancienZoom = zoom;
         zoom *= facteurZoom;
         zoom = Math.max(1e-20, Math.min(zoom, 1e-1));
@@ -59,15 +58,13 @@ public class Camera {
         planeteSuivie = null;
     }
 
-    public Point2D ecranVersMonde(double xEcran, double yEcran,
-                                  double largeurCanvas, double hauteurCanvas) {
+    public Point2D ecranVersMonde(double xEcran, double yEcran, double largeurCanvas, double hauteurCanvas) {
         double xMonde = (xEcran - largeurCanvas / 2.0) / zoom - offsetX;
         double yMonde = (yEcran - hauteurCanvas / 2.0) / zoom - offsetY;
         return new Point2D(xMonde, yMonde);
     }
 
-    public Point2D mondeVersEcran(double xMonde, double yMonde,
-                                  double largeurCanvas, double hauteurCanvas) {
+    public Point2D mondeVersEcran(double xMonde, double yMonde, double largeurCanvas, double hauteurCanvas) {
         double xEcran = (xMonde + offsetX) * zoom + largeurCanvas / 2.0;
         double yEcran = (yMonde + offsetY) * zoom + hauteurCanvas / 2.0;
         return new Point2D(xEcran, yEcran);

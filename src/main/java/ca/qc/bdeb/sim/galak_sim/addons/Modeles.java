@@ -264,7 +264,7 @@ public class Modeles {
                 "Trou Noir",
                 null,
                 Color.PURPLE,
-                ""
+                lireDescription("trouNoir.txt")
         );
         trouNoir.setTrouNoir(true);
 

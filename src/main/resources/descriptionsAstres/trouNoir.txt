@@ -1,0 +1,8 @@
+En astrophysique, un trou noir est un objet céleste si compact que l'intensité de son champ gravitationnel empêche
+toute forme de matière ou de rayonnement de s'en échapper. De tels objets ne peuvent ni émettre, ni diffuser la
+lumière et sont donc noirs, ce qui en astronomie revient à dire qu'ils sont optiquement invisibles. Toutefois,
+plusieurs techniques d’observation indirecte dans différentes longueurs d'onde ont été mises au point et permettent
+d’étudier de nombreux phénomènes qu’ils induisent. En particulier, la matière happée par un trou noir est chauffée à
+des températures très élevées dans le disque d'accrétion et émet une quantité importante de rayons X, avant d’être
+« absorbée ».
+https://fr.wikipedia.org/wiki/Trou_noir
